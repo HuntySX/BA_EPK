@@ -1,4 +1,6 @@
-package com.company.Simulation;
+package com.company.Simulation.Data;
+
+import com.company.Enums.Quality;
 
 public class Item {
 

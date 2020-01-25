@@ -1,5 +1,7 @@
 package com.company.EPK;
 
+import com.company.Simulation.Instance.Simulation_Instance;
+
 import java.util.List;
 
 public abstract class Node {
@@ -31,6 +33,10 @@ public abstract class Node {
 
     public void setID(int ID) {
         this.ID = ID;
+    }
+
+    public void assing_Next_Elements(Simulation_Instance instance) {
+        instance.add_Next_Elements(this.Next_Elem);
     }
 
 

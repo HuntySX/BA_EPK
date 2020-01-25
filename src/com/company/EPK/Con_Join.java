@@ -1,23 +1,67 @@
 package com.company.EPK;
 
+import com.company.Enums.Contype;
+import com.company.Simulation.Instance.Simulation_Instance;
+import com.company.Simulation.Queues_Gates.Event_Gate;
+
 import java.util.List;
+
+import static com.company.Enums.Status.Active;
+import static com.company.Enums.Status.Scheduled;
 
 public class Con_Join extends Connector {
 
     private List<Node> Pre_Elem;
+    private Event_Gate Event_Gate;
 
-    public Con_Join(List<Node> Next_Elem, int ID, Contype type) {
-        super(Next_Elem, ID, type);
+    public Con_Join(List<Node> Next_Elem, int ID, Contype contype) {
+        super(Next_Elem, ID, contype);
+        Event_Gate = com.company.Simulation.Queues_Gates.Event_Gate.get_Event_Gate();
     }
 
+    public List<Node> getPre_Elem() {
+        return Pre_Elem;
+    }
 
-    public Node check_Previous_Elem() {
-        /* if Processinstanzlistenelemente != Pre_Elem
-        return getNext_Elem().get(0);
-            else
-            return null;
-         */
-        return null;
+    public void setPre_Elem(List<Node> pre_Elem) {
+        Pre_Elem = pre_Elem;
+    }
+
+    public void addPre_Elem(Node pre_Elem) {
+        Pre_Elem.add(pre_Elem);
+    }
+
+    public boolean check_Previous_Elem(Simulation_Instance instance) {
+
+        for (Node n : Pre_Elem) {
+            if (instance.getWorkflowMonitor().get_Elements().contains(n) &&
+                    (instance.getWorkflowMonitor().getStatus().get(instance.getWorkflowMonitor().get_Elements().indexOf(n)) == Active ||
+                            instance.getWorkflowMonitor().getStatus().get(instance.getWorkflowMonitor().get_Elements().indexOf(n)) == Scheduled))
+                ;
+            {
+                return false;
+            }
+        }
+        return true;
+
+       /* if(instance.getScheduled_Processes().isEmpty()) {
+            Event_Gate.getEvent_List().add_transport_Process(instance);
+        }
+
+        boolean finished = true;
+
+        for (Function f : instance.getScheduled_Processes()) {
+            for (Node p: Pre_Elem) {
+                if (f.getID() == p.getID()) {
+                    finished = false;
+                    break;
+                }
+            }
+        }
+
+        if (finished) {
+            Event_Gate.getEvent_List().add_transport_Process(instance);
+        }*/
     }
 
 }

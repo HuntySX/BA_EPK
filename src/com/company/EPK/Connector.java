@@ -1,27 +1,29 @@
 package com.company.EPK;
 
+import com.company.Enums.Contype;
+
 import java.util.List;
 
 public abstract class Connector extends Node {
 
-    private Contype type;
+    private Contype contype;
 
 
-    public Connector(List<Node> Next_Elem, int ID, Contype type) {
+    public Connector(List<Node> Next_Elem, int ID, Contype contype) {
         super(Next_Elem, ID);
-        this.type = type;
+        this.contype = contype;
 
     }
 
-    public Connector(Contype type) {
-        this.type = type;
+    public Connector(Contype contype) {
+        this.contype = contype;
     }
 
-    public Contype getType() {
-        return type;
+    public Contype getContype() {
+        return contype;
     }
 
-    public void setType(Contype type) {
-        this.type = type;
+    public void setContype(Contype contype) {
+        this.contype = contype;
     }
 }

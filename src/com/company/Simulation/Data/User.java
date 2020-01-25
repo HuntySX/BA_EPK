@@ -1,4 +1,4 @@
-package com.company.Simulation;
+package com.company.Simulation.Data;
 
 import com.company.EPK.Function;
 
@@ -9,14 +9,15 @@ public class User {
     private String last_Name;
     private int p_ID;
     private List<Function> allowed_Processes;
+    private boolean active;
+    private float efficiency;
 
-    //TODO User-Effizienz?
-
-
-    public User(String first_Name, String last_Name, int p_ID) {
+    public User(String first_Name, String last_Name, int p_ID, float efficiency) {
         this.first_Name = first_Name;
         this.last_Name = last_Name;
         this.p_ID = p_ID;
+        this.active = true;
+        this.efficiency = efficiency;
     }
 
     public User(String first_Name, String last_Name, int p_ID, List<Function> allowed_Processes) {
@@ -24,6 +25,7 @@ public class User {
         this.last_Name = last_Name;
         this.allowed_Processes = allowed_Processes;
         this.p_ID = p_ID;
+        this.active = true;
     }
 
     public String getFirst_Name() {
@@ -50,6 +52,14 @@ public class User {
         this.p_ID = p_ID;
     }
 
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+
     public List<Function> getAllowed_Processes() {
         return allowed_Processes;
     }
@@ -58,4 +68,11 @@ public class User {
         this.allowed_Processes = allowed_Processes;
     }
 
+    public float getEfficiency() {
+        return efficiency;
+    }
+
+    public void setEfficiency(float efficiency) {
+        this.efficiency = efficiency;
+    }
 }

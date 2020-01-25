@@ -1,4 +1,4 @@
-package com.company.Simulation;
+package com.company.Enums;
 
 public enum Quality {
     Low, Middle, High

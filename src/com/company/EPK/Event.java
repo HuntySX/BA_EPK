@@ -1,5 +1,7 @@
 package com.company.EPK;
 
+import com.company.Simulation.Instance.Simulation_Instance;
+
 import java.util.List;
 
 public class Event extends Node {
@@ -49,5 +51,19 @@ public class Event extends Node {
 
     }
 
+    public boolean is_Start_Event() {
+        return is_Start_Event;
+    }
 
+    public void setIs_Start_Event(boolean is_Start_Event) {
+        this.is_Start_Event = is_Start_Event;
+    }
+
+    public boolean is_End_Event() {
+        return is_End_Event;
+    }
+
+    public void setIs_End_Event(boolean is_End_Event) {
+        this.is_End_Event = is_End_Event;
+    }
 }

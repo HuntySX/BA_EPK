@@ -1,4 +1,6 @@
-package com.company.Simulation;
+package com.company.Simulation.Instance;
+
+import com.company.Simulation.Data.Item;
 
 public class Rep_Instance extends Simulation_Instance {
 

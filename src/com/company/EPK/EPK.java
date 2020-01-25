@@ -29,7 +29,6 @@ public class EPK {
     }
 
     public void Instance_Generator() {
-        //TODO Randomizer
     }
 
 }
