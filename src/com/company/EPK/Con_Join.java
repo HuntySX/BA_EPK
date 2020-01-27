@@ -12,11 +12,11 @@ import static com.company.Enums.Status.Scheduled;
 public class Con_Join extends Connector {
 
     private List<Node> Pre_Elem;
-    private Event_Gate Event_Gate;
+    private Event_Gate event_gate;
 
     public Con_Join(List<Node> Next_Elem, int ID, Contype contype) {
         super(Next_Elem, ID, contype);
-        Event_Gate = com.company.Simulation.Queues_Gates.Event_Gate.get_Event_Gate();
+        event_gate = Event_Gate.get_Event_Gate();
     }
 
     public List<Node> getPre_Elem() {
@@ -37,7 +37,6 @@ public class Con_Join extends Connector {
             if (instance.getWorkflowMonitor().get_Elements().contains(n) &&
                     (instance.getWorkflowMonitor().getStatus().get(instance.getWorkflowMonitor().get_Elements().indexOf(n)) == Active ||
                             instance.getWorkflowMonitor().getStatus().get(instance.getWorkflowMonitor().get_Elements().indexOf(n)) == Scheduled))
-                ;
             {
                 return false;
             }

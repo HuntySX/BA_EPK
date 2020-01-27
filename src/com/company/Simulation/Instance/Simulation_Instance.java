@@ -4,6 +4,7 @@ import com.company.EPK.Function;
 import com.company.EPK.Node;
 import com.company.Enums.Status;
 import com.company.Simulation.Data.Workflow_Monitor;
+import com.sun.corba.se.spi.orbutil.threadpool.Work;
 
 import java.util.List;
 import java.util.concurrent.locks.Lock;
@@ -25,7 +26,7 @@ public abstract class Simulation_Instance {
         this.Last_Elem = null;
         scheduled_Processes = null;
         this.case_ID = case_ID;
-        this.workflowMonitor = null;
+        this.workflowMonitor = new Workflow_Monitor();
     }
 
     public Status getAct_Status() {
@@ -75,8 +76,6 @@ public abstract class Simulation_Instance {
     public void add_Next_Elements(List<Node> next_elem) {
         this.Next_Elem.addAll(next_elem);
     }
-
-    ;
 
     public Workflow_Monitor getWorkflowMonitor() {
         return workflowMonitor;

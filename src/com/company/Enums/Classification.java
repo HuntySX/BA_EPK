@@ -1,5 +1,5 @@
 package com.company.Enums;
 
-public enum Quality {
+public enum Classification {
     Low, Middle, High
 }

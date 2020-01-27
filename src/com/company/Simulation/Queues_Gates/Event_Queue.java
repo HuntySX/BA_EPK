@@ -79,7 +79,7 @@ public class Event_Queue implements Runnable {
                             } else if (n instanceof Con_Join) {
                                 if (((Con_Join) n).check_Previous_Elem(transport_event)) {
                                     Workflow.getStatus().set(Workflow.get_Elements().indexOf(n), Finished);
-                                    List<Node> to_append = (((Con_Join) n).getNext_Elem());
+                                    List<Node> to_append = (n.getNext_Elem());
                                     to_append(to_append, transport_event);
                                 }
                             } else {

@@ -1,7 +1,6 @@
 package com.company.Run;
 
-import com.company.EPK.Function;
-import com.company.Enums.Quality;
+import com.company.Enums.Classification;
 import com.company.Simulation.Data.Item;
 import com.company.Simulation.Data.Warehouse;
 import com.company.Simulation.Queues_Gates.Warehouse_Gate;
@@ -9,14 +8,20 @@ import com.company.Simulation.Queues_Gates.Warehouse_Queue;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.locks.Lock;
+import java.util.Random;
 
 public class Main {
 
     public static void main(String[] args) {
 
-        Item Holz = new Item(1, "Holz", 0, Quality.Low);
+        Item Holz = new Item(1, "Holz", 0, 1.0f, Classification.Low);
         List<Item> items = new ArrayList<>();
+        Random random = new Random();
+        System.out.println(random.nextFloat());
+        System.out.println(random.nextFloat());
+        System.out.println(random.nextFloat());
+        System.out.println(random.nextFloat());
+        System.out.println(random.nextFloat());
         items.add(Holz);
         Warehouse w = new Warehouse(items, items);
         Warehouse_Gate gate = Warehouse_Gate.get_Warehouse_Gate();

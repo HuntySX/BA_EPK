@@ -39,4 +39,12 @@ public class Workflow_Monitor {
         Elements.add(node);
         Status.add(Elements.indexOf(node), status);
     }
+
+    public void change_Workflow_status(Node n, Status status) {
+        for (int i = 0; i < Elements.size(); i++) {
+            if (Elements.get(i).getID() == n.getID()) {
+                Status.set(i, status);
+            }
+        }
+    }
 }
