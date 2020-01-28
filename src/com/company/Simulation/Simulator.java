@@ -1,9 +1,8 @@
 package com.company.Simulation;
 
-import com.company.Enums.Classification;
 import com.company.Simulation.Data.Item;
-import com.company.Simulation.Instance.Buy_Instance;
 
+import java.time.temporal.TemporalAmount;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -108,5 +107,8 @@ public class Simulator {
         } else return 1f;
     }
 
+    public TemporalAmount get_OrderTime() {
+        return null;
+    }
 }
 

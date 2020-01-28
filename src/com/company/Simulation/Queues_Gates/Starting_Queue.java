@@ -1,8 +1,6 @@
 package com.company.Simulation.Queues_Gates;
 
-import com.company.Enums.Status;
 import com.company.Simulation.Data.Item;
-import com.company.Simulation.Data.Process_List;
 import com.company.Simulation.Instance.Buy_Instance;
 import com.company.Simulation.Instance.Order_Instance;
 import com.company.Simulation.Instance.Rep_Instance;
@@ -11,9 +9,8 @@ import com.company.Simulation.Simulator;
 
 import java.time.LocalTime;
 import java.util.*;
-import java.util.concurrent.SynchronousQueue;
 
-import static com.company.Enums.Status.Pending;
+import static com.company.Enums.Process_Status.Pending;
 
 public class Starting_Queue implements Runnable {
 

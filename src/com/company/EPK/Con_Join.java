@@ -6,8 +6,8 @@ import com.company.Simulation.Queues_Gates.Event_Gate;
 
 import java.util.List;
 
-import static com.company.Enums.Status.Active;
-import static com.company.Enums.Status.Scheduled;
+import static com.company.Enums.Process_Status.Active;
+import static com.company.Enums.Process_Status.Scheduled;
 
 public class Con_Join extends Connector {
 
@@ -35,9 +35,8 @@ public class Con_Join extends Connector {
 
         for (Node n : Pre_Elem) {
             if (instance.getWorkflowMonitor().get_Elements().contains(n) &&
-                    (instance.getWorkflowMonitor().getStatus().get(instance.getWorkflowMonitor().get_Elements().indexOf(n)) == Active ||
-                            instance.getWorkflowMonitor().getStatus().get(instance.getWorkflowMonitor().get_Elements().indexOf(n)) == Scheduled))
-            {
+                    (instance.getWorkflowMonitor().getProcess_Status().get(instance.getWorkflowMonitor().get_Elements().indexOf(n)) == Active ||
+                            instance.getWorkflowMonitor().getProcess_Status().get(instance.getWorkflowMonitor().get_Elements().indexOf(n)) == Scheduled)) {
                 return false;
             }
         }

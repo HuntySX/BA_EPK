@@ -2,18 +2,17 @@ package com.company.Simulation.Instance;
 
 import com.company.EPK.Function;
 import com.company.EPK.Node;
-import com.company.Enums.Status;
+import com.company.Enums.Process_Status;
 import com.company.Simulation.Data.Workflow_Monitor;
-import com.sun.corba.se.spi.orbutil.threadpool.Work;
 
 import java.util.List;
 import java.util.concurrent.locks.Lock;
 
-import static com.company.Enums.Status.Starting;
+import static com.company.Enums.Process_Status.Starting;
 
 public abstract class Simulation_Instance {
 
-    private Status act_Status;
+    private Process_Status act_Process_Status;
     private Node Last_Elem;
     private Workflow_Monitor workflowMonitor;
     private List<Function> scheduled_Processes;
@@ -22,19 +21,19 @@ public abstract class Simulation_Instance {
     private Lock Instance_lock;
 
     public Simulation_Instance(int case_ID) {
-        this.act_Status = Starting;
+        this.act_Process_Status = Starting;
         this.Last_Elem = null;
         scheduled_Processes = null;
         this.case_ID = case_ID;
         this.workflowMonitor = new Workflow_Monitor();
     }
 
-    public Status getAct_Status() {
-        return act_Status;
+    public Process_Status getAct_Process_Status() {
+        return act_Process_Status;
     }
 
-    public void setAct_Status(Status act_Status) {
-        this.act_Status = act_Status;
+    public void setAct_Process_Status(Process_Status act_Process_Status) {
+        this.act_Process_Status = act_Process_Status;
     }
 
     public List<Function> getScheduled_Processes() {

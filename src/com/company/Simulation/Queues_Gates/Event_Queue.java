@@ -1,14 +1,14 @@
 package com.company.Simulation.Queues_Gates;
 
 import com.company.EPK.*;
-import com.company.Enums.Status;
+import com.company.Enums.Process_Status;
 import com.company.Simulation.Data.Workflow_Monitor;
 import com.company.Simulation.Instance.Simulation_Instance;
 
 import java.util.List;
 import java.util.Timer;
 
-import static com.company.Enums.Status.*;
+import static com.company.Enums.Process_Status.*;
 
 public class Event_Queue implements Runnable {
 
@@ -68,22 +68,22 @@ public class Event_Queue implements Runnable {
                     Workflow_Monitor Workflow = transport_event.getWorkflowMonitor();
 
                     for (Node n : Workflow.get_Elements()) {
-                        Status status = Workflow.getStatus().get(Workflow.get_Elements().indexOf(n));
+                        Process_Status processStatus = Workflow.getProcess_Status().get(Workflow.get_Elements().indexOf(n));
 
-                        if (status == Pending) {
+                        if (processStatus == Pending) {
 
                             if (n instanceof Con_Split) {
-                                Workflow.getStatus().set(Workflow.get_Elements().indexOf(n), Finished);
+                                Workflow.getProcess_Status().set(Workflow.get_Elements().indexOf(n), Finished);
                                 List<Node> to_append = ((Con_Split) n).choose_Next(transport_event);
                                 to_append(to_append, transport_event);
                             } else if (n instanceof Con_Join) {
                                 if (((Con_Join) n).check_Previous_Elem(transport_event)) {
-                                    Workflow.getStatus().set(Workflow.get_Elements().indexOf(n), Finished);
+                                    Workflow.getProcess_Status().set(Workflow.get_Elements().indexOf(n), Finished);
                                     List<Node> to_append = (n.getNext_Elem());
                                     to_append(to_append, transport_event);
                                 }
                             } else {
-                                Workflow.getStatus().set(Workflow.get_Elements().indexOf(n), Finished);
+                                Workflow.getProcess_Status().set(Workflow.get_Elements().indexOf(n), Finished);
                                 List<Node> to_append = (n.getNext_Elem());
                                 to_append(to_append, transport_event);
                             }

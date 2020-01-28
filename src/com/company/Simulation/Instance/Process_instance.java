@@ -2,6 +2,8 @@ package com.company.Simulation.Instance;
 
 import com.company.EPK.Node;
 import com.company.Simulation.Data.User;
+import com.company.Simulation.Data.Warehouse;
+import com.company.Simulation.Queues_Gates.Warehouse_Gate;
 
 import java.util.function.Consumer;
 
@@ -10,6 +12,7 @@ public class Process_instance implements Runnable {
     private Node process;
     private Thread t;
     private Thread mother;
+    private Warehouse_Gate warehouse;
     private Simulation_Instance instance;
     private User user;
     private Consumer<Void> consumable;
@@ -21,6 +24,7 @@ public class Process_instance implements Runnable {
         this.consumable = consumable;
         this.mother = mother;
         this.process = process;
+        this.warehouse = Warehouse_Gate.get_Warehouse_Gate();
     }
 
     public Thread getT() {

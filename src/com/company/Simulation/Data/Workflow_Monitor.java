@@ -1,22 +1,22 @@
 package com.company.Simulation.Data;
 
 import com.company.EPK.Node;
-import com.company.Enums.Status;
+import com.company.Enums.Process_Status;
 
 import java.util.List;
 
 public class Workflow_Monitor {
     private List<Node> Elements;
-    private List<Status> Status;
+    private List<Process_Status> Process_Status;
 
-    public Workflow_Monitor(List<Node> next_Elem, List<Status> status) {
+    public Workflow_Monitor(List<Node> next_Elem, List<Process_Status> processStatuses) {
         this.Elements = next_Elem;
-        this.Status = status;
+        this.Process_Status = processStatuses;
     }
 
     public Workflow_Monitor() {
         this.Elements = null;
-        this.Status = null;
+        this.Process_Status = null;
     }
 
     public List<Node> get_Elements() {
@@ -27,23 +27,23 @@ public class Workflow_Monitor {
         this.Elements = next_Elem;
     }
 
-    public List<Status> getStatus() {
-        return Status;
+    public List<Process_Status> getProcess_Status() {
+        return Process_Status;
     }
 
-    public void setStatus(List<Status> status) {
-        this.Status = status;
+    public void setProcess_Status(List<Process_Status> process_Status) {
+        this.Process_Status = process_Status;
     }
 
-    public void add_Workflow(Node node, Status status) {
+    public void add_Workflow(Node node, Process_Status processStatus) {
         Elements.add(node);
-        Status.add(Elements.indexOf(node), status);
+        Process_Status.add(Elements.indexOf(node), processStatus);
     }
 
-    public void change_Workflow_status(Node n, Status status) {
+    public void change_Workflow_status(Node n, Process_Status processStatus) {
         for (int i = 0; i < Elements.size(); i++) {
             if (Elements.get(i).getID() == n.getID()) {
-                Status.set(i, status);
+                Process_Status.set(i, processStatus);
             }
         }
     }

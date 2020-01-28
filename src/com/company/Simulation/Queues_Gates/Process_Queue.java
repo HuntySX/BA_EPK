@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Timer;
 import java.util.function.Consumer;
 
-import static com.company.Enums.Status.*;
+import static com.company.Enums.Process_Status.*;
 
 public class Process_Queue implements Runnable {
 
@@ -50,7 +50,7 @@ public class Process_Queue implements Runnable {
                     if (!p.getT().isAlive()) {
                         try {
                             p.getT().join();
-                            p.getInstance().getWorkflowMonitor().getStatus().set
+                            p.getInstance().getWorkflowMonitor().getProcess_Status().set
                                     (p.getInstance().getWorkflowMonitor().get_Elements().indexOf(p.getProcess()), Pending);
                             p.getUser().setActive(false);
                         } catch (InterruptedException e) {
@@ -86,7 +86,7 @@ public class Process_Queue implements Runnable {
                     synchronized (instance) {
                         for (Node n : instance.getWorkflowMonitor().get_Elements()) {
                             if (n instanceof Function &&
-                                    instance.getWorkflowMonitor().getStatus().get(instance.getWorkflowMonitor().get_Elements().indexOf(n)) == Scheduled &&
+                                    instance.getWorkflowMonitor().getProcess_Status().get(instance.getWorkflowMonitor().get_Elements().indexOf(n)) == Scheduled &&
                                     user.getAllowed_Processes().contains(n)) {
                                 consumable = ((Function) n).getConsumableMethod();
                                 concurrency = ((Function) n).isConcurrently();
@@ -101,7 +101,7 @@ public class Process_Queue implements Runnable {
                         Process_instance process_instance = new Process_instance(Process_Queue, process_thread, instance, user, consumable, process);
 
                         synchronized (instance) {
-                            instance.getWorkflowMonitor().getStatus().set(instance.getWorkflowMonitor().get_Elements().indexOf(instance), Active);
+                            instance.getWorkflowMonitor().getProcess_Status().set(instance.getWorkflowMonitor().get_Elements().indexOf(instance), Active);
                         }
                         synchronized (user) {
                             user.setActive(true);
@@ -114,7 +114,7 @@ public class Process_Queue implements Runnable {
 
                         synchronized (instance) {
                             for (Node n : instance.getWorkflowMonitor().get_Elements()) {
-                                if (instance.getWorkflowMonitor().getStatus().get(instance.getWorkflowMonitor().get_Elements().indexOf(n)) == Scheduled) {
+                                if (instance.getWorkflowMonitor().getProcess_Status().get(instance.getWorkflowMonitor().get_Elements().indexOf(n)) == Scheduled) {
                                     synchronized (process_gate) {
                                         process_gate.getProcess_list().Schedule_Process(instance);
                                     }

@@ -1,21 +1,29 @@
 package com.company.Simulation.Data;
 
+import com.company.Exceptions.ItemNotListedException;
 import com.company.Exceptions.NotEnoughStockException;
 import com.company.Simulation.Data.Item;
 import com.company.Simulation.Instance.Order_Instance;
+import com.company.Simulation.Instance.Process_instance;
+import com.sun.deploy.security.SelectableSecurityManager;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import static javafx.scene.input.KeyCode.R;
 
 public class Warehouse {
 
     private List<Item> Stock;
     private List<Item> min_Stock;
     private List<Order_Instance> Ordered;
+    private Thread Resupply;
 
-    public Warehouse(List<Item> Stock, List<Item> min_Stock) {
+    public Warehouse(List<Item> Stock, List<Item> min_Stock, Thread resupply) {
         this.min_Stock = min_Stock;
         this.Stock = Stock;
         this.Ordered = null;
+        this.Resupply = resupply;
     }
 
     public List<Item> getStock() {
@@ -26,34 +34,48 @@ public class Warehouse {
         Stock = stock;
     }
 
-    public int getSingleStock(int i_ID) {
+    public int getSingleStock(int i_ID) throws ItemNotListedException {
 
         for (Item i : Stock) {
             if (i.getI_ID() == i_ID) {
                 return i.getQuantity();
             }
         }
-        {
-            throw new RuntimeException();
-        }
+        throw new ItemNotListedException("Gegenstand unbekannt.");
     }
 
-    public void setSingleStock(int i_ID, int Quantity) throws NotEnoughStockException {
+    public void supplySingleStock(int i_ID, int Quantity) {
 
-        for (Item item : Stock) {
-            if (item.getI_ID() == i_ID) {
-                if (item.getQuantity() + Quantity >= 0) {
-                    item.setQuantity(item.getQuantity() + Quantity);
+    }
+
+    public boolean takeSingleStock(Process_instance instance, List<Item> Order) throws NotEnoughStockException {
+        List<Item> result = new ArrayList<>();
+        for (Item order : Order) {
+            for (Item item : Stock) {
+                if (item.getI_ID() == order.getI_ID()) {
+                    Item min_supply = min_Stock.get(Stock.indexOf(item));
+                    if (item.getQuantity() - order.getQuantity() >= 0 && order.getQuantity() <= min_supply.getQuantity()) {
+                        item.setQuantity(item.getQuantity() - order.getQuantity());
+                        order.setQuantity(0);
+                        if (item.getQuantity() <= min_supply.getQuantity() / 2) {
+                            Resupply.notify();
+                            return true;
+                        }
+                    } else if (order.getQuantity() > min_supply.getQuantity()) {
+                        //large_Ordering(instance, Order);
+                        return false;
+                    } else {
+                        Resupply.notify();
+                        throw new NotEnoughStockException("Lager nicht ausreichend gefüllt, Bestellung durchführen");
+
+                    }
                     break;
-                } else {
-                    throw new NotEnoughStockException("Lager nicht ausreichend gefüllt, Bestellung durchführen");
                 }
-
             }
         }
-        //TODO If Quanity > 0 Throw Event
-
+        return true;
     }
+
 
     public List<Order_Instance> getOrdered() {
         return Ordered;
@@ -63,18 +85,6 @@ public class Warehouse {
         //TODO Große Bestellung durchführen wenn Bestellwert > Minwert.
         //Wenn Bestellung < Akt.Wert Bestellung abschicken und Process bestätigen
         //Sonst Bestellung Warten lassen.
-    }
-
-    public void Restock() {
-        //TODO Lager: aktuellwert+Orderwert <Min_wert-> Bestellung auslösen.
-        /*
-        if(Bestellung < Minwert && < akt.Wert)
-           Aus Lager entnehmen
-        else if (Bestellung < Minwert)
-            Throw new Not Enough Stock Exception
-        else
-            large Ordering();
-         */
     }
 
     public void setOrdered(List<Order_Instance> ordered) {
