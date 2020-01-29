@@ -1,26 +1,32 @@
 package com.company.Simulation.Data;
 
+import com.company.Enums.Order_Status;
 import com.company.Exceptions.ItemNotListedException;
 import com.company.Exceptions.NotEnoughStockException;
 import com.company.Simulation.Data.Item;
+import com.company.Simulation.Instance.Buy_Instance;
 import com.company.Simulation.Instance.Order_Instance;
 import com.company.Simulation.Instance.Process_instance;
-import com.sun.deploy.security.SelectableSecurityManager;
+import com.company.Simulation.Simulator;
 
+import java.time.LocalTime;
+import java.time.temporal.TemporalAmount;
 import java.util.ArrayList;
 import java.util.List;
 
-import static javafx.scene.input.KeyCode.R;
+import static com.company.Enums.Order_Status.*;
 
 public class Warehouse {
 
     private List<Item> Stock;
+    private Simulator simulator;
     private List<Item> min_Stock;
     private List<Order_Instance> Ordered;
     private Thread Resupply;
 
     public Warehouse(List<Item> Stock, List<Item> min_Stock, Thread resupply) {
         this.min_Stock = min_Stock;
+        this.simulator = Simulator.get_Simulator();
         this.Stock = Stock;
         this.Ordered = null;
         this.Resupply = resupply;
@@ -48,7 +54,36 @@ public class Warehouse {
 
     }
 
-    public boolean takeSingleStock(Process_instance instance, List<Item> Order) throws NotEnoughStockException {
+    public Order_Status takeSingleStock(Process_instance instance, Item i) {
+        for (Item to_get : Stock) {
+            if (to_get.getI_ID() == i.getI_ID()) {
+                Item min_supply = min_Stock.get(Stock.indexOf(to_get));
+                if (to_get.getQuantity() - i.getQuantity() >= 0 && i.getQuantity() <= min_supply.getQuantity()) {
+                    to_get.setQuantity(to_get.getQuantity() - i.getQuantity());
+                    if (to_get.getQuantity() <= min_supply.getQuantity() / 2) {
+                        Resupply.notify();
+
+                    }
+                    return Received;
+                } else if (i.getQuantity() > min_supply.getQuantity()) {
+                    return OrderWaiting;
+                } else {
+                    Resupply.notify();
+                    return Waiting;
+                }
+            }
+            break;
+        }
+        return null;
+    }
+
+    public void large_Ordering(Process_instance instance, List<Item> Order) {
+        LocalTime time = simulator.get_Big_OrderTime();
+        Order_Instance generate_Order = new Order_Instance(Simulator.get_Simulator().get_unique_caseID(), Order, time, false, instance.getInstance().getCase_ID());
+
+    }
+
+    /*public boolean takeSingleStock(Process_instance instance, List<Item> Order) throws NotEnoughStockException {
         List<Item> result = new ArrayList<>();
         for (Item order : Order) {
             for (Item item : Stock) {
@@ -74,7 +109,7 @@ public class Warehouse {
             }
         }
         return true;
-    }
+    }*/
 
 
     public List<Order_Instance> getOrdered() {
@@ -99,4 +134,11 @@ public class Warehouse {
         this.min_Stock = min_Stock;
     }
 
+    public void addSingleStock(Item i) {
+        for (Item s : Stock) {
+            if (s.getI_ID() == i.getI_ID()) {
+                s.setQuantity(s.getQuantity() + i.getQuantity());
+            }
+        }
+    }
 }

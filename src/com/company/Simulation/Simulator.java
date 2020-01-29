@@ -2,7 +2,12 @@ package com.company.Simulation;
 
 import com.company.Simulation.Data.Item;
 
+import java.time.Duration;
+import java.time.LocalTime;
+import java.time.Period;
+import java.time.temporal.Temporal;
 import java.time.temporal.TemporalAmount;
+import java.time.temporal.TemporalUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -107,8 +112,16 @@ public class Simulator {
         } else return 1f;
     }
 
-    public TemporalAmount get_OrderTime() {
-        return null;
+    public LocalTime get_OrderTime() {
+        LocalTime time = LocalTime.now();
+        time = time.plusMinutes(2);
+        return time;
+    }
+
+    public LocalTime get_Big_OrderTime() {
+        LocalTime time = LocalTime.now();
+        time = time.plusMinutes(3);
+        return time;
     }
 }
 

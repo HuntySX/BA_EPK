@@ -4,6 +4,8 @@ import com.company.EPK.EPK;
 import com.company.EPK.Function;
 import com.company.EPK.Node;
 import com.company.Simulation.Data.User;
+import com.company.Simulation.Instance.Buy_Instance;
+import com.company.Simulation.Instance.Order_Instance;
 import com.company.Simulation.Instance.Process_instance;
 import com.company.Simulation.Instance.Simulation_Instance;
 
@@ -43,18 +45,38 @@ public class Process_Queue implements Runnable {
             e.printStackTrace();
         }
         User user = null;
-
+        List<Process_instance> to_delete = new ArrayList<>();
         synchronized (active_Processes) {
             if (!active_Processes.isEmpty()) {
                 for (Process_instance p : active_Processes) {
-                    if (!p.getT().isAlive()) {
+                    if (!p.getT().isAlive() && p.isFinished()) {
                         try {
                             p.getT().join();
                             p.getInstance().getWorkflowMonitor().getProcess_Status().set
                                     (p.getInstance().getWorkflowMonitor().get_Elements().indexOf(p.getProcess()), Pending);
+                            Event_Gate.get_Event_Gate().getEvent_List().add_transport_Process(p.getInstance());
                             p.getUser().setActive(false);
+                            to_delete.add(p);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
+                        }
+                    }
+                    if (p.getInstance() instanceof Buy_Instance
+                            && p.getT().getState() == Thread.State.WAITING
+                            && p.getInstance().getWorkflowMonitor().getProcess_Status().get(p.getInstance().getWorkflowMonitor().get_Elements().indexOf(p.getProcess())) == Active
+                            && ((Buy_Instance) p.getInstance()).isFullfilled()) {
+
+                        synchronized (user_gate) {
+                            List<User> users = User_Gate.get_User_Gate().getUser_List();
+
+                            for (User u : users) {
+                                if (!u.isActive()) {
+                                    if (user.getAllowed_Processes().contains(p.getProcess())) {
+                                        user.setActive(true);
+                                        p.getT().notify();
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -125,6 +147,9 @@ public class Process_Queue implements Runnable {
                     }
                 }
             }
+        }
+        if (!to_delete.isEmpty()) {
+            active_Processes.removeAll(to_delete);
         }
     }
 }

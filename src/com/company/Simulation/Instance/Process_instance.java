@@ -12,6 +12,8 @@ public class Process_instance implements Runnable {
     private Node process;
     private Thread t;
     private Thread mother;
+    private boolean order_fullfilled;
+    private boolean finished;
     private Warehouse_Gate warehouse;
     private Simulation_Instance instance;
     private User user;
@@ -21,6 +23,8 @@ public class Process_instance implements Runnable {
         this.t = t;
         this.instance = instance;
         this.user = user;
+        this.order_fullfilled = false;
+        this.finished = false;
         this.consumable = consumable;
         this.mother = mother;
         this.process = process;
@@ -61,6 +65,22 @@ public class Process_instance implements Runnable {
 
     public Node getProcess() {
         return process;
+    }
+
+    public boolean isOrder_fullfilled() {
+        return order_fullfilled;
+    }
+
+    public void setOrder_fullfilled(boolean order_fullfilled) {
+        this.order_fullfilled = order_fullfilled;
+    }
+
+    public boolean isFinished() {
+        return finished;
+    }
+
+    public void setFinished(boolean finished) {
+        this.finished = finished;
     }
 
     @Override

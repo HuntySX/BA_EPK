@@ -1,16 +1,22 @@
 package com.company.Simulation.Queues_Gates;
 
+import com.company.Enums.Order_Status;
 import com.company.Exceptions.HugeOrderException;
 import com.company.Exceptions.NotEnoughStockException;
 import com.company.Simulation.Data.Item;
+import com.company.Simulation.Data.Order_Monitor;
 import com.company.Simulation.Data.Warehouse;
+import com.company.Simulation.Instance.Buy_Instance;
 import com.company.Simulation.Instance.Order_Instance;
 import com.company.Simulation.Instance.Process_instance;
 import com.company.Simulation.Instance.Simulation_Instance;
 
+import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
+
+import static com.company.Enums.Order_Status.*;
 
 public class Warehouse_Queue implements Runnable {
 
@@ -31,11 +37,71 @@ public class Warehouse_Queue implements Runnable {
         //TODO Threading Fürs auffüllen des Lagers. Evtl auch Bestellungen? eine Geteilte Liste zwischen Warehouse Gate /
         //TODO Bestellvergleich über die Warehousegate für großbestellungen Durchführen, jeweiligen Thread reaktivieren wenn Bestellung vorhanden.
 
+        List<Process_instance> arriving = null;
+        List<Process_instance> waiting = null;
+        List<Process_instance> to_delete = new ArrayList<>();
+
         synchronized (warehouse_gate) {
-            List<Process_instance> arriving = warehouse_gate.getArriving_Orders();
-            List<Process_instance> waiting = warehouse_gate.getWaiting_Orders();
-            List<Process_instance> to_delete = new ArrayList<>();
-            if (!arriving.isEmpty()) {
+            arriving = warehouse_gate.getArriving_Orders();
+            waiting = warehouse_gate.getWaiting_Orders();
+        }
+        for (Process_instance arrive : arriving) {
+            if (!(((Order_Instance) arrive.getInstance()).isGeneral_Stock())) {
+                for (Process_instance wait : waiting) {
+                    if (wait.getInstance().getCase_ID() == ((Order_Instance) arrive.getInstance()).getFor_caseID()) {
+                        List<Item> Ordered_Items = ((Buy_Instance) wait.getInstance()).getBuy_Items();
+                        for (Item i : Ordered_Items) {
+                            if (((Buy_Instance) wait.getInstance()).getOrder_Monitor().get_Single_Status(i) == OrderWaiting) {
+                                ((Buy_Instance) wait.getInstance()).getOrder_Monitor().change_Status(i, Received);
+                            }
+                        }
+                        to_delete.add(arrive);
+                        break;
+                    }
+                }
+            } else {
+                List<Item> arriving_Items = ((Order_Instance) arrive.getInstance()).getOrdered_Items();
+                for (Item i : arriving_Items) {
+                    getWarehouse().addSingleStock(i);
+                }
+                to_delete.add(arrive);
+            }
+
+        }
+        if (!to_delete.isEmpty()) {
+            arriving.removeAll(to_delete);
+        }
+
+
+        if (!waiting.isEmpty()) {
+            for (Process_instance instance : waiting) {
+                List<Item> Big_Order = new ArrayList<>();
+                Order_Monitor Monitor = ((Buy_Instance) instance.getInstance()).getOrder_Monitor();
+                for (Item i : Monitor.getOrders()) {
+                    if (Monitor.get_Single_Status(i) == Unchecked || Monitor.get_Single_Status(i) == Waiting) {
+                        Order_Status status = getWarehouse().takeSingleStock(instance, i);
+                        if (status == Received) {
+                            Monitor.change_Status(i, Received);
+                        } else if (status == OrderWaiting) {
+                            Monitor.change_Status(i, OrderWaiting);
+                            Big_Order.add(i);
+                        } else if (status == Waiting) {
+                            Monitor.change_Status(i, Waiting);
+
+                        }
+                    }
+                }
+                if (!Big_Order.isEmpty()) {
+                    getWarehouse().large_Ordering(instance, Big_Order);
+
+                }
+            }
+        }
+
+        for (Process_instance instance : waiting) {
+            check_and_Notify_Threads(instance);
+        }
+            /*if (!arriving.isEmpty()) {
                 for (Process_instance a : arriving) {
                     synchronized (a) {
                         if (((Order_Instance) a.getInstance()).isGeneral_Stock()) {
@@ -66,6 +132,16 @@ public class Warehouse_Queue implements Runnable {
             }
 
         }
+    }*/
+    }
+
+    private void check_and_Notify_Threads(Process_instance instance) {
+        for (Order_Status status : ((Buy_Instance) instance.getInstance()).getOrder_Monitor().getOrder_Status()) {
+            if (status != Received) {
+                return;
+            }
+        }
+        instance.getT().notify();
     }
 
     public Thread getT() {

@@ -6,6 +6,8 @@ import com.company.Simulation.Data.Warehouse;
 import com.company.Simulation.Queues_Gates.Warehouse_Gate;
 import com.company.Simulation.Queues_Gates.Warehouse_Queue;
 
+import java.time.Duration;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -23,11 +25,17 @@ public class Main {
         System.out.println(random.nextFloat());
         System.out.println(random.nextFloat());
         items.add(Holz);
-        Warehouse w = new Warehouse(items, items);
+        Warehouse w = new Warehouse(items, items, null);
         Warehouse_Gate gate = Warehouse_Gate.get_Warehouse_Gate();
         gate.setWarehouse(w);
         Warehouse_Queue Q = new Warehouse_Queue();
         Q.getT().start();
+
+        LocalTime time = LocalTime.now();
+        System.out.println("TIME NOW: " + time);
+        Duration dur = Duration.ofMinutes(2);
+        time = time.plusMinutes(2);
+        System.out.println("TIME THEN: " + time);
 
 
 

@@ -72,9 +72,7 @@ public class Resupply_Warehouse_Queue implements Runnable {
         Simulation_Instance instance;
 
         synchronized (simulator) {
-            LocalTime time = LocalTime.now();
-            TemporalAmount toAdd = simulator.get_OrderTime();
-            time.plus(toAdd);
+            LocalTime time = simulator.get_OrderTime();
             instance = new Order_Instance(simulator.get_unique_caseID(), orders, time, true);
         }
         synchronized (starting_gate) {
