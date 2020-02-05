@@ -4,16 +4,19 @@ import com.company.Simulation.Data.Process_List;
 import com.company.Simulation.Data.Starting_List;
 
 import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class Process_Gate {
 
     private static Process_Gate process_gate;
-    private Process_List process_list;
-    private Lock lock;
+    private static Process_List process_list;
+    private static Lock lock;
 
     public static Process_Gate getProcess_gate() {
         if (process_gate == null) {
             process_gate = new Process_Gate();
+            process_list = new Process_List();
+            lock = new ReentrantLock();
         }
         return process_gate;
     }
@@ -23,10 +26,10 @@ public class Process_Gate {
     }
 
     public synchronized void setProcess_list(Process_List process_list) {
-        this.process_list = process_list;
+        Process_Gate.process_list = process_list;
     }
 
-    public Lock getLock() {
+    public synchronized Lock getLock() {
         return lock;
     }
 }

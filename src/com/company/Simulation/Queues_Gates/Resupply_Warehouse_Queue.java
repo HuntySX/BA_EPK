@@ -19,11 +19,15 @@ public class Resupply_Warehouse_Queue implements Runnable {
     private Simulator simulator;
     private Thread t;
 
-    public Resupply_Warehouse_Queue(Thread t, List<Item> min_Stock) {
+    public Resupply_Warehouse_Queue(Simulator simulator) {
         this.warehouse_gate = Warehouse_Gate.get_Warehouse_Gate();
         this.starting_gate = Starting_Gate.getStarting_gate();
-        this.simulator = Simulator.get_Simulator();
-        this.min_stock = min_Stock;
+        this.simulator = simulator;
+        this.min_stock = warehouse_gate.getWarehouse().getMin_Stock();
+        this.t = null;
+    }
+
+    public void setT(Thread t) {
         this.t = t;
     }
 
@@ -32,12 +36,13 @@ public class Resupply_Warehouse_Queue implements Runnable {
     }
 
     @Override
-    public void run() {
+    public synchronized void run() {
 
         List<Item> orders;
         try {
-            t.wait();
+            wait();
         } catch (InterruptedException e) {
+            e.printStackTrace();
         }
 
         synchronized (warehouse_gate) {

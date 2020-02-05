@@ -2,6 +2,7 @@ package com.company.Simulation.Data;
 
 import com.company.Simulation.Instance.Simulation_Instance;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Process_List {
@@ -12,7 +13,7 @@ public class Process_List {
     }
 
     public Process_List() {
-        Working_List = null;
+        Working_List = new ArrayList<>();
     }
 
     public synchronized List<Simulation_Instance> getWorking_List() {

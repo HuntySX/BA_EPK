@@ -7,6 +7,7 @@ import com.company.Simulation.Data.Workflow_Monitor;
 
 import java.util.List;
 import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import static com.company.Enums.Process_Status.Starting;
 
@@ -26,6 +27,7 @@ public abstract class Simulation_Instance {
         scheduled_Processes = null;
         this.case_ID = case_ID;
         this.workflowMonitor = new Workflow_Monitor();
+        Instance_lock = new ReentrantLock();
     }
 
     public Process_Status getAct_Process_Status() {

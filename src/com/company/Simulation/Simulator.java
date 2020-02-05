@@ -17,21 +17,17 @@ import static com.company.Enums.Classification.Middle;
 
 public class Simulator {
 
-    private static Simulator simulator;
     private int case_ID;
     private List<Item> all_Items;
 
-
-    private Simulator() {
-        all_Items = new ArrayList<>();
-        case_ID = 0;
+    public Simulator() {
+        this.all_Items = new ArrayList<>();
+        this.case_ID = 0;
     }
 
-    public static Simulator get_Simulator() {
-        if (simulator == null) {
-            simulator = new Simulator();
-        }
-        return simulator;
+    public Simulator(int case_ID, List<Item> all_Items) {
+        this.case_ID = case_ID;
+        this.all_Items = all_Items;
     }
 
     public int get_unique_caseID() {
@@ -46,7 +42,7 @@ public class Simulator {
     public Item generate_singleRandomItem() {
         Random random = new Random();
         if (!all_Items.isEmpty()) {
-            Item item = all_Items.get(random.nextInt(all_Items.size() - 1));
+            Item item = all_Items.get(random.nextInt(all_Items.size()));
             float Quality = generate_Quality();
             Item new_Item = new Item(item.getI_ID(), item.getItem_Name(), 1, Quality, item.getClassification());
             return item;
@@ -60,11 +56,15 @@ public class Simulator {
         List<Item> result = new ArrayList<>();
         List<Item> worklist = new ArrayList<>();
         List<Item> list = new ArrayList<>(all_Items);
+        if (distinct_item_counter == 0) {
+            List<Item> oneresult = new ArrayList<>(all_Items);
+            return oneresult;
+        }
         while (distinct_item_counter > 0) {
             int i = list.size();
             int index = random.nextInt(i);
             worklist.add(list.get(index));
-            list.remove(i);
+            list.remove(index);
             distinct_item_counter--;
         }
         for (Item item : worklist) {
@@ -114,14 +114,13 @@ public class Simulator {
 
     public LocalTime get_OrderTime() {
         LocalTime time = LocalTime.now();
-        time = time.plusMinutes(2);
+        time = time.plusMinutes(3);
         return time;
     }
 
     public LocalTime get_Big_OrderTime() {
         LocalTime time = LocalTime.now();
-        time = time.plusMinutes(3);
+        time = time.plusSeconds(3);
         return time;
     }
 }
-

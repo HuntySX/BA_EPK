@@ -3,6 +3,7 @@ package com.company.Simulation.Data;
 import com.company.EPK.Node;
 import com.company.Enums.Process_Status;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Workflow_Monitor {
@@ -15,8 +16,8 @@ public class Workflow_Monitor {
     }
 
     public Workflow_Monitor() {
-        this.Elements = null;
-        this.Process_Status = null;
+        this.Elements = new ArrayList<>();
+        this.Process_Status = new ArrayList<>();
     }
 
     public List<Node> get_Elements() {

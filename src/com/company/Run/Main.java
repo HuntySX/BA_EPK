@@ -1,22 +1,28 @@
 package com.company.Run;
 
+import com.company.EPK.*;
 import com.company.Enums.Classification;
+import com.company.Enums.Contype;
 import com.company.Simulation.Data.Item;
 import com.company.Simulation.Data.Warehouse;
 import com.company.Simulation.Queues_Gates.Warehouse_Gate;
 import com.company.Simulation.Queues_Gates.Warehouse_Queue;
 
+import java.io.FileNotFoundException;
 import java.time.Duration;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.function.Consumer;
 
 public class Main {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException, FileNotFoundException {
 
-        Item Holz = new Item(1, "Holz", 0, 1.0f, Classification.Low);
+        Generator gen = new Generator();
+        gen.instantiate();
+        /*Item Holz = new Item(1, "Holz", 0, 1.0f, Classification.Low);
         List<Item> items = new ArrayList<>();
         Random random = new Random();
         System.out.println(random.nextFloat());
@@ -41,11 +47,13 @@ public class Main {
 
 
 
-       /*//TODO Prozess Instanzieren Hier!
+       //TODO Prozess Instanzieren Hier!
 
         System.out.println("Hello World");
         Function f = new Function();
         f.setFunction_tag("Hello A");
-        System.out.println(f.toString());*/
+        System.out.println(f.toString());
+        */
+
     }
 }

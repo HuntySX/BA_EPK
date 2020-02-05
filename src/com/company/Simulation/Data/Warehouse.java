@@ -7,6 +7,7 @@ import com.company.Simulation.Data.Item;
 import com.company.Simulation.Instance.Buy_Instance;
 import com.company.Simulation.Instance.Order_Instance;
 import com.company.Simulation.Instance.Process_instance;
+import com.company.Simulation.Queues_Gates.Warehouse_Gate;
 import com.company.Simulation.Simulator;
 
 import java.time.LocalTime;
@@ -14,6 +15,7 @@ import java.time.temporal.TemporalAmount;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.company.Enums.Classification.*;
 import static com.company.Enums.Order_Status.*;
 
 public class Warehouse {
@@ -24,12 +26,24 @@ public class Warehouse {
     private List<Order_Instance> Ordered;
     private Thread Resupply;
 
-    public Warehouse(List<Item> Stock, List<Item> min_Stock, Thread resupply) {
+    public Warehouse(List<Item> Stock, List<Item> min_Stock, Simulator simulator) {
         this.min_Stock = min_Stock;
-        this.simulator = Simulator.get_Simulator();
+        this.simulator = simulator;
         this.Stock = Stock;
         this.Ordered = null;
-        this.Resupply = resupply;
+        this.Resupply = null;
+    }
+
+    public Warehouse(Simulator simulator) {
+        this.min_Stock = new ArrayList<>();
+        this.simulator = simulator;
+        this.Stock = new ArrayList<>();
+        this.Ordered = null;
+        this.Resupply = null;
+    }
+
+    public void setResupply(Thread resupply) {
+        Resupply = resupply;
     }
 
     public List<Item> getStock() {
@@ -50,10 +64,6 @@ public class Warehouse {
         throw new ItemNotListedException("Gegenstand unbekannt.");
     }
 
-    public void supplySingleStock(int i_ID, int Quantity) {
-
-    }
-
     public Order_Status takeSingleStock(Process_instance instance, Item i) {
         for (Item to_get : Stock) {
             if (to_get.getI_ID() == i.getI_ID()) {
@@ -66,6 +76,7 @@ public class Warehouse {
                     }
                     return Received;
                 } else if (i.getQuantity() > min_supply.getQuantity()) {
+                    Warehouse_Gate.get_Warehouse_Gate().add_waiting_Orders(instance);
                     return OrderWaiting;
                 } else {
                     Resupply.notify();
@@ -79,7 +90,7 @@ public class Warehouse {
 
     public void large_Ordering(Process_instance instance, List<Item> Order) {
         LocalTime time = simulator.get_Big_OrderTime();
-        Order_Instance generate_Order = new Order_Instance(Simulator.get_Simulator().get_unique_caseID(), Order, time, false, instance.getInstance().getCase_ID());
+        Order_Instance generate_Order = new Order_Instance(simulator.get_unique_caseID(), Order, time, false, instance.getInstance().getCase_ID());
 
     }
 
@@ -116,12 +127,6 @@ public class Warehouse {
         return Ordered;
     }
 
-    public void large_Ordering() {
-        //TODO Große Bestellung durchführen wenn Bestellwert > Minwert.
-        //Wenn Bestellung < Akt.Wert Bestellung abschicken und Process bestätigen
-        //Sonst Bestellung Warten lassen.
-    }
-
     public void setOrdered(List<Order_Instance> ordered) {
         Ordered = ordered;
     }
@@ -140,5 +145,20 @@ public class Warehouse {
                 s.setQuantity(s.getQuantity() + i.getQuantity());
             }
         }
+    }
+
+    public void AddDistinctToStock(Item i) {
+        int quantity;
+        if (i.getClassification() == Low) {
+            quantity = 150;
+        } else if (i.getClassification() == Middle) {
+            quantity = 60;
+        } else {
+            quantity = 5;
+        }
+        Item add_newStock = new Item(i.getI_ID(), i.getItem_Name(), quantity, i.getQuality(), i.getClassification());
+        min_Stock.add(add_newStock);
+        Stock.add(add_newStock);
+
     }
 }

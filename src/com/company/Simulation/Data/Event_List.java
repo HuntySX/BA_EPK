@@ -2,6 +2,7 @@ package com.company.Simulation.Data;
 
 import com.company.Simulation.Instance.Simulation_Instance;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.locks.Lock;
 
@@ -14,7 +15,7 @@ public class Event_List {
     }
 
     public Event_List() {
-        this.transport_List = null;
+        this.transport_List = new ArrayList<>();
     }
 
     public Lock getLock() {

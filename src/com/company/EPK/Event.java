@@ -42,6 +42,7 @@ public class Event extends Node {
     }
 
 
+
     //Allgemeiner Standart Konstruktor
     public Event(List<Node> Next_Elem, int ID, String Event_Tag, boolean is_Start_Event, boolean is_End_Event) {
         super(Next_Elem, ID);
@@ -66,4 +67,6 @@ public class Event extends Node {
     public void setIs_End_Event(boolean is_End_Event) {
         this.is_End_Event = is_End_Event;
     }
+
+
 }

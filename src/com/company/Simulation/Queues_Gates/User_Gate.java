@@ -2,18 +2,22 @@ package com.company.Simulation.Queues_Gates;
 
 import com.company.Simulation.Data.User;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class User_Gate {
 
     private static User_Gate user_gate;
-    private List<User> User_List;
-    private java.util.concurrent.locks.Lock user_Lock;
+    private static List<User> User_List;
+    private static java.util.concurrent.locks.Lock user_Lock;
 
     public static User_Gate get_User_Gate() {
         if (user_gate == null) {
             user_gate = new User_Gate();
+            User_List = new ArrayList<>();
+            user_Lock = new ReentrantLock();
         }
         return user_gate;
     }

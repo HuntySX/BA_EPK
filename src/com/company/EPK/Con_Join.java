@@ -16,7 +16,7 @@ public class Con_Join extends Connector {
 
     public Con_Join(List<Node> Next_Elem, int ID, Contype contype) {
         super(Next_Elem, ID, contype);
-        event_gate = Event_Gate.get_Event_Gate();
+        //event_gate = Event_Gate.get_Event_Gate();
     }
 
     public List<Node> getPre_Elem() {
@@ -61,5 +61,6 @@ public class Con_Join extends Connector {
             Event_Gate.getEvent_List().add_transport_Process(instance);
         }*/
     }
+
 
 }

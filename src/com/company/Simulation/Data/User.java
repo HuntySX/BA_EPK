@@ -25,7 +25,7 @@ public class User {
         this.last_Name = last_Name;
         this.allowed_Processes = allowed_Processes;
         this.p_ID = p_ID;
-        this.active = true;
+        this.active = false;
     }
 
     public String getFirst_Name() {

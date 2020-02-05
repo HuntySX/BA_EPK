@@ -2,14 +2,19 @@ package com.company.Simulation.Queues_Gates;
 
 import com.company.Simulation.Data.Event_List;
 
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
 public class Event_Gate {
     private static Event_Gate event_gate;
-    private Event_List event_List;
-    private java.util.concurrent.locks.Lock event_Lock;
+    private static Event_List event_List;
+    private static java.util.concurrent.locks.Lock event_Lock;
 
     public static Event_Gate get_Event_Gate() {
         if (event_gate == null) {
             event_gate = new Event_Gate();
+            event_List = new Event_List();
+            event_Lock = new ReentrantLock();
         }
         return event_gate;
     }
@@ -18,11 +23,11 @@ public class Event_Gate {
         return event_List;
     }
 
-    public java.util.concurrent.locks.Lock getEvent_Lock() {
+    public synchronized java.util.concurrent.locks.Lock getEvent_Lock() {
         return event_Lock;
     }
 
     public synchronized void setEvent_List(Event_List event_List) {
-        this.event_List = event_List;
+        Event_Gate.event_List = event_List;
     }
 }
