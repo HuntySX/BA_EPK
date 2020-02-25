@@ -1,7 +1,5 @@
 package com.company.EPK;
 
-import com.company.Simulation.Instance.Simulation_Instance;
-
 import java.util.List;
 
 public class Event extends Node {

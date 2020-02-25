@@ -1,10 +1,9 @@
 package com.company.EPK;
 
 import com.company.Enums.Function_Type;
-import com.company.Simulation.Instance.Process_instance;
+import com.company.Simulation.Simulation_Base.Threading_Instance.Process_instance;
 
 import java.util.List;
-import java.util.concurrent.locks.Lock;
 import java.util.function.Consumer;
 
 public class Function extends Node {

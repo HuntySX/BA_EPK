@@ -2,16 +2,12 @@ package com.company.EPK;
 
 import com.company.Enums.Contype;
 import com.company.Enums.Split_Status;
-import com.company.Simulation.Instance.Buy_Instance;
-import com.company.Simulation.Instance.Process_instance;
-import com.company.Simulation.Instance.Rep_Instance;
-import com.company.Simulation.Instance.Simulation_Instance;
+import com.company.Simulation.Simulation_Base.Threading_Instance.Simulation_Instance;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.function.BiFunction;
-import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public class Con_Split extends Connector {
