@@ -1,7 +1,7 @@
 package com.company.Simulation.Simulation_Threading;
 
-import com.company.Simulation.Simulation_Base.Data.Warehouse;
-import com.company.Simulation.Simulation_Base.Threading_Instance.Process_instance;
+import com.company.Simulation.Simulation_Base.Data.Threading_Data.Warehouse;
+import com.company.Simulation.Simulation_Base.Data.Threading_Data.Process_instance;
 
 import java.util.ArrayList;
 import java.util.List;

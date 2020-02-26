@@ -1,4 +1,4 @@
-package com.company.Simulation.Simulation_Base.Data;
+package com.company.Simulation.Simulation_Base.Data.Shared_Data;
 
 import com.company.EPK.Node;
 import com.company.Enums.Process_Status;

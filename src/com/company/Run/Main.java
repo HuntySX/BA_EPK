@@ -6,7 +6,7 @@ public class Main {
 
     public static void main(String[] args) throws InterruptedException, FileNotFoundException {
 
-        Generator gen = new Generator();
+        Threading_Generator gen = new Threading_Generator();
         gen.instantiate();
         /*Item Holz = new Item(1, "Holz", 0, 1.0f, Classification.Low);
         List<Item> items = new ArrayList<>();

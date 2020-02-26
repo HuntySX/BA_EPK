@@ -1,9 +1,8 @@
 package com.company.Simulation.Simulation_Threading;
 
-import com.company.Simulation.Simulation_Base.Data.Item;
-import com.company.Simulation.Simulation_Base.Threading_Instance.Order_Instance;
-import com.company.Simulation.Simulation_Base.Threading_Instance.Simulation_Instance;
-import com.company.Simulation.Simulator;
+import com.company.Simulation.Simulation_Base.Data.Threading_Data.Item;
+import com.company.Simulation.Simulation_Base.Data.Threading_Data.Order_Instance;
+import com.company.Simulation.Simulation_Base.Data.Shared_Data.Simulation_Instance;
 
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -14,13 +13,13 @@ public class Resupply_Warehouse_Queue implements Runnable {
     private Warehouse_Gate warehouse_gate;
     private Starting_Gate starting_gate;
     private List<Item> min_stock;
-    private Simulator simulator;
+    private Threading_Simulator threadingSimulator;
     private Thread t;
 
-    public Resupply_Warehouse_Queue(Simulator simulator) {
+    public Resupply_Warehouse_Queue(Threading_Simulator threadingSimulator) {
         this.warehouse_gate = Warehouse_Gate.get_Warehouse_Gate();
         this.starting_gate = Starting_Gate.getStarting_gate();
-        this.simulator = simulator;
+        this.threadingSimulator = threadingSimulator;
         this.min_stock = warehouse_gate.getWarehouse().getMin_Stock();
         this.t = null;
     }
@@ -74,9 +73,9 @@ public class Resupply_Warehouse_Queue implements Runnable {
     private void resupply(List<Item> orders) {
         Simulation_Instance instance;
 
-        synchronized (simulator) {
-            LocalTime time = simulator.get_OrderTime();
-            instance = new Order_Instance(simulator.get_unique_caseID(), orders, time, true);
+        synchronized (threadingSimulator) {
+            LocalTime time = threadingSimulator.get_OrderTime();
+            instance = new Order_Instance(threadingSimulator.get_unique_caseID(), orders, time, true);
         }
         synchronized (starting_gate) {
             starting_gate.getStarting_order().add_Starting_Instance(instance);

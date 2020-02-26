@@ -1,18 +1,18 @@
-package com.company.Simulation.Simulation_Base.Data;
+package com.company.Simulation.Simulation_Base.Data.Threading_Data;
 
-import com.company.Simulation.Simulation_Base.Threading_Instance.Simulation_Instance;
+import com.company.Simulation.Simulation_Base.Data.Shared_Data.Simulation_Instance;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class Starting_List {
+public class Threading_Starting_List {
     private List<Simulation_Instance> Starting_Instances;
 
-    public Starting_List(List<Simulation_Instance> starting_Instances) {
+    public Threading_Starting_List(List<Simulation_Instance> starting_Instances) {
         Starting_Instances = starting_Instances;
     }
 
-    public Starting_List() {
+    public Threading_Starting_List() {
         Starting_Instances = new ArrayList<>();
     }
 

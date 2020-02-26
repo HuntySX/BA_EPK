@@ -1,10 +1,11 @@
-package com.company.Simulation.Simulation_Base.Threading_Instance;
+package com.company.Simulation.Simulation_Base.Data.Threading_Data;
 
 import com.company.EPK.Function;
 import com.company.EPK.Node;
 import com.company.Enums.Function_Type;
 import com.company.Enums.Process_Status;
-import com.company.Simulation.Simulation_Base.Data.User;
+import com.company.Simulation.Simulation_Base.Data.Shared_Data.Simulation_Instance;
+import com.company.Simulation.Simulation_Base.Data.Shared_Data.User;
 import com.company.Simulation.Simulation_Threading.Printer_Gate;
 import com.company.Simulation.Simulation_Threading.Warehouse_Gate;
 

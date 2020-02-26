@@ -1,6 +1,6 @@
-package com.company.Simulation;
+package com.company.Simulation.Simulation_Threading;
 
-import com.company.Simulation.Simulation_Base.Data.Item;
+import com.company.Simulation.Simulation_Base.Data.Threading_Data.Item;
 
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -10,17 +10,17 @@ import java.util.Random;
 import static com.company.Enums.Classification.Low;
 import static com.company.Enums.Classification.Middle;
 
-public class Simulator {
+public class Threading_Simulator {
 
     private int case_ID;
     private List<Item> all_Items;
 
-    public Simulator() {
+    public Threading_Simulator() {
         this.all_Items = new ArrayList<>();
         this.case_ID = 0;
     }
 
-    public Simulator(int case_ID, List<Item> all_Items) {
+    public Threading_Simulator(int case_ID, List<Item> all_Items) {
         this.case_ID = case_ID;
         this.all_Items = all_Items;
     }

@@ -2,8 +2,8 @@ package com.company.Simulation.Simulation_Threading;
 
 import com.company.EPK.*;
 import com.company.Enums.Process_Status;
-import com.company.Simulation.Simulation_Base.Data.Workflow_Monitor;
-import com.company.Simulation.Simulation_Base.Threading_Instance.Simulation_Instance;
+import com.company.Simulation.Simulation_Base.Data.Shared_Data.Workflow_Monitor;
+import com.company.Simulation.Simulation_Base.Data.Shared_Data.Simulation_Instance;
 
 
 import java.time.LocalTime;

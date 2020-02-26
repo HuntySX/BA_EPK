@@ -1,12 +1,12 @@
 package com.company.Simulation.Simulation_Threading;
 
 import com.company.Enums.Order_Status;
-import com.company.Simulation.Simulation_Base.Data.Item;
-import com.company.Simulation.Simulation_Base.Data.Order_Monitor;
-import com.company.Simulation.Simulation_Base.Data.Warehouse;
-import com.company.Simulation.Simulation_Base.Threading_Instance.Buy_Instance;
-import com.company.Simulation.Simulation_Base.Threading_Instance.Order_Instance;
-import com.company.Simulation.Simulation_Base.Threading_Instance.Process_instance;
+import com.company.Simulation.Simulation_Base.Data.Threading_Data.Item;
+import com.company.Simulation.Simulation_Base.Data.Threading_Data.Order_Monitor;
+import com.company.Simulation.Simulation_Base.Data.Threading_Data.Warehouse;
+import com.company.Simulation.Simulation_Base.Data.Threading_Data.Buy_Instance;
+import com.company.Simulation.Simulation_Base.Data.Threading_Data.Order_Instance;
+import com.company.Simulation.Simulation_Base.Data.Threading_Data.Process_instance;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,8 +32,6 @@ public class Warehouse_Queue implements Runnable {
 
 
     public synchronized void run() {
-        //TODO Threading Fürs auffüllen des Lagers. Evtl auch Bestellungen? eine Geteilte Liste zwischen Warehouse Gate /
-        //TODO Bestellvergleich über die Warehousegate für großbestellungen Durchführen, jeweiligen Thread reaktivieren wenn Bestellung vorhanden.
         while (not_killed) {
             List<Process_instance> arriving = null;
             List<Process_instance> waiting = null;

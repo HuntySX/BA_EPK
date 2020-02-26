@@ -3,10 +3,10 @@ package com.company.Simulation.Simulation_Threading;
 import com.company.EPK.EPK;
 import com.company.EPK.Function;
 import com.company.EPK.Node;
-import com.company.Simulation.Simulation_Base.Data.User;
-import com.company.Simulation.Simulation_Base.Threading_Instance.Buy_Instance;
-import com.company.Simulation.Simulation_Base.Threading_Instance.Process_instance;
-import com.company.Simulation.Simulation_Base.Threading_Instance.Simulation_Instance;
+import com.company.Simulation.Simulation_Base.Data.Shared_Data.User;
+import com.company.Simulation.Simulation_Base.Data.Threading_Data.Buy_Instance;
+import com.company.Simulation.Simulation_Base.Data.Threading_Data.Process_instance;
+import com.company.Simulation.Simulation_Base.Data.Shared_Data.Simulation_Instance;
 
 import java.util.ArrayList;
 import java.util.List;

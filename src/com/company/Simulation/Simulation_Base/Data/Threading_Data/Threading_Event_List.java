@@ -1,20 +1,20 @@
-package com.company.Simulation.Simulation_Base.Data;
+package com.company.Simulation.Simulation_Base.Data.Threading_Data;
 
-import com.company.Simulation.Simulation_Base.Threading_Instance.Simulation_Instance;
+import com.company.Simulation.Simulation_Base.Data.Shared_Data.Simulation_Instance;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.locks.Lock;
 
-public class Event_List {
+public class Threading_Event_List {
     private List<Simulation_Instance> transport_List;
     public java.util.concurrent.locks.Lock Lock;
 
-    public Event_List(List<Simulation_Instance> transport_List) {
+    public Threading_Event_List(List<Simulation_Instance> transport_List) {
         this.transport_List = transport_List;
     }
 
-    public Event_List() {
+    public Threading_Event_List() {
         this.transport_List = new ArrayList<>();
     }
 

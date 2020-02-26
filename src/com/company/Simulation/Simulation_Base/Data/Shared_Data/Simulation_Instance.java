@@ -1,9 +1,9 @@
-package com.company.Simulation.Simulation_Base.Threading_Instance;
+package com.company.Simulation.Simulation_Base.Data.Shared_Data;
 
 import com.company.EPK.Function;
 import com.company.EPK.Node;
 import com.company.Enums.Process_Status;
-import com.company.Simulation.Simulation_Base.Data.Workflow_Monitor;
+import com.company.Simulation.Simulation_Base.Data.Shared_Data.Workflow_Monitor;
 
 import java.util.List;
 import java.util.concurrent.locks.Lock;
@@ -86,3 +86,4 @@ public abstract class Simulation_Instance {
         this.workflowMonitor = workflowMonitors;
     }
 }
+

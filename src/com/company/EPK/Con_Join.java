@@ -1,7 +1,7 @@
 package com.company.EPK;
 
 import com.company.Enums.Contype;
-import com.company.Simulation.Simulation_Base.Threading_Instance.Simulation_Instance;
+import com.company.Simulation.Simulation_Base.Data.Shared_Data.Simulation_Instance;
 import com.company.Simulation.Simulation_Threading.Event_Gate;
 
 import java.util.List;

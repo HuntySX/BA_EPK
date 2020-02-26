@@ -1,12 +1,11 @@
 package com.company.Simulation.Simulation_Threading;
 
 import com.company.EPK.EPK;
-import com.company.Simulation.Simulation_Base.Data.Item;
-import com.company.Simulation.Simulation_Base.Threading_Instance.Buy_Instance;
-import com.company.Simulation.Simulation_Base.Threading_Instance.Order_Instance;
-import com.company.Simulation.Simulation_Base.Threading_Instance.Rep_Instance;
-import com.company.Simulation.Simulation_Base.Threading_Instance.Simulation_Instance;
-import com.company.Simulation.Simulator;
+import com.company.Simulation.Simulation_Base.Data.Threading_Data.Item;
+import com.company.Simulation.Simulation_Base.Data.Threading_Data.Buy_Instance;
+import com.company.Simulation.Simulation_Base.Data.Threading_Data.Order_Instance;
+import com.company.Simulation.Simulation_Base.Data.Threading_Data.Rep_Instance;
+import com.company.Simulation.Simulation_Base.Data.Shared_Data.Simulation_Instance;
 
 import java.time.LocalTime;
 import java.util.*;
@@ -18,17 +17,17 @@ public class Starting_Queue implements Runnable {
     private Starting_Gate starting_gate;
     private Event_Gate event_gate;
     private Random random;
-    private final Simulator simulator;
+    private final Threading_Simulator threadingSimulator;
     private final EPK epk;
     private Thread SQ;
     private boolean not_killed;
 
-    public Starting_Queue(Simulator simulator, EPK epk) {
+    public Starting_Queue(Threading_Simulator threadingSimulator, EPK epk) {
         this.event_gate = Event_Gate.get_Event_Gate();
         this.starting_gate = Starting_Gate.getStarting_gate();
         this.SQ = null;
         this.random = new Random();
-        this.simulator = simulator;
+        this.threadingSimulator = threadingSimulator;
         this.not_killed = true;
         this.epk = epk;
     }
@@ -62,7 +61,6 @@ public class Starting_Queue implements Runnable {
                     //synchronized (order_List) {
                     Iterator<Simulation_Instance> o = order_List.iterator();
                     while (o.hasNext()) {
-                        //TODO Iterator check
                         Simulation_Instance instance = o.next();
                         if (((Order_Instance) instance).getTime().isBefore(LocalTime.now())) {
                             //synchronized (Starting_Gate.getStarting_gate()) {
@@ -101,9 +99,9 @@ public class Starting_Queue implements Runnable {
         int iD;
         Item rep_Item;
 
-        synchronized (simulator) {
-            iD = simulator.get_unique_caseID();
-            rep_Item = simulator.generate_singleRandomItem();
+        synchronized (threadingSimulator) {
+            iD = threadingSimulator.get_unique_caseID();
+            rep_Item = threadingSimulator.generate_singleRandomItem();
         }
         Rep_Instance rep = new Rep_Instance(iD, rep_Item);
         synchronized (Starting_Gate.getStarting_gate()) {
@@ -122,9 +120,9 @@ public class Starting_Queue implements Runnable {
         int iD;
         List<Item> buy_Items;
 
-        synchronized (simulator) {
-            iD = simulator.get_unique_caseID();
-            buy_Items = simulator.generate_severalRandomItems();
+        synchronized (threadingSimulator) {
+            iD = threadingSimulator.get_unique_caseID();
+            buy_Items = threadingSimulator.generate_severalRandomItems();
         }
         Buy_Instance buy = new Buy_Instance(iD, buy_Items);
         synchronized (Starting_Gate.getStarting_gate()) {

@@ -1,11 +1,9 @@
-package com.company.Simulation.Simulation_Base.Data;
+package com.company.Simulation.Simulation_Base.Data.Threading_Data;
 
 import com.company.Enums.Order_Status;
 import com.company.Exceptions.ItemNotListedException;
-import com.company.Simulation.Simulation_Base.Threading_Instance.Order_Instance;
-import com.company.Simulation.Simulation_Base.Threading_Instance.Process_instance;
 import com.company.Simulation.Simulation_Threading.Warehouse_Gate;
-import com.company.Simulation.Simulator;
+import com.company.Simulation.Simulation_Threading.Threading_Simulator;
 
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -17,22 +15,22 @@ import static com.company.Enums.Order_Status.*;
 public class Warehouse {
 
     private List<Item> Stock;
-    private Simulator simulator;
+    private Threading_Simulator threadingSimulator;
     private List<Item> min_Stock;
     private List<Order_Instance> Ordered;
     private Thread Resupply;
 
-    public Warehouse(List<Item> Stock, List<Item> min_Stock, Simulator simulator) {
+    public Warehouse(List<Item> Stock, List<Item> min_Stock, Threading_Simulator threadingSimulator) {
         this.min_Stock = min_Stock;
-        this.simulator = simulator;
+        this.threadingSimulator = threadingSimulator;
         this.Stock = Stock;
         this.Ordered = null;
         this.Resupply = null;
     }
 
-    public Warehouse(Simulator simulator) {
+    public Warehouse(Threading_Simulator threadingSimulator) {
         this.min_Stock = new ArrayList<>();
-        this.simulator = simulator;
+        this.threadingSimulator = threadingSimulator;
         this.Stock = new ArrayList<>();
         this.Ordered = null;
         this.Resupply = null;
@@ -85,8 +83,8 @@ public class Warehouse {
     }
 
     public void large_Ordering(Process_instance instance, List<Item> Order) {
-        LocalTime time = simulator.get_Big_OrderTime();
-        Order_Instance generate_Order = new Order_Instance(simulator.get_unique_caseID(), Order, time, false, instance.getInstance().getCase_ID());
+        LocalTime time = threadingSimulator.get_Big_OrderTime();
+        Order_Instance generate_Order = new Order_Instance(threadingSimulator.get_unique_caseID(), Order, time, false, instance.getInstance().getCase_ID());
 
     }
 

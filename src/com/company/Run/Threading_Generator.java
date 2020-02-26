@@ -5,16 +5,15 @@ import com.company.Enums.Classification;
 import com.company.Enums.Contype;
 import com.company.Enums.Function_Type;
 import com.company.Enums.Split_Status;
-import com.company.Simulation.Simulation_Base.Data.Item;
-import com.company.Simulation.Simulation_Base.Data.User;
-import com.company.Simulation.Simulation_Base.Data.Warehouse;
-import com.company.Simulation.Simulation_Base.Threading_Instance.Buy_Instance;
-import com.company.Simulation.Simulation_Base.Threading_Instance.Process_instance;
-import com.company.Simulation.Simulation_Base.Threading_Instance.Rep_Instance;
-import com.company.Simulation.Simulation_Base.Threading_Instance.Simulation_Instance;
+import com.company.Simulation.Simulation_Base.Data.Threading_Data.Item;
+import com.company.Simulation.Simulation_Base.Data.Shared_Data.User;
+import com.company.Simulation.Simulation_Base.Data.Threading_Data.Warehouse;
+import com.company.Simulation.Simulation_Base.Data.Threading_Data.Buy_Instance;
+import com.company.Simulation.Simulation_Base.Data.Threading_Data.Process_instance;
+import com.company.Simulation.Simulation_Base.Data.Threading_Data.Rep_Instance;
+import com.company.Simulation.Simulation_Base.Data.Shared_Data.Simulation_Instance;
 import com.company.Simulation.Simulation_Threading.*;
-import com.company.Simulation.Simulation_Threading.Queues_Gates.*;
-import com.company.Simulation.Simulator;
+import com.company.Simulation.Simulation_Threading.Threading_Simulator;
 
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -24,9 +23,9 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-public class Generator {
+public class Threading_Generator {
 
-    public Generator() {
+    public Threading_Generator() {
 
     }
 
@@ -429,7 +428,7 @@ public class Generator {
         Item i4 = new Item(4, "Kommode", 0, 1f, Classification.Middle);
         Item i5 = new Item(5, "Schrank", 0, 1f, Classification.High);
 
-        Simulator sim = new Simulator();
+        Threading_Simulator sim = new Threading_Simulator();
         sim.add_newItem(i1);
         sim.add_newItem(i2);
         sim.add_newItem(i3);

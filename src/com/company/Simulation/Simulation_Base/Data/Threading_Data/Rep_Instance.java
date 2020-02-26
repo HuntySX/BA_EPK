@@ -1,6 +1,7 @@
-package com.company.Simulation.Simulation_Base.Threading_Instance;
+package com.company.Simulation.Simulation_Base.Data.Threading_Data;
 
-import com.company.Simulation.Simulation_Base.Data.Item;
+import com.company.Simulation.Simulation_Base.Data.Shared_Data.Simulation_Instance;
+import com.company.Simulation.Simulation_Base.Data.Threading_Data.Item;
 
 public class Rep_Instance extends Simulation_Instance {
 

@@ -1,6 +1,6 @@
 package com.company.Simulation.Simulation_Threading;
 
-import com.company.Simulation.Simulation_Base.Data.User;
+import com.company.Simulation.Simulation_Base.Data.Shared_Data.User;
 
 import java.util.ArrayList;
 import java.util.List;

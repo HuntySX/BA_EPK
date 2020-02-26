@@ -1,7 +1,7 @@
 package com.company.EPK;
 
 import com.company.Enums.Function_Type;
-import com.company.Simulation.Simulation_Base.Threading_Instance.Process_instance;
+import com.company.Simulation.Simulation_Base.Data.Threading_Data.Process_instance;
 
 import java.util.List;
 import java.util.function.Consumer;
