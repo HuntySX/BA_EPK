@@ -33,8 +33,6 @@ public class Main {
 
 
 
-       //TODO Prozess Instanzieren Hier!
-
         System.out.println("Hello World");
         Function f = new Function();
         f.setFunction_tag("Hello A");

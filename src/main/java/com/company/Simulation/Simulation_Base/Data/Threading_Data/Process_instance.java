@@ -6,7 +6,7 @@ import com.company.Enums.Function_Type;
 import com.company.Enums.Process_Status;
 import com.company.Simulation.Simulation_Base.Data.Shared_Data.Simulation_Instance;
 import com.company.Simulation.Simulation_Base.Data.Shared_Data.User;
-import com.company.Simulation.Simulation_Threading.Printer_Gate;
+import com.company.Simulation.Simulation_Base.Data.Printer_Gate;
 import com.company.Simulation.Simulation_Threading.Warehouse_Gate;
 
 import java.time.LocalTime;

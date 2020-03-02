@@ -3,6 +3,8 @@ package com.company.Simulation.Simulation_Discrete_Event;
 import com.company.Simulation.Simulation_Base.Data.Discrete_Data.Event_Instance;
 import com.company.Simulation.Simulation_Base.Data.Discrete_Data.Simulation_Event_List;
 import com.company.Simulation.Simulation_Base.Data.Discrete_Data.Simulation_Waiting_List;
+import com.company.Simulation.Simulation_Base.Data.Shared_Data.Settings;
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 import java.time.LocalTime;
 
@@ -14,10 +16,10 @@ public class Event_Calendar {
     private Simulation_Event_List Upcoming_List;
     private Simulation_Waiting_List Waiting_List;
 
-    public Event_Calendar(LocalTime begin_Time, LocalTime end_Time) {
-        Begin_Time = begin_Time;
-        End_Time = end_Time;
-        runtime = begin_Time;
+    public Event_Calendar(Settings settings) {
+        Begin_Time = settings.getBeginTime();
+        End_Time = settings.getEndTime();
+        runtime = settings.getBeginTime();
         Waiting_List = new Simulation_Waiting_List();
         Upcoming_List = new Simulation_Event_List();
     }
@@ -48,5 +50,12 @@ public class Event_Calendar {
 
     public Event_Instance calculate_Next_Event() {
         return null;
+    }
+
+    public void fillCalendar() {
+
+        DescriptiveStatistics descriptiveStatistics = new DescriptiveStatistics();
+
+
     }
 }

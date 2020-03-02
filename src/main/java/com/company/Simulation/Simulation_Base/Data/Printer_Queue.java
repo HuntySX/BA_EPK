@@ -1,4 +1,4 @@
-package com.company.Simulation.Simulation_Threading;
+package com.company.Simulation.Simulation_Base.Data;
 
 import com.company.Print.Print_File;
 import com.google.gson.Gson;
@@ -16,7 +16,7 @@ public class Printer_Queue implements Runnable {
     private FileOutputStream output;
     private boolean not_killed;
 
-    public Printer_Queue() throws FileNotFoundException {
+    public Printer_Queue() {
         printer_gate = Printer_Gate.get_Printer_Gate();
         not_killed = true;
         this.t = null;
