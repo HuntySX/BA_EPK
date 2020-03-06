@@ -1,20 +1,26 @@
 package com.company.Simulation.Simulation_Base.Data.Discrete_Data;
 
+import com.company.EPK.Function;
 import com.company.Simulation.Simulation_Base.Data.Shared_Data.User;
 
 import java.util.List;
 
 public class Resource {
+    private int r_ID;
     private String name;
     private int count;
     private List<User> Allowed_Users;
+    private List<Function> Used_In;
 
-    public Resource(String name, int count) {
+
+    public Resource(String name, int count, int r_ID) {
+        this.r_ID = r_ID;
         this.name = name;
         this.count = count;
     }
 
-    public Resource(String name, int count, List<User> allowed_Users) {
+    public Resource(String name, int count, List<User> allowed_Users, int r_ID) {
+        this.r_ID = r_ID;
         this.name = name;
         this.count = count;
         Allowed_Users = allowed_Users;
@@ -40,7 +46,24 @@ public class Resource {
         return Allowed_Users;
     }
 
+    public void add_Used_In(Function Func) {
+        if (!Used_In.contains(Func)) {
+            Used_In.add(Func);
+        }
+        if (!Func.getNeeded_Resources().contains(this)) {
+            Func.Add_Needed_Resource(this);
+        }
+    }
+
     public void setAllowed_Users(List<User> allowed_Users) {
         Allowed_Users = allowed_Users;
+    }
+
+    public List<Function> getUsed_In() {
+        return Used_In;
+    }
+
+    public int getID() {
+        return r_ID;
     }
 }

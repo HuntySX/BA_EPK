@@ -46,11 +46,11 @@ public class Starting_Queue implements Runnable {
 
     public synchronized void run() {
         while (not_killed) {
-            try {
-                wait(1000);
+           /* try {
+                wait(30000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
-            }
+            }*/
 
             List<Simulation_Instance> order_List;
             synchronized (Starting_Gate.getStarting_gate()) {
@@ -79,7 +79,7 @@ public class Starting_Queue implements Runnable {
                 //TODO Timing vom Instance chooser.
                 //TODO IF Else Auflösen.
                 try {
-                    wait(20000);
+                    wait(2);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }

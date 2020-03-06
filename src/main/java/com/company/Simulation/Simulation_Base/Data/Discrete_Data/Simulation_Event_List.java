@@ -1,46 +1,57 @@
 package com.company.Simulation.Simulation_Base.Data.Discrete_Data;
 
+import com.company.EPK.Function;
+import com.company.EPK.Node;
+
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 
 public class Simulation_Event_List {
-    private List<Event_Instance> Event_List;
+
+    private List<Instance_Workflow> Workflows;
 
     public Simulation_Event_List() {
-        Event_List = new ArrayList<>();
+        Workflows = new ArrayList<>();
     }
 
-    public void addTimedEvent(Event_Instance event) {
-        if (Event_List.isEmpty()) {
-            Event_List.add(event);
+    public void addTimedEvent(Instance_Workflow event, LocalTime time, Node node) {
+        Instance_Workflow workflow = new Instance_Workflow(event.getInstance(), time, node);
+        if (Workflows.isEmpty()) {
+            Workflows.add(workflow);
         } else {
-            ListIterator iter = Event_List.listIterator();
+            ListIterator iter = Workflows.listIterator();
             while (iter.hasNext()) {
-                Event_Instance List_Event = (Event_Instance) iter.next();
-                if (List_Event.getTime().isAfter(event.getTime())) {
+                Instance_Workflow List_Workflow = (Instance_Workflow) iter.next();
+                if (List_Workflow.getTo_Start().isAfter(workflow.getTo_Start())) {
                     iter.previous();
-                    iter.add(event);
+                    iter.add(workflow);
                     break;
                 }
             }
         }
     }
 
-    public List<Event_Instance> getByTime(LocalTime time) {
+    public List<Instance_Workflow> getByTime(LocalTime time) {
 
-        ListIterator iter = Event_List.listIterator();
-        List<Event_Instance> result = new ArrayList<>();
+        ListIterator iter = Workflows.listIterator();
+        List<Instance_Workflow> result = new ArrayList<>();
         while (iter.hasNext()) {
-            Event_Instance List_Event = (Event_Instance) iter.next();
-            if (List_Event.getTime().isAfter(time)) {
+            Instance_Workflow List_Workflow = (Instance_Workflow) iter.next();
+            if (List_Workflow.getTo_Start().isAfter(time)) {
                 break;
             } else {
-                result.add(List_Event);
+                result.add(List_Workflow);
             }
         }
         return result;
+    }
+
+    public void remove_from_EventList(Instance_Workflow Instance) {
+        if (Workflows.contains(Instance)) {
+            Workflows.remove(Instance);
+        }
     }
 
     public boolean TimeEquals(LocalTime event_Time, LocalTime time) {

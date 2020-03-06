@@ -1,6 +1,7 @@
 package com.company.Run;
 
 import com.company.EPK.EPK;
+import com.company.Simulation.Simulation_Base.Data.Discrete_Data.Bib.Event_Decider;
 import com.company.Simulation.Simulation_Base.Data.Discrete_Data.Loader.EPK_Loader;
 import com.company.Simulation.Simulation_Base.Data.Discrete_Data.Loader.Resource_Loader;
 import com.company.Simulation.Simulation_Base.Data.Discrete_Data.Loader.Settings_Loader;
@@ -11,7 +12,7 @@ import com.company.Simulation.Simulation_Base.Data.Shared_Data.User;
 import com.company.Simulation.Simulation_Discrete_Event.Discrete_Event_Simulator;
 import com.company.Simulation.Simulation_Base.Data.Printer_Gate;
 import com.company.Simulation.Simulation_Base.Data.Printer_Queue;
-import com.company.Simulation.Simulation_Discrete_Event.Event_Calendar;
+import com.company.Simulation.Simulation_Base.Data.Discrete_Data.Event_Calendar;
 
 import java.util.List;
 
@@ -29,16 +30,19 @@ public class Discrete_Event_Generator {
     private List<Resource> Resources;
     private Discrete_Event_Simulator Simulation;
     private Event_Calendar event_Calendar;
+    private Event_Decider event_decider;
 
     public Discrete_Event_Generator(String EPK_file, String Setting_file, String User_file, String Resource_file) {
         this.EPK_loader = new EPK_Loader(EPK_file);
         this.Settings_loader = new Settings_Loader(Setting_file);
         this.User_loader = new User_Loader(User_file);
+        //TODO Workforce hier an Functionen / User Binden?
         this.Resource_loader = new Resource_Loader(Resource_file);
         this.EPK = null;
         this.Simulation = null;
         this.printer_Queue = new Printer_Queue();
         this.printer_Gate = Printer_Gate.get_Printer_Gate();
+        this.event_decider = null;
         Thread T = new Thread();
         printer_Queue.setT(T);
     }
@@ -49,11 +53,10 @@ public class Discrete_Event_Generator {
         this.Users = User_loader.generate_User_List();
         this.Resources = Resource_loader.generate_Resources();
         this.event_Calendar = new Event_Calendar(Settings);
+        this.event_decider = new Event_Decider(Settings, Users, Resources);
         event_Calendar.fillCalendar();
         this.Simulation = new Discrete_Event_Simulator(this);
     }
-
-    ;
 
     public void run() {
         Simulation.run();
@@ -81,6 +84,10 @@ public class Discrete_Event_Generator {
 
     public Event_Calendar getEvent_Calendar() {
         return event_Calendar;
+    }
+
+    public Event_Decider getEvent_Decider() {
+        return event_decider;
     }
 
     //TODO Erstelle hier EPK Objekt und füttere dieses mit dem Graphen

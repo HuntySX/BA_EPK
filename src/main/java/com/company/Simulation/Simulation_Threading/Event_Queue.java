@@ -62,7 +62,7 @@ public class Event_Queue implements Runnable {
 
         while (not_killed) {
             try {
-                wait(1000);
+                wait(2);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -70,8 +70,9 @@ public class Event_Queue implements Runnable {
             Simulation_Instance transport_event = null;
             synchronized (Event_Gate.get_Event_Gate().getEvent_Lock()) {
                 List<Simulation_Instance> transport_list = Event_Gate.get_Event_Gate().getEvent_List().getTransport_List();
-                if (!transport_list.isEmpty()) {
-                    synchronized (transport_list.get(0).getInstance_lock()) {
+                synchronized (Event_Gate.get_Event_Gate().getEvent_Lock()) {
+                    if (!transport_list.isEmpty()) {
+
                         transport_event = transport_list.get(0);
                         transport_list.remove(transport_event);
                     }

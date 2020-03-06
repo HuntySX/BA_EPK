@@ -49,7 +49,7 @@ public class Process_Queue implements Runnable {
         while (not_killed) {
             synchronized (lock) {
                 try {
-                    lock.wait(1000);
+                    lock.wait(2);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -114,19 +114,19 @@ public class Process_Queue implements Runnable {
                                     Consumer<Process_instance> consumable = null;
                                     boolean concurrency = false;
                                     Node process = null;
-                                    // synchronized (instance) {
-                                    for (Node n : instance.getWorkflowMonitor().get_Elements()) {
-                                        if (n instanceof Function &&
-                                                instance.getWorkflowMonitor().getProcess_Status().get(instance.getWorkflowMonitor().get_Elements().indexOf(n)) == Scheduled &&
-                                                user.getAllowed_Processes().contains(n)) {
-                                            Process_Gate.getProcess_gate().getProcess_list().getWorking_List().remove(0);
-                                            consumable = ((Function) n).getConsumableMethod();
-                                            concurrency = ((Function) n).isConcurrently();
-                                            process = n;
-                                            break;
-                                        }
+                                    synchronized (instance.getInstance_lock()) {
+                                        for (Node n : instance.getWorkflowMonitor().get_Elements()) {
+                                            if (n instanceof Function &&
+                                                    instance.getWorkflowMonitor().getProcess_Status().get(instance.getWorkflowMonitor().get_Elements().indexOf(n)) == Scheduled &&
+                                                    user.getAllowed_Processes().contains(n)) {
+                                                Process_Gate.getProcess_gate().getProcess_list().getWorking_List().remove(0);
+                                                consumable = ((Function) n).getConsumableMethod();
+                                                concurrency = ((Function) n).isConcurrently();
+                                                process = n;
+                                                break;
+                                            }
                                     }
-                                    //}
+                                    }
 
                                     if (consumable != null) {
                                         Process_instance process_instance = new Process_instance(lock, ((Function) process).getFunction_type(), instance, user, consumable, concurrency, process);

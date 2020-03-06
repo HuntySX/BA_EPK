@@ -80,6 +80,8 @@ public class Printer_Queue implements Runnable {
 
                 System.out.println("Written!");
                 List.clear();
+
+
             }
         }
     }

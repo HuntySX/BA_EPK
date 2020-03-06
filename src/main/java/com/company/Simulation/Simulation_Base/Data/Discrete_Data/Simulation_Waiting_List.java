@@ -1,30 +1,43 @@
 package com.company.Simulation.Simulation_Base.Data.Discrete_Data;
 
+import com.company.EPK.Function;
+
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 
 public class Simulation_Waiting_List {
 
-    private List<Event_Instance> Event_List;
+    private List<Instance_Workflow> Workflows;
 
     public Simulation_Waiting_List() {
-        Event_List = new ArrayList<>();
+        Workflows = new ArrayList<>();
     }
 
-    public void addTimedEvent(Event_Instance event) {
-        if (Event_List.isEmpty()) {
-            Event_List.add(event);
+    public List<Instance_Workflow> getEvent_List() {
+        return Workflows;
+    }
+
+    public void addTimedEvent(Instance_Workflow workflow) {
+        if (Workflows.isEmpty()) {
+            Workflows.add(workflow);
         } else {
-            ListIterator iter = Event_List.listIterator();
+            ListIterator iter = Workflows.listIterator();
             while (iter.hasNext()) {
-                Event_Instance List_Event = (Event_Instance) iter.next();
-                if (List_Event.getTime().isAfter(event.getTime())) {
+                Instance_Workflow Instance = (Instance_Workflow) iter.next();
+                if (Instance.getTo_Start().isAfter(workflow.getTo_Start())) {
                     iter.previous();
-                    iter.add(event);
+                    iter.add(workflow);
                     break;
                 }
             }
+        }
+    }
+
+    public void remove_from_WaitingList(Instance_Workflow Instance) {
+        if (Workflows.contains(Instance)) {
+            Workflows.remove(Instance);
         }
     }
 }

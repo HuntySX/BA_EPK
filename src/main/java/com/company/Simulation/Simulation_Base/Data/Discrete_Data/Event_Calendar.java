@@ -1,5 +1,6 @@
-package com.company.Simulation.Simulation_Discrete_Event;
+package com.company.Simulation.Simulation_Base.Data.Discrete_Data;
 
+import com.company.EPK.Node;
 import com.company.Simulation.Simulation_Base.Data.Discrete_Data.Event_Instance;
 import com.company.Simulation.Simulation_Base.Data.Discrete_Data.Simulation_Event_List;
 import com.company.Simulation.Simulation_Base.Data.Discrete_Data.Simulation_Waiting_List;
@@ -7,6 +8,7 @@ import com.company.Simulation.Simulation_Base.Data.Shared_Data.Settings;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 import java.time.LocalTime;
+import java.util.List;
 
 public class Event_Calendar {
 
@@ -48,14 +50,36 @@ public class Event_Calendar {
         return Waiting_List;
     }
 
+    public void Add_To_Waiting_List(Instance_Workflow Instance) {
+        if (Instance != null) {
+            Waiting_List.addTimedEvent(Instance);
+        }
+    }
+
+    public void Add_To_Upcoming_List(Instance_Workflow Instance, LocalTime Time, Node Node) {
+        if (Instance != null && Time != null && Node != null) {
+            Upcoming_List.addTimedEvent(Instance, Time, Node);
+        }
+    }
+
     public Event_Instance calculate_Next_Event() {
         return null;
     }
 
+    public void Remove_From_Upcoming_List(Instance_Workflow Instance) {
+        Upcoming_List.remove_from_EventList(Instance);
+    }
+
+    public void Remove_From_Waiting_List(Instance_Workflow Instance) {
+        Waiting_List.remove_from_WaitingList(Instance);
+    }
+
     public void fillCalendar() {
-
         DescriptiveStatistics descriptiveStatistics = new DescriptiveStatistics();
+    }
 
+    public void jump() {
+        runtime = runtime.plusSeconds(1);
 
     }
 }

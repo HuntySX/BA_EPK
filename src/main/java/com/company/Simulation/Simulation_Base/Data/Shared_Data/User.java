@@ -1,6 +1,7 @@
 package com.company.Simulation.Simulation_Base.Data.Shared_Data;
 
 import com.company.EPK.Function;
+import com.company.EPK.Workforce;
 
 import java.util.List;
 
@@ -11,6 +12,7 @@ public class User {
     private List<Function> allowed_Processes;
     private boolean active;
     private float efficiency;
+    private List<Workforce> Workforce;
 
     public User(String first_Name, String last_Name, int p_ID, float efficiency) {
         this.first_Name = first_Name;
@@ -27,6 +29,8 @@ public class User {
         this.p_ID = p_ID;
         this.active = false;
     }
+
+    //TODO Set Get Workforce ( Add, Construct bla)
 
     public String getFirst_Name() {
         return first_Name;
@@ -74,5 +78,9 @@ public class User {
 
     public void setEfficiency(float efficiency) {
         this.efficiency = efficiency;
+    }
+
+    public List<Workforce> getWorkforce() {
+        return Workforce;
     }
 }

@@ -1,14 +1,21 @@
 package com.company.Simulation.Simulation_Base.Data.Shared_Data;
 
+import com.company.Enums.Option_Event_Choosing;
+
 import java.time.LocalTime;
 
 public class Settings {
 
     private LocalTime beginTime;
     private LocalTime endTime;
+    private Option_Event_Choosing Decide_Event_choosing;
 
     public Settings() {
 
+    }
+
+    public Option_Event_Choosing getDecide_Event() {
+        return Decide_Event_choosing;
     }
 
     public LocalTime getBeginTime() {

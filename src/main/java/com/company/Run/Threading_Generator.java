@@ -221,7 +221,7 @@ public class Threading_Generator {
         Consumer<Process_instance> shortWait = (Process_instance instance) -> {
             synchronized (instance.getLock()) {
                 try {
-                    instance.getLock().wait(200);
+                    instance.getLock().wait(1);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -230,7 +230,7 @@ public class Threading_Generator {
         Consumer<Process_instance> middleWait = (Process_instance instance) -> {
             synchronized (instance.getLock()) {
                 try {
-                    instance.getLock().wait(1000);
+                    instance.getLock().wait(2);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -239,7 +239,7 @@ public class Threading_Generator {
         Consumer<Process_instance> longWait = (Process_instance instance) -> {
             synchronized (instance.getLock()) {
                 try {
-                    instance.getLock().wait(5000);
+                    instance.getLock().wait(5);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -483,13 +483,14 @@ public class Threading_Generator {
         starting_queue.setSQ(SQ);
         warehouse_queue.setT(WQ);
 
-        PRQ.start();
-        SQ.start();
+
         EQ.start();
+        SQ.start();
+        PRQ.start();
         WQ.start();
         RSQ.start();
         synchronized (this) {
-            wait(300000);
+            wait(120000);
         }
 
         PQ.start();

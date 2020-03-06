@@ -1,6 +1,8 @@
 package com.company.EPK;
 
 import com.company.Enums.Function_Type;
+import com.company.Simulation.Simulation_Base.Data.Discrete_Data.Resource;
+import com.company.Simulation.Simulation_Base.Data.Shared_Data.User;
 import com.company.Simulation.Simulation_Base.Data.Threading_Data.Process_instance;
 
 import java.util.List;
@@ -11,6 +13,8 @@ public class Function extends Node {
     private Function_Type function_type;
     private int successor = 1;
     private boolean concurrently = true;
+    private List<Resource> Needed_Resources;
+    private List<Workforce> Needed_Workforce;
     private Consumer<Process_instance> ConsumableMethod;
 
     public Function(String function_tag, Function_Type type, int ID) {
@@ -29,11 +33,13 @@ public class Function extends Node {
         return function_type;
     }
 
-    public Function(List<Node> Next_Elem, int ID, String Function_tag, boolean concurrently) {
+    public Function(List<Node> Next_Elem, int ID, String Function_tag, boolean concurrently, List<Resource> Needed_Resources, List<Workforce> Needed_Workforce) {
         super(Next_Elem, ID);
         this.Function_tag = Function_tag;
         this.concurrently = concurrently;
         this.ConsumableMethod = null;
+        this.Needed_Resources = Needed_Resources;
+        this.Needed_Workforce = Needed_Workforce;
     }
 
     public String getFunction_tag() {
@@ -54,6 +60,27 @@ public class Function extends Node {
 
     public Consumer<Process_instance> getConsumableMethod() {
         return ConsumableMethod;
+    }
+
+    public List<Resource> getNeeded_Resources() {
+        return Needed_Resources;
+    }
+
+    public void Add_Needed_Resource(Resource res) {
+        if (!Needed_Resources.contains(res)) {
+            Needed_Resources.add(res);
+        }
+        if (res.getUsed_In().contains(this)) {
+            res.add_Used_In(this);
+        }
+    }
+
+    public List<Workforce> getNeeded_Workforce() {
+        return Needed_Workforce;
+    }
+
+    public void add_Needed_Workforce(Workforce work) {
+        Needed_Workforce.add(work);
     }
 
     public void setConsumableMethod(Consumer<Process_instance> consumableMethod) {
