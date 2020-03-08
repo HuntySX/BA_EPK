@@ -2,9 +2,10 @@ package com.company.EPK;
 
 import com.company.Enums.Function_Type;
 import com.company.Simulation.Simulation_Base.Data.Discrete_Data.Resource;
-import com.company.Simulation.Simulation_Base.Data.Shared_Data.User;
 import com.company.Simulation.Simulation_Base.Data.Threading_Data.Process_instance;
 
+import java.time.LocalTime;
+import java.time.temporal.TemporalAmount;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -16,6 +17,7 @@ public class Function extends Node {
     private List<Resource> Needed_Resources;
     private List<Workforce> Needed_Workforce;
     private Consumer<Process_instance> ConsumableMethod;
+    private LocalTime WorkingTime;
 
     public Function(String function_tag, Function_Type type, int ID) {
 
@@ -33,13 +35,14 @@ public class Function extends Node {
         return function_type;
     }
 
-    public Function(List<Node> Next_Elem, int ID, String Function_tag, boolean concurrently, List<Resource> Needed_Resources, List<Workforce> Needed_Workforce) {
+    public Function(List<Node> Next_Elem, int ID, String Function_tag, boolean concurrently, List<Resource> Needed_Resources, List<Workforce> Needed_Workforce, LocalTime WorkingTime) {
         super(Next_Elem, ID);
         this.Function_tag = Function_tag;
         this.concurrently = concurrently;
         this.ConsumableMethod = null;
         this.Needed_Resources = Needed_Resources;
         this.Needed_Workforce = Needed_Workforce;
+        this.WorkingTime = WorkingTime;
     }
 
     public String getFunction_tag() {
@@ -85,6 +88,14 @@ public class Function extends Node {
 
     public void setConsumableMethod(Consumer<Process_instance> consumableMethod) {
         ConsumableMethod = consumableMethod;
+    }
+
+    public LocalTime getWorkingTime() {
+        return WorkingTime;
+    }
+
+    public void setWorkingTime(LocalTime workingTime) {
+        WorkingTime = workingTime;
     }
 
     @Override

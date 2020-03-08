@@ -9,6 +9,7 @@ public class Settings {
     private LocalTime beginTime;
     private LocalTime endTime;
     private Option_Event_Choosing Decide_Event_choosing;
+    private boolean Optimal_User_Layout;
 
     public Settings() {
 
@@ -32,6 +33,10 @@ public class Settings {
 
     public void setEndTime(LocalTime endTime) {
         this.endTime = endTime;
+    }
+
+    public boolean get_Optimal_Loadout() {
+        return Optimal_User_Layout;
     }
 
     //TODO

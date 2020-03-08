@@ -53,5 +53,4 @@ public abstract class Node {
         instance.add_Next_Elements(this.Next_Elem);
     }
 
-
 }

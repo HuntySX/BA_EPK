@@ -71,34 +71,77 @@ public class Discrete_Event_Simulator {
 
                 }
                 if (to_Run.getNode() instanceof Function) {
-                    if (!to_Run.isWorking()) {
 
-                        List<Workforce> workforces = ((Function) to_Run.getNode()).getNeeded_Workforce();
-                        List<Resource> resources = ((Function) to_Run.getNode()).getNeeded_Resources();
-                        List<User> CalculateUsers = new ArrayList<>();
-                        for (User u : users) {
-                            if (!u.isActive()) {
-                                List<Workforce> capable = u.getWorkforce();
-                                for (Workforce cap : capable) {
-                                    if (workforces.contains(cap)) {
-                                        if (CalculateUsers.contains(u)) {
-                                            CalculateUsers.add(u);
+                    //FALL1: To_Run Arbeitet noch nicht an Function
+                    if (!to_Run.isWorking()) {
+                        //FALL Optimum nicht erforderlich
+                        if (!Settings.get_Optimal_Loadout()) {
+
+                            List<Workforce> workforces = ((Function) to_Run.getNode()).getNeeded_Workforce();
+                            List<Resource> resources = ((Function) to_Run.getNode()).getNeeded_Resources();
+                            List<Resource> CalculateResource = new ArrayList<>();
+                            List<User> CalculateUsers = new ArrayList<>();
+
+                            //CHECK FOR USER WORKFORCE AVAILABLE
+                            for (User u : users) {
+                                if (!u.isActive()) {
+                                    List<Workforce> capable = u.getWorkforce();
+                                    for (Workforce cap : capable) {
+                                        if (workforces.contains(cap)) {
+                                            if (CalculateUsers.contains(u)) {
+                                                CalculateUsers.add(u);
+                                            }
+                                            workforces.remove(cap);
                                         }
-                                        workforces.remove(cap);
+                                    }
+                                    if (workforces.isEmpty()) {
+                                        break;
                                     }
                                 }
-                                if (workforces.isEmpty()) {
-                                    break;
+                            }
+                            if (!workforces.isEmpty()) {
+                                throw new Exception();
+                                //TODO Exception oder Auf Waiting List?
+                            }
+
+                            //CHECK RESOURCE LIMITS
+                            else {
+
+                                boolean not_fullfillable = false;
+                                for (Resource res : ((Function) to_Run.getNode()).getNeeded_Resources()) {
+                                    if (not_fullfillable) {
+                                        break;
+                                    }
+                                    for (Resource r : resources) {
+                                        if (r.getID() == res.getID() && r.getCount() >= res.getCount()) {
+                                            Resource countres = new Resource(r.getName(), res.getCount(), r.getID());
+                                            CalculateResource.add(countres);
+                                        } else if (r.getID() == res.getID() && r.getCount() < res.getCount()) {
+                                            not_fullfillable = true;
+                                            break;
+                                        }
+                                    }
                                 }
+                                if (not_fullfillable) {
+                                    //TODO Exceoption oder auf Waiting List?
+                                } else {
+                                    if (!CalculateResource.isEmpty()) {
+                                        for (Resource res : CalculateResource) {
+                                            for (Resource r : resources) {
+                                                if (res.getID() == r.getID()) {
+                                                    r.setCount(r.getCount() - res.getCount());
+                                                }
+                                            }
+                                        }
+                                    }
+                                    to_Run.setWorking(true);
+                                    LocalTime Duration = event_Calendar.getRuntime().
+                                            Instance_Workflow
+                                    new_Instance = new Instance_Workflow(to_Run.getInstance(), to_Run.getTo_Start().plus(((Function) to_Run.getNode()).getWborkingTime()), to_Run.getNode());
+                                }
+                                //TODO Activate Instance
                             }
                         }
-                        if (!workforces.isEmpty()) {
-                            throw new Exception();
-                            //TODO Exception oder Auf Waiting List?
-                        } else
-                            to_Run.getNode().getNext_Elem();
-                        //TODO Activate Instance
-                    }
 
                     if (to_Run.isWorking()) {
                         //TODO Deactivate Instance, Add Next Elem as new Instance to Upcoming List
