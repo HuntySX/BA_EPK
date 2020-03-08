@@ -2,12 +2,13 @@ package com.company.Simulation.Simulation_Base.Data.Shared_Data;
 
 import com.company.Enums.Option_Event_Choosing;
 
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 public class Settings {
 
-    private LocalTime beginTime;
-    private LocalTime endTime;
+    private LocalDateTime beginTime;
+    private LocalDateTime endTime;
     private Option_Event_Choosing Decide_Event_choosing;
     private boolean Optimal_User_Layout;
 
@@ -19,19 +20,19 @@ public class Settings {
         return Decide_Event_choosing;
     }
 
-    public LocalTime getBeginTime() {
+    public LocalDateTime getBeginTime() {
         return beginTime;
     }
 
-    public void setBeginTime(LocalTime beginTime) {
+    public void setBeginTime(LocalDateTime beginTime) {
         this.beginTime = beginTime;
     }
 
-    public LocalTime getEndTime() {
+    public LocalDateTime getEndTime() {
         return endTime;
     }
 
-    public void setEndTime(LocalTime endTime) {
+    public void setEndTime(LocalDateTime endTime) {
         this.endTime = endTime;
     }
 

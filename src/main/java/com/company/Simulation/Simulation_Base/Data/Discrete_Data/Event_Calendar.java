@@ -7,14 +7,15 @@ import com.company.Simulation.Simulation_Base.Data.Discrete_Data.Simulation_Wait
 import com.company.Simulation.Simulation_Base.Data.Shared_Data.Settings;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 
 public class Event_Calendar {
 
-    private LocalTime runtime;
-    private LocalTime Begin_Time;
-    private LocalTime End_Time;
+    private LocalDateTime runtime;
+    private LocalDateTime Begin_Time;
+    private LocalDateTime End_Time;
     private Simulation_Event_List Upcoming_List;
     private Simulation_Waiting_List Waiting_List;
 
@@ -26,19 +27,19 @@ public class Event_Calendar {
         Upcoming_List = new Simulation_Event_List();
     }
 
-    public LocalTime getRuntime() {
+    public LocalDateTime getRuntime() {
         return runtime;
     }
 
-    public void setRuntime(LocalTime runtime) {
+    public void setRuntime(LocalDateTime runtime) {
         this.runtime = runtime;
     }
 
-    public LocalTime getBegin_Time() {
+    public LocalDateTime getBegin_Time() {
         return Begin_Time;
     }
 
-    public LocalTime getEnd_Time() {
+    public LocalDateTime getEnd_Time() {
         return End_Time;
     }
 
@@ -56,9 +57,9 @@ public class Event_Calendar {
         }
     }
 
-    public void Add_To_Upcoming_List(Instance_Workflow Instance, LocalTime Time, Node Node) {
-        if (Instance != null && Time != null && Node != null) {
-            Upcoming_List.addTimedEvent(Instance, Time, Node);
+    public void Add_To_Upcoming_List(Instance_Workflow Instance) {
+        if (Instance != null) {
+            Upcoming_List.addTimedEvent(Instance);
         }
     }
 

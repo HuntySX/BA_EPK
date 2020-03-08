@@ -58,7 +58,7 @@ public class Discrete_Event_Generator {
         this.Simulation = new Discrete_Event_Simulator(this);
     }
 
-    public void run() {
+    public void run() throws Exception {
         Simulation.run();
     }
 
