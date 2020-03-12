@@ -33,7 +33,7 @@ public class Simulation_Event_List {
         }
     }
 
-    public List<Instance_Workflow> getByTime(LocalDateTime time) {
+    public List<Instance_Workflow> getByTime(LocalTime time) {
 
         ListIterator iter = Workflows.listIterator();
         List<Instance_Workflow> result = new ArrayList<>();
@@ -49,12 +49,10 @@ public class Simulation_Event_List {
     }
 
     public void remove_from_EventList(Instance_Workflow Instance) {
-        if (Workflows.contains(Instance)) {
-            Workflows.remove(Instance);
-        }
+        Workflows.remove(Instance);
     }
 
-    public boolean TimeEquals(LocalDateTime event_Time, LocalDateTime time) {
+    public boolean TimeEquals(LocalTime event_Time, LocalTime time) {
         return event_Time.getHour() == time.getHour() && event_Time.getMinute() == time.getMinute() && event_Time.getSecond() == time.getSecond();
     }
 

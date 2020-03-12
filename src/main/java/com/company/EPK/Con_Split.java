@@ -1,6 +1,7 @@
 package com.company.EPK;
 
 import com.company.Enums.Contype;
+import com.company.Enums.Split_Decide_Type;
 import com.company.Enums.Split_Status;
 import com.company.Simulation.Simulation_Base.Data.Shared_Data.Simulation_Instance;
 
@@ -16,13 +17,22 @@ public class Con_Split extends Connector {
     private Supplier<List<Node>> Pathfi;
     private List<Node> Single_Elem;
     private Split_Status Status;
+    private Split_Decide_Type Decide_Type;
+    private boolean is_Event_Driven;
 
-    public Con_Split(List<Node> Next_Elem, int ID, Contype contype, Split_Status status, Supplier<List<Node>> Pathfi, BiFunction<Simulation_Instance, List<Node>, List<Node>> Pathfinder) {
+    public Con_Split(List<Node> Next_Elem, int ID, Contype contype, Split_Status status, Supplier<List<Node>> Pathfi, BiFunction<Simulation_Instance, List<Node>, List<Node>> Pathfinder, boolean is_Event_Driven) {
         super(Next_Elem, ID, contype);
         this.Pathfinder = Pathfinder;
         this.Single_Elem = new ArrayList<>();
         this.Pathfi = Pathfi;
         this.Status = status;
+        this.is_Event_Driven = is_Event_Driven;
+    }
+
+    public Con_Split(List<Node> Next_Elem, int ID, Contype contype, Split_Decide_Type decide_type, boolean is_Event_Driven) {
+        super(Next_Elem, ID, contype);
+        this.Decide_Type = decide_type;
+        this.is_Event_Driven = is_Event_Driven;
     }
 
     public void setSingle_Elem(List<Node> Elem) {

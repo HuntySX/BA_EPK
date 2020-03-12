@@ -1,5 +1,5 @@
 package com.company.Enums;
 
 public enum Contype {
-    AND, OR, XOR
+    AND, EAGER_OR, EAGER_XOR, LAZY_OR, LAZY_XOR
 }

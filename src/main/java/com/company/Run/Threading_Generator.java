@@ -32,7 +32,7 @@ public class Threading_Generator {
     }
 
     public void instantiate() throws InterruptedException, FileNotFoundException {
-
+/*
         //EPK
         //Beginn
         EPK epk = new EPK();
@@ -269,7 +269,7 @@ public class Threading_Generator {
 
         //Function Consumer Binden
 
-        f1.setConsumableMethod(shortWait);
+        /*f1.setConsumableMethod(shortWait);
         f2.setConsumableMethod(shortWait);
         f3.setConsumableMethod(longWait);
         f4.setConsumableMethod(shortWait);
@@ -493,7 +493,7 @@ public class Threading_Generator {
             wait(120000);
         }
 
-        PQ.start();
+        PQ.start();*/
 
     }
 }

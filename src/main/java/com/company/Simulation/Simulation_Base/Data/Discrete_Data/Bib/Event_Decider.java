@@ -31,6 +31,7 @@ public class Event_Decider {
             if (Waiting.getEvent_List().isEmpty()) {
                 if (Check_Condition_For_Event.Check_For_Condition(Users, Resources, Upcoming.get(0))) {
                     Instance_Workflow result = Upcoming.get(0);
+                    Upcoming.remove(0);
                     return result;
                 } else {
                     return null;
@@ -38,6 +39,7 @@ public class Event_Decider {
             } else {
                 if (Check_Condition_For_Event.Check_For_Condition(Users, Resources, Waiting.getEvent_List().get(0))) {
                     Instance_Workflow result = Waiting.getEvent_List().get(0);
+                    Waiting.getEvent_List().remove(0);
                     return result;
                 } else {
                     return null;

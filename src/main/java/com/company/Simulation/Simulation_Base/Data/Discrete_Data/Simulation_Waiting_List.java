@@ -36,8 +36,6 @@ public class Simulation_Waiting_List {
     }
 
     public void remove_from_WaitingList(Instance_Workflow Instance) {
-        if (Workflows.contains(Instance)) {
-            Workflows.remove(Instance);
-        }
+        Workflows.remove(Instance);
     }
 }

@@ -1,5 +1,6 @@
 package com.company.Simulation.Simulation_Base.Data.Shared_Data;
 
+import com.company.Enums.FillingType;
 import com.company.Enums.Option_Event_Choosing;
 
 import java.time.LocalDateTime;
@@ -7,10 +8,14 @@ import java.time.LocalTime;
 
 public class Settings {
 
-    private LocalDateTime beginTime;
-    private LocalDateTime endTime;
+    private boolean get_Only_Start_Finishable_Functions;
+    private LocalTime beginTime;
+    private LocalTime endTime;
     private Option_Event_Choosing Decide_Event_choosing;
     private boolean Optimal_User_Layout;
+    private boolean Print_Only_Function;
+    private FillingType fillingType;
+    private int RuntimeDays;
 
     public Settings() {
 
@@ -20,24 +25,40 @@ public class Settings {
         return Decide_Event_choosing;
     }
 
-    public LocalDateTime getBeginTime() {
+    public LocalTime getBeginTime() {
         return beginTime;
     }
 
-    public void setBeginTime(LocalDateTime beginTime) {
+    public void setBeginTime(LocalTime beginTime) {
         this.beginTime = beginTime;
     }
 
-    public LocalDateTime getEndTime() {
+    public LocalTime getEndTime() {
         return endTime;
     }
 
-    public void setEndTime(LocalDateTime endTime) {
+    public void setEndTime(LocalTime endTime) {
         this.endTime = endTime;
     }
 
     public boolean get_Optimal_Loadout() {
         return Optimal_User_Layout;
+    }
+
+    public boolean getPrint_Only_Function() {
+        return Print_Only_Function;
+    }
+
+    public FillingType getfillingType() {
+        return fillingType;
+    }
+
+    public int getRuntimeDays() {
+        return RuntimeDays;
+    }
+
+    public boolean isGet_Only_Start_Finishable_Functions() {
+        return get_Only_Start_Finishable_Functions;
     }
 
     //TODO
