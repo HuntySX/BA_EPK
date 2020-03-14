@@ -12,8 +12,8 @@ public class EPK {
     private List<Function> functions;
     private List<Con_Join> connector_Join;
     private List<Con_Split> connector_Split;
-    private Event start_Event;
-    private Event end_Event;
+    private List<Event> start_Event;
+    private List<Event> end_Event;
     private List<Simulation_Instance> Instances;
 
     public EPK(List<Node> elements, List<Event> events, List<Function> functions, List<Con_Join> connector_Join, List<Con_Split> connector_Split) {
@@ -36,19 +36,19 @@ public class EPK {
         this.Instances = new ArrayList<>();
     }
 
-    public Event getStart_Event() {
+    public List<Event> getStart_Events() {
         return start_Event;
     }
 
-    public void setStart_Event(Event start_Event) {
+    public void setStart_Events(List<Event> start_Event) {
         this.start_Event = start_Event;
     }
 
-    public Event getEnd_Event() {
+    public List<Event> getEnd_Events() {
         return end_Event;
     }
 
-    public void setEnd_Event(Event end_Event) {
+    public void setEnd_Events(List<Event> end_Event) {
         this.end_Event = end_Event;
     }
 
@@ -96,5 +96,29 @@ public class EPK {
     public void add_con_Split(Con_Split cs) {
         connector_Split.add(cs);
         elements.add(cs);
+    }
+
+    public void add_Start_Event(Event ev) {
+        if (!start_Event.contains(ev)) {
+            start_Event.add(ev);
+        }
+    }
+
+    public void remove_Start_Event(Event ev) {
+        if (start_Event.contains(ev)) {
+            start_Event.remove(ev);
+        }
+    }
+
+    public void add_End_Event(Event ev) {
+        if (!end_Event.contains(ev)) {
+            end_Event.add(ev);
+        }
+    }
+
+    public void remove_End_Event(Event ev) {
+        if (!end_Event.contains(ev)) {
+            end_Event.remove(ev);
+        }
     }
 }

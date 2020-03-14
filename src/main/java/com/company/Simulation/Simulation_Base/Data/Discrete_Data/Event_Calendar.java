@@ -1,20 +1,18 @@
 package com.company.Simulation.Simulation_Base.Data.Discrete_Data;
 
+import com.company.EPK.EPK;
+import com.company.EPK.Event;
 import com.company.EPK.Function;
-import com.company.EPK.Node;
-import com.company.Enums.FillingType;
-import com.company.Simulation.Simulation_Base.Data.Discrete_Data.Event_Instance;
-import com.company.Simulation.Simulation_Base.Data.Discrete_Data.Simulation_Event_List;
-import com.company.Simulation.Simulation_Base.Data.Discrete_Data.Simulation_Waiting_List;
+import com.company.Enums.Start_Event_Type;
 import com.company.Simulation.Simulation_Base.Data.Shared_Data.Settings;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
-import static com.company.Enums.FillingType.*;
+import static com.company.Enums.Start_Event_Type.*;
 
 public class Event_Calendar {
 
@@ -25,10 +23,12 @@ public class Event_Calendar {
     private List<Simulation_Event_List> Upcoming_List;
     private Simulation_Waiting_List Waiting_List;
     private Settings settings;
+    private EPK epk;
 
-    public Event_Calendar(Settings settings) {
+    public Event_Calendar(Settings settings, EPK epk) {
 
         this.settings = settings;
+        this.epk = epk;
         this.RuntimeDays = settings.getRuntimeDays();
         Begin_Time = settings.getBeginTime();
         End_Time = settings.getEndTime();
@@ -106,20 +106,94 @@ public class Event_Calendar {
         Waiting_List.remove_from_WaitingList(Instance);
     }
 
+    private static void QuickSort(int[] inputArray, int low, int high) {
+
+        int iLowerIndex = low;
+        int iHighIndex = high;
+
+        // Take middle as pivot element.
+        int middle = low + (high - low) / 2;
+        int pivotElement = inputArray[middle];
+
+        while (iLowerIndex <= iHighIndex) {
+
+            // Keep scanning lower half till value is less than pivot element
+            while (inputArray[iLowerIndex] < pivotElement) {
+                iLowerIndex++;
+            }
+
+            // Keep scanning upper half till value is greater than pivot element
+            while (inputArray[iHighIndex] > pivotElement) {
+                iHighIndex--;
+            }
+
+            //swap element if they are out of place
+            if (iLowerIndex <= iHighIndex) {
+                swap(inputArray, iLowerIndex, iHighIndex);
+                iLowerIndex++;
+                iHighIndex--;
+            }
+        }
+
+        // Sort lower half -- low to iHighIndex
+        if (low < iHighIndex) {
+            QuickSort(inputArray, low, iHighIndex);
+        }
+
+        // Sort upper half -- iLowerIndex to high
+        if (iLowerIndex < high) {
+            QuickSort(inputArray, iLowerIndex, high);
+        }
+    }
+
+    public void jump() {
+        runtime = runtime.plusSeconds(1);
+
+    }
+
+    //swap elements
+    private static void swap(int[] arr, int iElement1, int iElement2) {
+        int temp = arr[iElement1];
+        arr[iElement1] = arr[iElement2];
+        arr[iElement2] = temp;
+    }
+
     public void fillCalendar() {
 
-        FillingType fillingType = settings.getfillingType();
+        Start_Event_Type startEventType = settings.getfillingType();
         int days = RuntimeDays;
         int begintime = Begin_Time.toSecondOfDay();
         int endtime = End_Time.toSecondOfDay();
+        int instances_Per_Day = settings.getNumber_Instances_Per_Day();
 
-        if (fillingType == NORMAL) {
+        if (startEventType == NORMAL) {
 
-        } else if (fillingType == RANDOM) {
-            for (int i = 0; i < RuntimeDays; i++) {
+        } else if (startEventType == RANDOM) {
 
+            List<Event> Start_Events = epk.getStart_Events();
+            int case_ID = 0;
+
+            for (Event Start_ev : Start_Events) {
+                for (int i = 0; i < RuntimeDays; i++) {
+                    int[] timerlist = new int[instances_Per_Day];
+                    int duration = endtime - begintime;
+                    Random rand = new Random();
+                    for (int j = 0; j < instances_Per_Day; j++) {
+                        int start_Time = rand.nextInt(duration);
+                        start_Time = begintime + start_Time;
+                        timerlist[j] = start_Time;
+                    }
+                    QuickSort(timerlist, 0, instances_Per_Day - 1);
+                    for (int k : timerlist) {
+                        Event_Instance new_Ev_Instance = new Event_Instance(case_ID);
+                        case_ID++;
+                        LocalTime to_Start = LocalTime.ofSecondOfDay(k);
+                        Instance_Workflow to_Instantiate = new Instance_Workflow(new_Ev_Instance, to_Start, Start_ev);
+                        Upcoming_List.get(i).addTimedEvent(to_Instantiate);
+                    }
+                }
             }
-        } else if (fillingType == EXPONENTIAL) {
+        } else if (startEventType == EXPONENTIAL) {
 
         }
         /*else if(fillingType == ){
@@ -131,9 +205,6 @@ public class Event_Calendar {
 
         DescriptiveStatistics descriptiveStatistics = new DescriptiveStatistics();
     }
-
-    public void jump() {
-        runtime = runtime.plusSeconds(1);
-
-    }
 }
+
+

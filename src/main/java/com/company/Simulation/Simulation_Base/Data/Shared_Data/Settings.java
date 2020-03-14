@@ -1,9 +1,8 @@
 package com.company.Simulation.Simulation_Base.Data.Shared_Data;
 
-import com.company.Enums.FillingType;
+import com.company.Enums.Start_Event_Type;
 import com.company.Enums.Option_Event_Choosing;
 
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 public class Settings {
@@ -14,8 +13,9 @@ public class Settings {
     private Option_Event_Choosing Decide_Event_choosing;
     private boolean Optimal_User_Layout;
     private boolean Print_Only_Function;
-    private FillingType fillingType;
+    private Start_Event_Type startEventType;
     private int RuntimeDays;
+    private int number_Instances_Per_Day;
 
     public Settings() {
 
@@ -49,8 +49,8 @@ public class Settings {
         return Print_Only_Function;
     }
 
-    public FillingType getfillingType() {
-        return fillingType;
+    public Start_Event_Type getfillingType() {
+        return startEventType;
     }
 
     public int getRuntimeDays() {
@@ -59,6 +59,10 @@ public class Settings {
 
     public boolean isGet_Only_Start_Finishable_Functions() {
         return get_Only_Start_Finishable_Functions;
+    }
+
+    public int getNumber_Instances_Per_Day() {
+        return number_Instances_Per_Day;
     }
 
     //TODO
