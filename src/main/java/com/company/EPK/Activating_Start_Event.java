@@ -5,17 +5,19 @@ import com.company.Run.Discrete_Event_Generator;
 
 import java.util.List;
 
-public class Start_Event extends Event {
+import static com.company.Enums.Start_Event_Type.INSTANTIATED;
+
+public class Activating_Start_Event extends Event {
 
     private Start_Event_Type start_event_type;
     private Discrete_Event_Generator Generator;
-    private int to_Instantiate;
+    private Activating_Function Function;
 
-    public Start_Event(Start_Event_Type type, Discrete_Event_Generator generator, int to_Instantiate, List<Node> Next_Elem, String Event_Tag, boolean is_Start_Event) {
+    public Activating_Start_Event(Activating_Function function, Discrete_Event_Generator generator, int to_Instantiate, List<Node> Next_Elem, String Event_Tag, boolean is_Start_Event) {
         super(Next_Elem, Event_Tag, is_Start_Event);
-        this.to_Instantiate = to_Instantiate;
         this.Generator = generator;
-        this.start_event_type = type;
+        this.start_event_type = INSTANTIATED;
+        this.Function = function;
     }
 
     public Start_Event_Type getStart_event_type() {
@@ -34,11 +36,5 @@ public class Start_Event extends Event {
         Generator = generator;
     }
 
-    public int getTo_Instantiate() {
-        return to_Instantiate;
-    }
 
-    public void setTo_Instantiate(int to_Instantiate) {
-        this.to_Instantiate = to_Instantiate;
-    }
 }

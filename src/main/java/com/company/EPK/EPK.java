@@ -15,6 +15,7 @@ public class EPK {
     private List<Event> start_Event;
     private List<Event> end_Event;
     private List<Simulation_Instance> Instances;
+    private List<Start_Event> discrete_start_Events;
 
     public EPK(List<Node> elements, List<Event> events, List<Function> functions, List<Con_Join> connector_Join, List<Con_Split> connector_Split) {
         this.elements = elements;
@@ -23,6 +24,16 @@ public class EPK {
         this.connector_Join = connector_Join;
         this.connector_Split = connector_Split;
         this.Instances = new ArrayList<>();
+    }
+
+    public EPK(List<Node> elements, List<Event> events, List<Function> functions, List<Con_Join> connector_Join, List<Con_Split> connector_Split, List<Start_Event> discrete_start_Events) {
+        this.elements = elements;
+        this.events = events;
+        this.functions = functions;
+        this.connector_Join = connector_Join;
+        this.connector_Split = connector_Split;
+        this.Instances = new ArrayList<>();
+        this.discrete_start_Events = discrete_start_Events;
     }
 
     public EPK() {
@@ -34,6 +45,21 @@ public class EPK {
         this.start_Event = null;
         this.end_Event = null;
         this.Instances = new ArrayList<>();
+        this.discrete_start_Events = new ArrayList<>();
+    }
+
+    public void setDiscrete_start_Events(List<Start_Event> discrete_start_Events) {
+        this.discrete_start_Events = discrete_start_Events;
+    }
+
+    public void add_Discrete_start_Events(Start_Event Event) {
+        if (Event != null && !discrete_start_Events.contains(Event)) {
+            discrete_start_Events.add(Event);
+        }
+    }
+
+    public List<Start_Event> get_Discrete_Start_Events() {
+        return discrete_start_Events;
     }
 
     public List<Event> getStart_Events() {

@@ -31,6 +31,7 @@ public class Discrete_Event_Generator {
     private Discrete_Event_Simulator Simulation;
     private Event_Calendar event_Calendar;
     private Event_Decider event_decider;
+    private int case_ID;
 
     public Discrete_Event_Generator(String EPK_file, String Setting_file, String User_file, String Resource_file) {
         this.EPK_loader = new EPK_Loader(EPK_file);
@@ -43,6 +44,7 @@ public class Discrete_Event_Generator {
         this.printer_Queue = new Printer_Queue();
         this.printer_Gate = Printer_Gate.get_Printer_Gate();
         this.event_decider = null;
+        this.case_ID = 0;
         Thread T = new Thread();
         printer_Queue.setT(T);
     }
@@ -52,13 +54,13 @@ public class Discrete_Event_Generator {
         this.Settings = Settings_loader.generate_Settings();
         this.Users = User_loader.generate_User_List();
         this.Resources = Resource_loader.generate_Resources();
-        this.event_Calendar = new Event_Calendar(Settings);
-        this.event_decider = new Event_Decider(Settings, Users, Resources);
-        event_Calendar.fillCalendar();
+        this.event_Calendar = new Event_Calendar(Settings, EPK, this);
+        this.event_decider = new Event_Decider(Settings, Users, Resources, event_Calendar);
         this.Simulation = new Discrete_Event_Simulator(this);
     }
 
     public void run() throws Exception {
+        event_Calendar.fillCalendar();
         Simulation.run();
     }
 
@@ -90,6 +92,11 @@ public class Discrete_Event_Generator {
         return event_decider;
     }
 
+    public int get_Unique_case_ID() {
+        int id = case_ID;
+        case_ID = case_ID + 1;
+        return id;
+    }
     //TODO Erstelle hier EPK Objekt und füttere dieses mit dem Graphen
     //TODO Erstelle hier das Simulation Discrete Event Simulator Object welches Settings erhällt, sowie die Liste an Events.
     //TODO starte ein Run Objekt das Evtl Loggt, den Printer erhällt und die EPK und Simulator Objekte.

@@ -4,14 +4,12 @@ import com.company.EPK.*;
 import com.company.Enums.Gate_Check_Status;
 import com.company.Run.Discrete_Event_Generator;
 import com.company.Simulation.Simulation_Base.Data.Discrete_Data.*;
-import com.company.Simulation.Simulation_Base.Data.Discrete_Data.Bib.Check_Condition_For_Event;
 import com.company.Simulation.Simulation_Base.Data.Discrete_Data.Bib.Event_Decider;
 import com.company.Simulation.Simulation_Base.Data.Shared_Data.Settings;
 import com.company.Simulation.Simulation_Base.Data.Printer_Gate;
 import com.company.Simulation.Simulation_Base.Data.Printer_Queue;
 import com.company.Simulation.Simulation_Base.Data.Shared_Data.User;
 
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,7 +39,7 @@ public class Discrete_Event_Simulator {
         this.printer_gate = Printer_Gate.get_Printer_Gate();
         this.Settings = Generator.getSettings();
         this.event_Decider = Generator.getEvent_Decider();
-        this.runtimeDays = Settings.getRuntimeDays();
+        this.runtimeDays = Settings.getMax_RuntimeDays();
         LocalTime begin = Settings.getBeginTime();
         LocalTime end = Settings.getEndTime();
 
@@ -52,12 +50,11 @@ public class Discrete_Event_Simulator {
 
     public void run() throws Exception {
 
-        for (int day = 0; day < runtimeDays; day++) { //TODO BY TIME
-
-            while (event_Calendar.getRuntime().isBefore(event_Calendar.getEnd_Time())) {
+        while (!event_Calendar.isFinished_cycle()) {
+            while (event_Calendar.getRuntime().isBefore(event_Calendar.getEnd_Time()) && !event_Calendar.isFinished_cycle()) {
 
                 List<Instance_Workflow> latest_Instances = new ArrayList<>();
-                Simulation_Event_List upcoming_Events = event_Calendar.get_Single_Upcoming_List(day);
+                Simulation_Event_List upcoming_Events = event_Calendar.get_Single_Upcoming_List(event_Calendar.getAct_runtimeDay());
                 Simulation_Waiting_List waiting_list = event_Calendar.getWaiting_List();
                 latest_Instances = upcoming_Events.getByTime(event_Calendar.getRuntime());
                 Instance_Workflow to_Run = event_Decider.Decide_Event(latest_Instances, waiting_list);
@@ -65,26 +62,36 @@ public class Discrete_Event_Simulator {
 
                     if (to_Run.getNode() instanceof Event) {
                         to_Run.getInstance().add_To_Finished_Work(to_Run.getNode());
-                        List<Node> Next_Elem = to_Run.getNode().getNext_Elem();
-                        for (Node n : Next_Elem) {
-                            to_Run.getInstance().add_To_Scheduled_Work(n);
-                            Instance_Workflow new_Instance = new Instance_Workflow(to_Run.getInstance(), event_Calendar.getRuntime(), n);
-                            event_Calendar.Add_To_Upcoming_List(new_Instance, day);
+                        if (!(((Event) to_Run.getNode()).is_End_Event())) {
 
-                            if (Settings.getPrint_Only_Function() && n instanceof Function) {
-                                //TODO Print Scheduled for n;
+                            List<Node> Next_Elem = to_Run.getNode().getNext_Elem();
+                            for (Node n : Next_Elem) {
+                                to_Run.getInstance().add_To_Scheduled_Work(n);
+                                Instance_Workflow new_Instance = new Instance_Workflow(to_Run.getInstance(), event_Calendar.getRuntime(), n);
+                                event_Calendar.Add_To_Upcoming_List(new_Instance, event_Calendar.getAct_runtimeDay());
+
+                                if (Settings.getPrint_Only_Function() && n instanceof Function) {
+                                    //TODO Print Scheduled for n;
+                                } else {
+                                    //TODO Print every Node Scheduled;
+                                }
+                            }
+                        } else {
+                            if (Settings.getPrint_Only_Function() && to_Run.getNode() instanceof Function) {
+                                //TODO Print FINISHED for n;
                             } else {
-                                //TODO Print every Node Scheduled;
+                                //TODO Print every Node FINISHED;
                             }
                         }
                     }
 
                     if (to_Run.getNode() instanceof Event_Con_Split) {
+                        to_Run.getInstance().add_To_Finished_Work(to_Run.getNode());
                         List<Node> Next_Elem = ((Event_Con_Split) to_Run.getNode()).choose_Next();
                         for (Node n : Next_Elem) {
                             to_Run.getInstance().add_To_Scheduled_Work(n);
                             Instance_Workflow new_Instance = new Instance_Workflow(to_Run.getInstance(), event_Calendar.getRuntime(), n);
-                            event_Calendar.Add_To_Upcoming_List(new_Instance, day);
+                            event_Calendar.Add_To_Upcoming_List(new_Instance, event_Calendar.getAct_runtimeDay());
                             if (Settings.getPrint_Only_Function() && n instanceof Function) {
                                 //TODO Print Scheduled for n;
                             } else {
@@ -101,10 +108,11 @@ public class Discrete_Event_Simulator {
                                     "Teilbereich (Uhrzeit/Gate): " + to_Run.getNode().toString());
                         } else if (check == ADVANCE) {
                             List<Node> Next_Elem = to_Run.getNode().getNext_Elem();
+                            to_Run.getInstance().add_To_Finished_Work(to_Run.getNode());
                             for (Node n : Next_Elem) {
                                 to_Run.getInstance().add_To_Scheduled_Work(n);
                                 Instance_Workflow new_Instance = new Instance_Workflow(to_Run.getInstance(), event_Calendar.getRuntime(), n);
-                                event_Calendar.Add_To_Upcoming_List(new_Instance, day);
+                                event_Calendar.Add_To_Upcoming_List(new_Instance, event_Calendar.getAct_runtimeDay());
                                 if (Settings.getPrint_Only_Function() && n instanceof Function) {
                                     //TODO Print Scheduled for n;
                                 } else {
@@ -116,46 +124,76 @@ public class Discrete_Event_Simulator {
                             LocalTime Actualize = event_Calendar.getRuntime();
                             Actualize.plusSeconds(1);
                             Instance_Workflow new_Instance = new Instance_Workflow(to_Run.getInstance(), Actualize, to_Run.getNode());
-                            event_Calendar.Add_To_Upcoming_List(new_Instance, day);
+                            event_Calendar.Add_To_Upcoming_List(new_Instance, event_Calendar.getAct_runtimeDay());
 
                         }
                     }
-                    if (to_Run.getNode() instanceof Function) {
+                    if (to_Run.getNode() instanceof Activating_Function) {
+                        if (to_Run.getInstance() instanceof Activating_Event_Instance && ((Activating_Event_Instance) to_Run.getInstance()).getEnd_Function() == to_Run.getNode()) {
+                            int for_case_ID = ((Activating_Event_Instance) to_Run.getInstance()).getFor_case_ID();
+                            List<Instance_Workflow> Activation_List = ((Activating_Function) to_Run.getNode()).getWaiting_For_Activation_Instances();
+                            for (Instance_Workflow workflow : Activation_List) {
+                                if (workflow.getInstance().getCase_ID() == for_case_ID
+                                        && workflow.getWaiting_Ticket() == to_Run.getWaiting_Ticket()) {
+                                    workflow.setIs_Waiting(true);
+                                    event_Calendar.Add_To_Waiting_List(workflow);
+                                    Activation_List.remove(workflow);
+                                    break;
+                                }
+                            }
+                            to_Run.getInstance().add_To_Finished_Work(to_Run.getNode());
+                        } else {
+                            if (to_Run.getInstance() instanceof Event_Instance && to_Run.Is_Waiting()) {
+                                to_Run.setIs_Waiting(false);
+                                ActivateFunction(to_Run, event_Calendar.getAct_runtimeDay());
+                            } else if (to_Run.getInstance() instanceof Event_Instance && !to_Run.Is_Waiting()) {
+
+                                boolean decide = ((Activating_Function) to_Run.getNode()).Decide();
+                                if (decide == true) {
+                                    ActivateFunction(to_Run, event_Calendar.getAct_runtimeDay());
+                                } else {
+                                    to_Run.setWaiting_Ticket(event_Calendar.getUnique_Waiting_Ticket_ID());
+                                    ((Activating_Function) to_Run.getNode()).Instantiate_Activation(to_Run);
+                                }
+                            }
+                        }
+                    }
+
+                    if (to_Run.getNode() instanceof Function && !(to_Run.getNode() instanceof Activating_Function)) {
 
                         //FALL1: To_Run Arbeitet noch nicht an Function
                         if (!to_Run.isWorking()) {
-                            ActivateFunction(to_Run, day);
+                            ActivateFunction(to_Run, event_Calendar.getAct_runtimeDay());
                         }
 
                         //FALL2: To_Run hat arbeit beendet:
                         if (to_Run.isWorking() && (to_Run.getTo_Start() == (event_Calendar.getRuntime()) || to_Run.getTo_Start().isBefore(event_Calendar.getRuntime()))) {
-                            DeactivateFunction(to_Run, day);
+                            DeactivateFunction(to_Run, event_Calendar.getAct_runtimeDay());
                         }
+                    }
 
-                        //Actualize new Working Upcoming and Working List for Every Type of Node
-                        //Get next torun, if empty, go back to while, end it, and start event_Calendar.jump()
-                        upcoming_Events = event_Calendar.get_Single_Upcoming_List(day);
-                        waiting_list = event_Calendar.getWaiting_List();
-                        latest_Instances = upcoming_Events.getByTime(event_Calendar.getRuntime());
-                        to_Run = event_Decider.Decide_Event(latest_Instances, waiting_list);
-                        if (to_Run == null) {
-                            if (!latest_Instances.isEmpty()) {
-                                for (Instance_Workflow Instance : latest_Instances) {
-                                    event_Calendar.Add_To_Waiting_List(Instance);
-                                    upcoming_Events.remove_from_EventList(Instance);
-                                }
+                    //Actualize new Working Upcoming and Working List for Every Type of Node
+                    //Get next torun, if empty, go back to while, end it, and start event_Calendar.jump()
+                    upcoming_Events = event_Calendar.get_Single_Upcoming_List(event_Calendar.getAct_runtimeDay());
+                    waiting_list = event_Calendar.getWaiting_List();
+                    latest_Instances = upcoming_Events.getByTime(event_Calendar.getRuntime());
+                    to_Run = event_Decider.Decide_Event(latest_Instances, waiting_list);
+                    if (to_Run == null) {
+                        if (!latest_Instances.isEmpty()) {
+                            for (Instance_Workflow Instance : latest_Instances) {
+                                event_Calendar.Add_To_Waiting_List(Instance);
+                                upcoming_Events.remove_from_EventList(Instance);
                             }
-
                         }
 
                     }
-                }
-                event_Calendar.jump();
 
+                }
             }
-            event_Calendar.setRuntime(event_Calendar.getBegin_Time());
+            event_Calendar.jump();
         }
     }
+
 
     //------------------------------------------------------------------------------------------------------------------
     //------------------------------------------------------------------------------------------------------------------
@@ -234,6 +272,7 @@ public class Discrete_Event_Simulator {
             if (!workforces.isEmpty()) {
                 System.out.println("DEBUG: Workforce not Empty but should be");
                 System.out.println("Fixing: Adding Instance back to Waiting List");
+                to_Run.setTo_Start(to_Run.getTo_Start().plusSeconds(1));
                 event_Calendar.getWaiting_List().addTimedEvent(to_Run);
                 error = true;
 
@@ -261,6 +300,7 @@ public class Discrete_Event_Simulator {
                 if (not_fullfillable) {
                     System.out.println("DEBUG: Resources not provided but should be");
                     System.out.println("Fixing: Adding Instance back to Waiting List");
+                    to_Run.setTo_Start(to_Run.getTo_Start().plusSeconds(1));
                     event_Calendar.getWaiting_List().addTimedEvent(to_Run);
                     error = true;
                 } else {
@@ -280,19 +320,60 @@ public class Discrete_Event_Simulator {
         }
         if (!error) {
             LocalTime Duration = event_Calendar.getRuntime();
-            Duration.plusHours(((Function) to_Run.getNode()).getWorkingTime().getHour());
-            Duration.plusMinutes(((Function) to_Run.getNode()).getWorkingTime().getMinute());
-            Duration.plusSeconds(((Function) to_Run.getNode()).getWorkingTime().getSecond());
-            to_Run.setWorking(true);
-            event_Calendar.Remove_From_Upcoming_List(to_Run, day);
-            for (User u : CalculateUsers) {
-                u.setActive(true);
+            int lasting_Shifttime_in_Seconds = event_Calendar.getEnd_Time().toSecondOfDay() - event_Calendar.getRuntime().toSecondOfDay();
+            int Workingtime_in_Seconds = ((Function) to_Run.getNode()).getWorkingTime().get_Duration_to_Seconds();
+
+            if (Workingtime_in_Seconds <= lasting_Shifttime_in_Seconds) {
+
+                Instance_Workflow Running_Instance = new Instance_Workflow(to_Run.getInstance(), Duration, to_Run.getNode());
+                Running_Instance.Add_Active_Users(CalculateUsers);
+                Running_Instance.Add_Active_Resources(CalculateResource);
+                event_Calendar.Add_To_Upcoming_List(Running_Instance, day);
+                if (Settings.getPrint_Only_Function() && to_Run.getNode() instanceof Function) {
+                    //TODO Print Function Activated for n
+                } else {
+                    //TODO Print Activated everynode for n
+                }
+            } else {
+                Workingtime_in_Seconds = Workingtime_in_Seconds - lasting_Shifttime_in_Seconds;
+                int Shifttime_in_Seconds = event_Calendar.getEnd_Time().toSecondOfDay() - event_Calendar.getBegin_Time().toSecondOfDay();
+                int advanceday = 1;
+                Duration = event_Calendar.getBegin_Time();
+
+                while (Workingtime_in_Seconds > Shifttime_in_Seconds) {
+                    Workingtime_in_Seconds = Workingtime_in_Seconds - Shifttime_in_Seconds;
+                    advanceday++;
+                }
+
+                if (advanceday >= event_Calendar.getRuntimeDays() - event_Calendar.getAct_runtimeDay()) {
+                    System.out.println("DEBUG: Time not provided but should be");
+                    System.out.println("Fixing: Adding Instance back to Waiting List");
+                    to_Run.setTo_Start(to_Run.getTo_Start().plusSeconds(1));
+                    event_Calendar.getWaiting_List().addTimedEvent(to_Run);
+                }
+
+                Duration.plusSeconds(Workingtime_in_Seconds);
+                to_Run.setWorking(true);
+                event_Calendar.Remove_From_Upcoming_List(to_Run, day);
+                for (User u : CalculateUsers) {
+                    u.setActive(true);
+                }
+
+                Instance_Workflow Running_Instance = new Instance_Workflow(to_Run.getInstance(), Duration, to_Run.getNode());
+                Running_Instance.Add_Active_Users(CalculateUsers);
+                Running_Instance.Add_Active_Resources(CalculateResource);
+
+                if (day + advanceday < Settings.getMax_RuntimeDays()) {
+                    event_Calendar.Add_To_Upcoming_List(Running_Instance, day + advanceday);
+                }
+
+                if (Settings.getPrint_Only_Function() && to_Run.getNode() instanceof Function) {
+                    //TODO Print Function Activated for n
+                } else {
+                    //TODO Print Activated everynode for n
+                }
             }
 
-            Instance_Workflow Running_Instance = new Instance_Workflow(to_Run.getInstance(), Duration, to_Run.getNode());
-            Running_Instance.Add_Active_Users(CalculateUsers);
-            Running_Instance.Add_Active_Resources(CalculateResource);
-            event_Calendar.Add_To_Upcoming_List(Running_Instance, day);
         }
     }
 }

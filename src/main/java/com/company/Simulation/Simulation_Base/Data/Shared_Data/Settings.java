@@ -14,7 +14,7 @@ public class Settings {
     private boolean Optimal_User_Layout;
     private boolean Print_Only_Function;
     private Start_Event_Type startEventType;
-    private int RuntimeDays;
+    private int max_RuntimeDays;
     private int number_Instances_Per_Day;
 
     public Settings() {
@@ -53,8 +53,8 @@ public class Settings {
         return startEventType;
     }
 
-    public int getRuntimeDays() {
-        return RuntimeDays;
+    public int getMax_RuntimeDays() {
+        return max_RuntimeDays;
     }
 
     public boolean isGet_Only_Start_Finishable_Functions() {

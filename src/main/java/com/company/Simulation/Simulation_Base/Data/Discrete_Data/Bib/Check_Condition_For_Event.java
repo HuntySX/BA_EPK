@@ -1,9 +1,7 @@
 package com.company.Simulation.Simulation_Base.Data.Discrete_Data.Bib;
 
 import com.company.EPK.*;
-import com.company.Simulation.Simulation_Base.Data.Discrete_Data.Event_Instance;
-import com.company.Simulation.Simulation_Base.Data.Discrete_Data.Instance_Workflow;
-import com.company.Simulation.Simulation_Base.Data.Discrete_Data.Resource;
+import com.company.Simulation.Simulation_Base.Data.Discrete_Data.*;
 import com.company.Simulation.Simulation_Base.Data.Shared_Data.Settings;
 import com.company.Simulation.Simulation_Base.Data.Shared_Data.User;
 
@@ -24,10 +22,12 @@ public class Check_Condition_For_Event {
     }
     */
 
-    public static boolean Check_For_Condition(List<User> Users, List<Resource> Resources, Instance_Workflow Instance) {
+    //TODO Check for Condition prüft aktuell immer Activating Functions auf möglichkeit durhczuführen.
+    // Es Exisitieren jedoch fälle wo dies nicht nötig wäre
+    public static boolean Check_For_Condition(List<User> Users, List<Resource> Resources, Instance_Workflow Instance, Event_Calendar calendar, Settings settings) {
         boolean rescheck = true;
-        if (Instance.getNode() instanceof Event || Instance.getNode() instanceof Con_Join || Instance.getNode() instanceof Con_Split
-                || (Instance.getNode() instanceof Function && Instance.isWorking())) {
+        if (Instance.getNode() instanceof Event || Instance.getNode() instanceof Event_Con_Join || Instance.getNode() instanceof Event_Con_Split
+                || (Instance.getNode() instanceof Function && Instance.isWorking() && !(Instance.getNode() instanceof Activating_Function))) {
             return true;
         } else {
             for (Resource needing : ((Function) Instance.getNode()).getNeeded_Resources()) {
@@ -65,9 +65,26 @@ public class Check_Condition_For_Event {
                         return false;
                     }
                 }
-                return true;
+
+                int lasting_Shifttime_in_Seconds = calendar.getEnd_Time().toSecondOfDay() - calendar.getRuntime().toSecondOfDay();
+                int Workingtime_in_Seconds = ((Function) Instance.getNode()).getWorkingTime().get_Duration_to_Seconds();
+                if (Workingtime_in_Seconds <= lasting_Shifttime_in_Seconds) {
+                    return true;
+                } else {
+                    Workingtime_in_Seconds = Workingtime_in_Seconds - lasting_Shifttime_in_Seconds;
+                    int Shifttime_in_Seconds = calendar.getEnd_Time().toSecondOfDay() - calendar.getBegin_Time().toSecondOfDay();
+                    int advanceday = 1;
+                    while (Workingtime_in_Seconds > Shifttime_in_Seconds) {
+                        Workingtime_in_Seconds = Workingtime_in_Seconds - Shifttime_in_Seconds;
+                        advanceday++;
+                    }
+                    if (advanceday >= calendar.getRuntimeDays() - calendar.getAct_runtimeDay()) {
+                        return false;
+                    }
+                }
             }
+            return true;
         }
     }
-    }
+}
 

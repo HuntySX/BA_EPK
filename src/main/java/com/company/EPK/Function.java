@@ -2,11 +2,9 @@ package com.company.EPK;
 
 import com.company.Enums.Function_Type;
 import com.company.Simulation.Simulation_Base.Data.Discrete_Data.Resource;
+import com.company.Simulation.Simulation_Base.Data.Discrete_Data.Workingtime;
 import com.company.Simulation.Simulation_Base.Data.Threading_Data.Process_instance;
 
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.temporal.TemporalAmount;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -18,10 +16,9 @@ public class Function extends Node {
     private List<Resource> Needed_Resources;
     private List<Workforce> Needed_Workforce;
     private Consumer<Process_instance> ConsumableMethod;
-    private LocalTime WorkingTime;
+    private Workingtime WorkingTime;
 
     public Function(String function_tag, Function_Type type, int ID) {
-
         super(ID);
         this.function_type = type;
         Function_tag = function_tag;
@@ -36,14 +33,15 @@ public class Function extends Node {
         return function_type;
     }
 
-    public Function(List<Node> Next_Elem, int ID, String Function_tag, boolean concurrently, List<Resource> Needed_Resources, List<Workforce> Needed_Workforce, LocalTime WorkingTime) {
+    public Function(List<Node> Next_Elem, int ID, String Function_tag, boolean concurrently, List<Resource> Needed_Resources,
+                    List<Workforce> Needed_Workforce, int Workinghours, int Workingminutes, int Workingseconds) {
         super(Next_Elem, ID);
         this.Function_tag = Function_tag;
         this.concurrently = concurrently;
         this.ConsumableMethod = null;
         this.Needed_Resources = Needed_Resources;
         this.Needed_Workforce = Needed_Workforce;
-        this.WorkingTime = WorkingTime;
+        this.WorkingTime = new Workingtime(Workinghours, Workingminutes, Workingseconds);
     }
 
     public String getFunction_tag() {
@@ -91,13 +89,26 @@ public class Function extends Node {
         ConsumableMethod = consumableMethod;
     }
 
-    public LocalTime getWorkingTime() {
+    public Workingtime getWorkingTime() {
         return WorkingTime;
     }
 
-    public void setWorkingTime(LocalTime workingTime) {
+    public void setWorkingTime(Workingtime workingTime) {
         WorkingTime = workingTime;
     }
+
+    public void setWorkingHours(int Hours) {
+        WorkingTime.setHours(Hours);
+    }
+
+    public void setWorkingMinutes(int Minutes) {
+        WorkingTime.setMinutes(Minutes);
+    }
+
+    public void setWorkingSeconds(int Seconds) {
+        WorkingTime.setSeconds(Seconds);
+    }
+
 
     @Override
     public String toString() {

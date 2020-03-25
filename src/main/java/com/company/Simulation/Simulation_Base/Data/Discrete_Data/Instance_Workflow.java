@@ -17,6 +17,8 @@ public class Instance_Workflow {
     private List<User> Active_User;
     private List<Resource> Active_Resource;
     private boolean Working;
+    private boolean Waiting;
+    private int waiting_Ticket;
 
     public Instance_Workflow(Event_Instance instance, LocalTime to_Start, Node node) {
         Instance = instance;
@@ -24,6 +26,24 @@ public class Instance_Workflow {
         this.node = node;
         this.Active_Resource = new ArrayList<>();
         this.Active_User = new ArrayList<>();
+        Waiting = false;
+        Working = false;
+    }
+
+    public boolean Is_Waiting() {
+        return Waiting;
+    }
+
+    public void setIs_Waiting(boolean is_Waiting) {
+        this.Waiting = is_Waiting;
+    }
+
+    public int getWaiting_Ticket() {
+        return waiting_Ticket;
+    }
+
+    public void setWaiting_Ticket(int waiting_Ticket) {
+        this.waiting_Ticket = waiting_Ticket;
     }
 
     public Event_Instance getInstance() {
