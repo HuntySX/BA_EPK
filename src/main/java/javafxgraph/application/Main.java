@@ -1,15 +1,11 @@
-package com.company.UI;
+package javafxgraph.application;
 
 import javafx.application.Application;
-import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+
 import javafxgraph.fxgraph.graph.CellType;
 import javafxgraph.fxgraph.graph.Graph;
 import javafxgraph.fxgraph.graph.Model;
@@ -17,10 +13,10 @@ import javafxgraph.fxgraph.layout.base.Layout;
 import javafxgraph.fxgraph.layout.random.RandomLayout;
 
 import java.io.File;
+import java.net.MalformedURLException;
 import java.net.URL;
 
 public class Main extends Application {
-
 
     Graph graph;
 
@@ -29,22 +25,15 @@ public class Main extends Application {
     }
 
     @Override
-    public void start(Stage primaryStage) throws Exception {
+    public void start(Stage primaryStage) throws MalformedURLException {
+        BorderPane root = new BorderPane();
 
-        URL url = new File("src/main/java/com/company/UI/Main.fxml").toURI().toURL();
-        FXMLLoader loader = new FXMLLoader();
-        loader.setLocation(url);
-        Parent root = loader.load();
+        VBox box = new VBox();
+        graph = new Graph(box);
+
+        root.setCenter(graph.getScrollPane());
+
         Scene scene = new Scene(root, 1024, 768);
-
-        Borderpanecon borderpanecon = (Borderpanecon) loader.getController();
-        BorderPane pane = borderpanecon.getCanvaspane();
-        VBox Box = borderpanecon.getLeftbox();
-
-        graph = new Graph(Box);
-
-        pane.setCenter(graph.getScrollPane());
-
         //scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm()); not working
 
         primaryStage.setScene(scene);
@@ -54,6 +43,7 @@ public class Main extends Application {
 
         Layout layout = new RandomLayout(graph);
         layout.execute();
+
     }
 
     private void addGraphComponents() {
