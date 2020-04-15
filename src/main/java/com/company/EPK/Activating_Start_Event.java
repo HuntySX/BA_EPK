@@ -13,8 +13,8 @@ public class Activating_Start_Event extends Event {
     private Discrete_Event_Generator Generator;
     private Activating_Function Function;
 
-    public Activating_Start_Event(Activating_Function function, Discrete_Event_Generator generator, int to_Instantiate, List<Node> Next_Elem, String Event_Tag, boolean is_Start_Event) {
-        super(Next_Elem, Event_Tag, is_Start_Event);
+    public Activating_Start_Event(Activating_Function function, int ID, Discrete_Event_Generator generator, List<Node> Next_Elem, String Event_Tag, boolean is_Start_Event) {
+        super(Next_Elem, ID, Event_Tag, is_Start_Event);
         this.Generator = generator;
         this.start_event_type = INSTANTIATED;
         this.Function = function;

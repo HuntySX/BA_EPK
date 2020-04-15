@@ -10,7 +10,7 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="BA_EPK" target="1.8" />
+      <module name="BA_EPK" target="13" />
     </bytecodeTargetLevel>
   </component>
 </project>

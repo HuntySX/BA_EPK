@@ -20,8 +20,15 @@ public class Function extends Node {
 
     public Function(String function_tag, Function_Type type, int ID) {
         super(ID);
+        if (function_tag == null) {
+            String a = "Function ";
+            String b = Integer.toString(ID);
+            a = a.concat(b);
+            this.Function_tag = a;
+        } else {
+            this.Function_tag = function_tag;
+        }
         this.function_type = type;
-        Function_tag = function_tag;
     }
 
     public Function() {
@@ -36,7 +43,14 @@ public class Function extends Node {
     public Function(List<Node> Next_Elem, int ID, String Function_tag, boolean concurrently, List<Resource> Needed_Resources,
                     List<Workforce> Needed_Workforce, int Workinghours, int Workingminutes, int Workingseconds) {
         super(Next_Elem, ID);
-        this.Function_tag = Function_tag;
+        if (Function_tag == null) {
+            String a = "Function ";
+            String b = Integer.toString(ID);
+            a = a.concat(b);
+            this.Function_tag = a;
+        } else {
+            this.Function_tag = Function_tag;
+        }
         this.concurrently = concurrently;
         this.ConsumableMethod = null;
         this.Needed_Resources = Needed_Resources;

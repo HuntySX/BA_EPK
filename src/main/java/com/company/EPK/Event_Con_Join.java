@@ -4,7 +4,6 @@ import com.company.Enums.Contype;
 import com.company.Enums.Gate_Check_Status;
 import com.company.Simulation.Simulation_Base.Data.Discrete_Data.Event_Instance;
 import com.company.Simulation.Simulation_Base.Data.Discrete_Data.Instance_Workflow;
-import com.company.Simulation.Simulation_Threading.Event_Gate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +35,7 @@ public class Event_Con_Join extends Connector {
 
             if (!Scheduled_Nodes.isEmpty()) {
                 return WAIT;
-                //TODO Check Scheduled Notes for Functions, to Exclude Race Conditioning Gates
+                //TODO Check Scheduled Nodes for Functions, to Exclude Race Conditioning Gates
             } else {
 
                 for (Nodemap m : Mapped_Branch_Elements) {

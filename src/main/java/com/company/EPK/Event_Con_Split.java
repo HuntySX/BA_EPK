@@ -2,15 +2,10 @@ package com.company.EPK;
 
 import com.company.Enums.Contype;
 import com.company.Enums.Split_Decide_Type;
-import com.company.Enums.Split_Status;
-import com.company.Simulation.Simulation_Base.Data.Discrete_Data.Instance_Workflow;
-import com.company.Simulation.Simulation_Base.Data.Shared_Data.Simulation_Instance;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.function.BiFunction;
-import java.util.function.Supplier;
 
 public class Event_Con_Split extends Connector {
 
@@ -55,6 +50,8 @@ public class Event_Con_Split extends Connector {
             }
         } else if (Decide_Type == Split_Decide_Type.EXPONENTIAL) {
             //TODO EXPONENTIAL
+        } else if (Decide_Type == Split_Decide_Type.FULL) {
+            //TODO FULL (AND)
         }
         return Result;
     }

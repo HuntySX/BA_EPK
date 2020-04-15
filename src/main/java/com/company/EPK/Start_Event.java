@@ -12,7 +12,7 @@ public class Start_Event extends Event {
     private int to_Instantiate;
 
     public Start_Event(Start_Event_Type type, Discrete_Event_Generator generator, int to_Instantiate, List<Node> Next_Elem, String Event_Tag, boolean is_Start_Event) {
-        super(Next_Elem, Event_Tag, is_Start_Event);
+        super(Next_Elem, 0, Event_Tag, is_Start_Event); //TODO ID HIER FALSCH, Muss richtig weitergegeben werden!!!!
         this.to_Instantiate = to_Instantiate;
         this.Generator = generator;
         this.start_event_type = type;
