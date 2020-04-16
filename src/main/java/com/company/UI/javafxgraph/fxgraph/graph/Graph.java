@@ -1,5 +1,6 @@
 package com.company.UI.javafxgraph.fxgraph.graph;
 
+import com.company.UI.Borderpanecon;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.control.ScrollPane;
@@ -19,20 +20,25 @@ public class Graph {
     private Node Active_Element;
     private VBox VBox;
     private Group canvas;
+    private Borderpanecon controller;
     private ZoomableScrollPane scrollPane;
 
-    public Graph(VBox Box) {
+    public Graph(VBox Box, Borderpanecon controller) {
 
         this.model = new Model();
         this.VBox = Box;
+        this.controller = controller;
+
         canvas = new Group();
         cellLayer = new CellLayer();
 
         canvas.getChildren().add(cellLayer);
 
-        mouseGestures = new MouseGestures(this, Box);
+        mouseGestures = new MouseGestures(this, Box, model, controller);
 
         scrollPane = new ZoomableScrollPane(canvas);
+
+        mouseGestures.makeCanvasClickable(scrollPane);
 
         scrollPane.setFitToWidth(true);
         scrollPane.setFitToHeight(true);

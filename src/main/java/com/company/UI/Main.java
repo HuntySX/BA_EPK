@@ -40,7 +40,7 @@ public class Main extends Application {
 
         borderpanecon.initializeButtons();
 
-        graph = new Graph(Box);
+        graph = new Graph(Box, borderpanecon);
 
         pane.setCenter(graph.getScrollPane());
 

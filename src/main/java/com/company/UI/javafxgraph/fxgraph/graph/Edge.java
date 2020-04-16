@@ -28,6 +28,7 @@ public class Edge extends Group {
 
         getChildren().add(line);
 
+
     }
 
     public Cell getSource() {

@@ -20,5 +20,4 @@ public class TriangleCell extends Cell {
         setView(view);
 
     }
-
 }
