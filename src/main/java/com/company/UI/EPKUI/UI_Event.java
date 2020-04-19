@@ -1,7 +1,7 @@
 package com.company.UI.EPKUI;
 
 import com.company.EPK.Event;
-import com.company.EPK.Node;
+import com.company.EPK.EPK_Node;
 import com.dlsc.formsfx.model.structure.Field;
 import com.dlsc.formsfx.model.structure.Form;
 import com.dlsc.formsfx.model.structure.Group;
@@ -17,12 +17,12 @@ import java.util.List;
 
 public class UI_Event extends Event implements UI_Instantiable {
     private VBox Box;
-    private List<Node> Nodelist;
+    private List<EPK_Node> nodelist;
     private IntegerProperty UI_ID = new SimpleIntegerProperty();
     private StringProperty tag;
     private BooleanProperty is_Start = new SimpleBooleanProperty(false);
     private BooleanProperty is_End = new SimpleBooleanProperty(false);
-    private MultiSelectionField<Node> Next_Elems;
+    private MultiSelectionField<EPK_Node> Next_Elems;
 
     public UI_Event(int ID, UI_EPK EPK) {
         super(null, ID, null);
@@ -38,9 +38,9 @@ public class UI_Event extends Event implements UI_Instantiable {
                                 Field.ofStringType(tag).label("Knotenname")))));
         Box.getChildren().add(new Separator());
 
-        this.Nodelist = EPK.getAll_Elems();
-        MultiSelectionField<Node> Next_Elems = Field.ofMultiSelectionType(Nodelist, Arrays.asList(1, 2, 3)).label("Nachfolger");
-        SimpleListViewControl<Node> lv = new SimpleListViewControl<>();
+        this.nodelist = EPK.getAll_Elems();
+        MultiSelectionField<EPK_Node> Next_Elems = Field.ofMultiSelectionType(nodelist, Arrays.asList(1, 2, 3)).label("Nachfolger");
+        SimpleListViewControl<EPK_Node> lv = new SimpleListViewControl<>();
         lv.setField(Next_Elems);
         Box.getChildren().add(lv);
         Box.getChildren().add(new Separator());
@@ -50,7 +50,7 @@ public class UI_Event extends Event implements UI_Instantiable {
                 Field.ofBooleanType(is_End).label("Endevent").editable(false)))));
     }
 
-    public UI_Event(List<Node> Next_Elem, int ID, String Event_Tag) {
+    public UI_Event(List<EPK_Node> Next_Elem, int ID, String Event_Tag) {
         super(Next_Elem, ID, Event_Tag);
     }
 

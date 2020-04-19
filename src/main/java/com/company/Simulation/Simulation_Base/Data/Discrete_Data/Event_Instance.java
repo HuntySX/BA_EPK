@@ -1,6 +1,6 @@
 package com.company.Simulation.Simulation_Base.Data.Discrete_Data;
 
-import com.company.EPK.Node;
+import com.company.EPK.EPK_Node;
 import com.company.Simulation.Simulation_Base.Data.Shared_Data.Simulation_Instance;
 
 import java.util.ArrayList;
@@ -8,8 +8,8 @@ import java.util.List;
 
 public class Event_Instance extends Simulation_Instance {
 
-    private List<Node> Scheduled_Work;
-    private List<Node> Finished_Work;
+    private List<EPK_Node> Scheduled_Work;
+    private List<EPK_Node> Finished_Work;
 
     public Event_Instance(int case_ID) {
         super(case_ID);
@@ -17,47 +17,47 @@ public class Event_Instance extends Simulation_Instance {
         Finished_Work = new ArrayList<>();
     }
 
-    public List<Node> getScheduled_Work() {
+    public List<EPK_Node> getScheduled_Work() {
         return Scheduled_Work;
     }
 
-    public void setScheduled_Work(List<Node> scheduled_Work) {
+    public void setScheduled_Work(List<EPK_Node> scheduled_Work) {
         Scheduled_Work = scheduled_Work;
     }
 
-    public void add_To_Finished_Work(Node node) {
-        if (node != null) {
+    public void add_To_Finished_Work(EPK_Node EPKNode) {
+        if (EPKNode != null) {
             {
-                Finished_Work.add(node);
-                Scheduled_Work.remove(node);
+                Finished_Work.add(EPKNode);
+                Scheduled_Work.remove(EPKNode);
             }
         }
     }
 
-    public void add_To_Scheduled_Work(Node node) {
-        if (node != null) {
-            Scheduled_Work.add(node);
+    public void add_To_Scheduled_Work(EPK_Node EPKNode) {
+        if (EPKNode != null) {
+            Scheduled_Work.add(EPKNode);
         }
     }
 
-    public void remove_from_Finished_Work(Node node) {
-        if (node != null) {
-            Finished_Work.remove(node);
+    public void remove_from_Finished_Work(EPK_Node EPKNode) {
+        if (EPKNode != null) {
+            Finished_Work.remove(EPKNode);
         }
     }
 
-    public void remove_from_Scheduled_Work(Node node) {
-        if (node != null) {
-            Finished_Work.add(node);
-            Scheduled_Work.remove(node);
+    public void remove_from_Scheduled_Work(EPK_Node EPKNode) {
+        if (EPKNode != null) {
+            Finished_Work.add(EPKNode);
+            Scheduled_Work.remove(EPKNode);
         }
     }
 
-    public List<Node> getFinished_Work() {
+    public List<EPK_Node> getFinished_Work() {
         return Finished_Work;
     }
 
-    public void setFinished_Work(List<Node> finished_Work) {
+    public void setFinished_Work(List<EPK_Node> finished_Work) {
         Finished_Work = finished_Work;
     }
 }

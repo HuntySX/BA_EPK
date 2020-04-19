@@ -4,12 +4,12 @@ import com.company.Enums.Contype;
 
 import java.util.List;
 
-public abstract class Connector extends Node {
+public abstract class Connector extends EPK_Node {
 
     private Contype contype;
 
 
-    public Connector(List<Node> Next_Elem, int ID, Contype contype) {
+    public Connector(List<EPK_Node> Next_Elem, int ID, Contype contype) {
         super(Next_Elem, ID);
         this.contype = contype;
 

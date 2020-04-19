@@ -53,7 +53,7 @@ public class MouseGestures {
 
                 List<Cell> Cells = model.getAllCells();
                 int index = 0;
-                Cell cell = new Cell(null);
+                Cell cell = new Cell(model.getUniqueCellID());
                 for (Cell c : Cells) {
                     if (c.getCellId().equals("Cell A")) {
                         cell = c;
@@ -105,7 +105,7 @@ public class MouseGestures {
                 Box.getChildren().clear();
                 double x = event.getX();
                 double y = event.getY();
-                model.addCell("Cell H", CellType.TRIANGLE);
+                model.addCell("Cell H", CellType.TRIANGLE, controller.getBtn_Type());
                 graph.endUpdate();
                 Cell cell = new Cell(null);
                 for (Cell c : model.getAllCells()) {
@@ -175,7 +175,6 @@ public class MouseGestures {
     }
 
     public void makeDraggable(final Node node) {
-
 
         node.setOnMousePressed(onMousePressedEventHandler);
         node.setOnMouseDragged(onMouseDraggedEventHandler);

@@ -2,7 +2,7 @@ package com.company.UI.EPKUI;
 
 import com.company.EPK.Activating_Function;
 import com.company.EPK.Activating_Start_Event;
-import com.company.EPK.Node;
+import com.company.EPK.EPK_Node;
 import com.company.EPK.Workforce;
 import com.company.Enums.Decide_Activation_Type;
 import com.company.Enums.Function_Type;
@@ -22,12 +22,12 @@ import java.util.List;
 
 public class UI_Activate_Function extends Activating_Function implements UI_Instantiable {
     private VBox Box;
-    private List<Node> Nodelist;
+    private List<EPK_Node> nodelist;
     private List<UI_Event_Activating_Starter> Activating_Start_Events;
     private SingleSelectionField<UI_Event_Activating_Starter> Activating_Start_Event;
     private IntegerProperty UI_ID = new SimpleIntegerProperty();
     private StringProperty tag;
-    private MultiSelectionField<Node> Next_Elems;
+    private MultiSelectionField<EPK_Node> Next_Elems;
     private BooleanProperty concurrently = new SimpleBooleanProperty(true);
     private List<Resource> Resources;
     private MultiSelectionField<Resource> Needed_Resources;
@@ -58,10 +58,10 @@ public class UI_Activate_Function extends Activating_Function implements UI_Inst
                                 Field.ofStringType(tag).label("Knotenname")))));
         Box.getChildren().add(new Separator());
 
-        this.Nodelist = EPK.getAll_Elems();
+        this.nodelist = EPK.getAll_Elems();
         this.Activating_Start_Events = EPK.getAll_Activating_Start_Events();
-        MultiSelectionField<Node> Next_Elems = Field.ofMultiSelectionType(Nodelist).label("Nachfolger");
-        SimpleListViewControl<Node> lv = new SimpleListViewControl<>();
+        MultiSelectionField<EPK_Node> Next_Elems = Field.ofMultiSelectionType(nodelist).label("Nachfolger");
+        SimpleListViewControl<EPK_Node> lv = new SimpleListViewControl<>();
         lv.setField(Next_Elems);
         Box.getChildren().add(lv);
         Box.getChildren().add(new FormRenderer(Form.of(Group.of(Field.ofBooleanType(concurrently).label("Konkurrierbare Ausführung").tooltip("Bestimmt ob dieser Prozess Parallel zu einem anderen " +

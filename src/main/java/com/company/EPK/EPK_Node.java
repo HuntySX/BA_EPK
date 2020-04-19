@@ -5,12 +5,12 @@ import com.company.Simulation.Simulation_Base.Data.Shared_Data.Simulation_Instan
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class Node {
+public abstract class EPK_Node {
 
-    private List<Node> Next_Elem;
+    private List<EPK_Node> Next_Elem;
     private int ID;
 
-    public Node(List<Node> Next_Elem, int ID) {
+    public EPK_Node(List<EPK_Node> Next_Elem, int ID) {
         this.ID = ID;
         if (Next_Elem == null) {
             this.Next_Elem = new ArrayList<>();
@@ -19,26 +19,26 @@ public abstract class Node {
         }
     }
 
-    public Node() {
+    public EPK_Node() {
         this.ID = 1;
         this.Next_Elem = new ArrayList<>();
     }
 
-    public Node(int ID) {
+    public EPK_Node(int ID) {
         this.ID = ID;
         this.Next_Elem = new ArrayList<>();
     }
 
-    public List<Node> getNext_Elem() {
+    public List<EPK_Node> getNext_Elem() {
         return Next_Elem;
     }
 
-    public void add_Next_Elem(Node n) {
-        Next_Elem.add(n);
+    public void setNext_Elem(List<EPK_Node> next_Elem) {
+        Next_Elem = next_Elem;
     }
 
-    public void setNext_Elem(List<Node> next_Elem) {
-        Next_Elem = next_Elem;
+    public void add_Next_Elem(EPK_Node n) {
+        Next_Elem.add(n);
     }
 
     public int getID() {

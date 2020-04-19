@@ -111,7 +111,7 @@ public class Event_Calendar {
 
             if (Instance.getTo_Start().isBefore(End_Time)) {
                 Upcoming_List.get(day).addTimedEvent(Instance);
-            } else if (Instance.getNode() instanceof Function && Instance.isWorking()) {
+            } else if (Instance.getEPKNode() instanceof Function && Instance.isWorking()) {
                 if (day + 1 < RuntimeDays) {
                     LocalTime Calculation = Instance.getTo_Start();
                     int to_finish = Calculation.toSecondOfDay() - End_Time.toSecondOfDay();

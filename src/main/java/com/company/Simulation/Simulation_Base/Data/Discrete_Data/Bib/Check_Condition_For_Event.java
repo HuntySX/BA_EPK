@@ -26,11 +26,11 @@ public class Check_Condition_For_Event {
     // Es Exisitieren jedoch fälle wo dies nicht nötig wäre
     public static boolean Check_For_Condition(List<User> Users, List<Resource> Resources, Instance_Workflow Instance, Event_Calendar calendar, Settings settings) {
         boolean rescheck = true;
-        if (Instance.getNode() instanceof Event || Instance.getNode() instanceof Event_Con_Join || Instance.getNode() instanceof Event_Con_Split
-                || (Instance.getNode() instanceof Function && Instance.isWorking() && !(Instance.getNode() instanceof Activating_Function))) {
+        if (Instance.getEPKNode() instanceof Event || Instance.getEPKNode() instanceof Event_Con_Join || Instance.getEPKNode() instanceof Event_Con_Split
+                || (Instance.getEPKNode() instanceof Function && Instance.isWorking() && !(Instance.getEPKNode() instanceof Activating_Function))) {
             return true;
         } else {
-            for (Resource needing : ((Function) Instance.getNode()).getNeeded_Resources()) {
+            for (Resource needing : ((Function) Instance.getEPKNode()).getNeeded_Resources()) {
                 if (!rescheck) {
                     return false;
                 }
@@ -46,7 +46,7 @@ public class Check_Condition_For_Event {
             if (!rescheck) {
                 return false;
             } else {
-                for (Workforce workforce : ((Function) Instance.getNode()).getNeeded_Workforce()) {
+                for (Workforce workforce : ((Function) Instance.getEPKNode()).getNeeded_Workforce()) {
                     boolean workforcefound = false;
                     for (User user : Users) {
                         if (!user.isActive()) {
@@ -67,7 +67,7 @@ public class Check_Condition_For_Event {
                 }
 
                 int lasting_Shifttime_in_Seconds = calendar.getEnd_Time().toSecondOfDay() - calendar.getRuntime().toSecondOfDay();
-                int Workingtime_in_Seconds = ((Function) Instance.getNode()).getWorkingTime().get_Duration_to_Seconds();
+                int Workingtime_in_Seconds = ((Function) Instance.getEPKNode()).getWorkingTime().get_Duration_to_Seconds();
                 if (Workingtime_in_Seconds <= lasting_Shifttime_in_Seconds) {
                     return true;
                 } else {

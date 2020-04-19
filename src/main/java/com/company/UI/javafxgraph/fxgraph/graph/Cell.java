@@ -1,22 +1,28 @@
 package com.company.UI.javafxgraph.fxgraph.graph;
 
+import com.company.EPK.EPK_Node;
+import com.company.UI.EPKUI.UI_Instantiable;
 import javafx.scene.Node;
 import javafx.scene.layout.Pane;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Cell extends Pane {
 
-    String cellId;
+    int cellId;
+    EPK_Node UI_Node;
 
     List<Cell> children = new ArrayList<>();
     List<Cell> parents = new ArrayList<>();
 
     Node view;
+    Node label;
 
-    public Cell(String cellId) {
+    public Cell(int cellId, EPK_Node node) {
         this.cellId = cellId;
+        this.UI_Node = node;
     }
 
     public void addCellChild(Cell cell) {
@@ -43,14 +49,20 @@ public class Cell extends Pane {
         return this.view;
     }
 
-    public void setView(Node view) {
+    public Node getLabel() {
+        return this.label;
+    }
+
+    public void setView(Node view, Node label) {
 
         this.view = view;
+        this.label = label;
         getChildren().add(view);
-
+        getChildren().add(label);
     }
 
-    public String getCellId() {
+    public int getCellId() {
         return cellId;
     }
+
 }

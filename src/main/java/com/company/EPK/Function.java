@@ -8,7 +8,7 @@ import com.company.Simulation.Simulation_Base.Data.Threading_Data.Process_instan
 import java.util.List;
 import java.util.function.Consumer;
 
-public class Function extends Node {
+public class Function extends EPK_Node {
     private String Function_tag;
     private Function_Type function_type;
     private int successor = 1;
@@ -40,7 +40,7 @@ public class Function extends Node {
         return function_type;
     }
 
-    public Function(List<Node> Next_Elem, int ID, String Function_tag, boolean concurrently, List<Resource> Needed_Resources,
+    public Function(List<EPK_Node> Next_Elem, int ID, String Function_tag, boolean concurrently, List<Resource> Needed_Resources,
                     List<Workforce> Needed_Workforce, int Workinghours, int Workingminutes, int Workingseconds) {
         super(Next_Elem, ID);
         if (Function_tag == null) {

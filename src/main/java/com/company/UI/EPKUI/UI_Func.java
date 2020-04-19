@@ -1,7 +1,7 @@
 package com.company.UI.EPKUI;
 
 import com.company.EPK.Function;
-import com.company.EPK.Node;
+import com.company.EPK.EPK_Node;
 import com.company.EPK.Workforce;
 import com.company.Simulation.Simulation_Base.Data.Discrete_Data.Resource;
 import com.dlsc.formsfx.model.structure.Field;
@@ -20,10 +20,10 @@ import java.util.List;
 
 public class UI_Func extends Function implements UI_Instantiable {
     private VBox Box;
-    private List<Node> Nodelist;
+    private List<EPK_Node> nodelist;
     private IntegerProperty UI_ID = new SimpleIntegerProperty();
     private StringProperty tag;
-    private MultiSelectionField<Node> Next_Elems;
+    private MultiSelectionField<EPK_Node> Next_Elems;
     private BooleanProperty concurrently = new SimpleBooleanProperty(true);
     private List<Resource> Resources;
     private MultiSelectionField<Resource> Needed_Resources;
@@ -49,9 +49,9 @@ public class UI_Func extends Function implements UI_Instantiable {
                                 Field.ofStringType(tag).label("Knotenname")))));
         Box.getChildren().add(new Separator());
 
-        this.Nodelist = EPK.getAll_Elems();
-        MultiSelectionField<Node> Next_Elems = Field.ofMultiSelectionType(Nodelist).label("Nachfolger");
-        SimpleListViewControl<Node> lv = new SimpleListViewControl<>();
+        this.nodelist = EPK.getAll_Elems();
+        MultiSelectionField<EPK_Node> Next_Elems = Field.ofMultiSelectionType(nodelist).label("Nachfolger");
+        SimpleListViewControl<EPK_Node> lv = new SimpleListViewControl<>();
         lv.setField(Next_Elems);
         Box.getChildren().add(lv);
         Box.getChildren().add(new Separator());

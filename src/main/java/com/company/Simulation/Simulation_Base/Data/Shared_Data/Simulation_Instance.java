@@ -1,9 +1,8 @@
 package com.company.Simulation.Simulation_Base.Data.Shared_Data;
 
 import com.company.EPK.Function;
-import com.company.EPK.Node;
+import com.company.EPK.EPK_Node;
 import com.company.Enums.Process_Status;
-import com.company.Simulation.Simulation_Base.Data.Shared_Data.Workflow_Monitor;
 
 import java.util.List;
 import java.util.concurrent.locks.Lock;
@@ -14,10 +13,10 @@ import static com.company.Enums.Process_Status.Starting;
 public abstract class Simulation_Instance {
 
     private Process_Status act_Process_Status;
-    private Node Last_Elem;
+    private EPK_Node Last_Elem;
     private Workflow_Monitor workflowMonitor;
     private List<Function> scheduled_Processes;
-    private List<Node> Next_Elem;
+    private List<EPK_Node> Next_Elem;
     private int case_ID;
     private Lock Instance_lock;
 
@@ -54,19 +53,19 @@ public abstract class Simulation_Instance {
         this.case_ID = case_ID;
     }
 
-    public Node getLast_Elem() {
+    public EPK_Node getLast_Elem() {
         return Last_Elem;
     }
 
-    public void setLast_Elem(Node last_Elem) {
+    public void setLast_Elem(EPK_Node last_Elem) {
         Last_Elem = last_Elem;
     }
 
-    public List<Node> getNext_Elem() {
+    public List<EPK_Node> getNext_Elem() {
         return Next_Elem;
     }
 
-    public void setNext_Elem(List<Node> next_Elem) {
+    public void setNext_Elem(List<EPK_Node> next_Elem) {
         Next_Elem = next_Elem;
     }
 
@@ -74,7 +73,7 @@ public abstract class Simulation_Instance {
         return Instance_lock;
     }
 
-    public void add_Next_Elements(List<Node> next_elem) {
+    public void add_Next_Elements(List<EPK_Node> next_elem) {
         this.Next_Elem.addAll(next_elem);
     }
 

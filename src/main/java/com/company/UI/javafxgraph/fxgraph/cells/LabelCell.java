@@ -5,13 +5,12 @@ import javafx.scene.control.Label;
 
 public class LabelCell extends Cell {
 
-    public LabelCell(String id) {
+    public LabelCell(int id) {
         super(id);
 
-        Label view = new Label(id);
-
+        String s = Integer.toString(id);
+        Label view = new Label(s);
         setView(view);
-
     }
 
 }

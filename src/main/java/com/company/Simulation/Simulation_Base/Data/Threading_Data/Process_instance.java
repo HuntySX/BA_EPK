@@ -1,7 +1,7 @@
 package com.company.Simulation.Simulation_Base.Data.Threading_Data;
 
 import com.company.EPK.Function;
-import com.company.EPK.Node;
+import com.company.EPK.EPK_Node;
 import com.company.Enums.Function_Type;
 import com.company.Enums.Process_Status;
 import com.company.Simulation.Simulation_Base.Data.Shared_Data.Simulation_Instance;
@@ -16,7 +16,7 @@ import java.util.function.Consumer;
 
 public class Process_instance implements Runnable {
 
-    private Node process;
+    private EPK_Node process;
     private Function_Type type;
     private Thread t;
     private Lock mother;
@@ -29,7 +29,7 @@ public class Process_instance implements Runnable {
     private Consumer<Process_instance> consumable;
     private Lock lock;
 
-    public Process_instance(Lock mother, Function_Type type, Simulation_Instance instance, User user, Consumer<Process_instance> consumable, boolean concurrency, Node process) {
+    public Process_instance(Lock mother, Function_Type type, Simulation_Instance instance, User user, Consumer<Process_instance> consumable, boolean concurrency, EPK_Node process) {
         this.t = null;
         this.instance = instance;
         this.type = type;
@@ -80,7 +80,7 @@ public class Process_instance implements Runnable {
         this.consumable = consumable;
     }
 
-    public Node getProcess() {
+    public EPK_Node getProcess() {
         return process;
     }
 

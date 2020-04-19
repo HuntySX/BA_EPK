@@ -1,7 +1,7 @@
 package com.company.UI.EPKUI;
 
 import com.company.EPK.Event_Con_Split;
-import com.company.EPK.Node;
+import com.company.EPK.EPK_Node;
 import com.company.Enums.Contype;
 import com.company.Enums.Split_Decide_Type;
 import com.dlsc.formsfx.model.structure.*;
@@ -17,9 +17,9 @@ import java.util.List;
 public class UI_AND_Split extends Event_Con_Split implements UI_Instantiable {
 
     private VBox Box;
-    private List<Node> Nodelist;
+    private List<EPK_Node> nodelist;
     private IntegerProperty UI_ID = new SimpleIntegerProperty();
-    private MultiSelectionField<Node> Next_Elems;
+    private MultiSelectionField<EPK_Node> Next_Elems;
     private List<Split_Decide_Type> Decide_Types;
     private SingleSelectionField<Split_Decide_Type> Decide_Type;
 
@@ -34,9 +34,9 @@ public class UI_AND_Split extends Event_Con_Split implements UI_Instantiable {
                                 Field.ofIntegerType(UI_ID).label("ID").editable(false)))));
         Box.getChildren().add(new Separator());
 
-        this.Nodelist = EPK.getAll_Elems();
-        Next_Elems = Field.ofMultiSelectionType(Nodelist).label("Nachfolger");
-        SimpleListViewControl<Node> NList = new SimpleListViewControl<>();
+        this.nodelist = EPK.getAll_Elems();
+        Next_Elems = Field.ofMultiSelectionType(nodelist).label("Nachfolger");
+        SimpleListViewControl<EPK_Node> NList = new SimpleListViewControl<>();
         NList.setField(Next_Elems);
         Box.getChildren().add(NList);
         Box.getChildren().add(new Separator());
@@ -48,7 +48,7 @@ public class UI_AND_Split extends Event_Con_Split implements UI_Instantiable {
         Box.getChildren().add(new FormRenderer(Form.of(Group.of(Decide_Type))));
     }
 
-    public UI_AND_Split(List<Node> Next_Elem, int ID, Contype contype, Split_Decide_Type decide_type) {
+    public UI_AND_Split(List<EPK_Node> Next_Elem, int ID, Contype contype, Split_Decide_Type decide_type) {
         super(Next_Elem, ID, contype, decide_type);
     }
 

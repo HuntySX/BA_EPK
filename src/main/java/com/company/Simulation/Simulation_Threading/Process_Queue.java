@@ -2,7 +2,7 @@ package com.company.Simulation.Simulation_Threading;
 
 import com.company.EPK.EPK;
 import com.company.EPK.Function;
-import com.company.EPK.Node;
+import com.company.EPK.EPK_Node;
 import com.company.Simulation.Simulation_Base.Data.Shared_Data.User;
 import com.company.Simulation.Simulation_Base.Data.Threading_Data.Buy_Instance;
 import com.company.Simulation.Simulation_Base.Data.Threading_Data.Process_instance;
@@ -113,9 +113,9 @@ public class Process_Queue implements Runnable {
                                 if (instance != null) {
                                     Consumer<Process_instance> consumable = null;
                                     boolean concurrency = false;
-                                    Node process = null;
+                                    EPK_Node process = null;
                                     synchronized (instance.getInstance_lock()) {
-                                        for (Node n : instance.getWorkflowMonitor().get_Elements()) {
+                                        for (EPK_Node n : instance.getWorkflowMonitor().get_Elements()) {
                                             if (n instanceof Function &&
                                                     instance.getWorkflowMonitor().getProcess_Status().get(instance.getWorkflowMonitor().get_Elements().indexOf(n)) == Scheduled &&
                                                     user.getAllowed_Processes().contains(n)) {
@@ -125,7 +125,7 @@ public class Process_Queue implements Runnable {
                                                 process = n;
                                                 break;
                                             }
-                                    }
+                                        }
                                     }
 
                                     if (consumable != null) {
@@ -146,7 +146,7 @@ public class Process_Queue implements Runnable {
                                         //}
 
                                         //synchronized (instance) {
-                                        for (Node n : instance.getWorkflowMonitor().get_Elements()) {
+                                        for (EPK_Node n : instance.getWorkflowMonitor().get_Elements()) {
                                             if (instance.getWorkflowMonitor().getProcess_Status().get(instance.getWorkflowMonitor().get_Elements().indexOf(n)) == Scheduled) {
                                                 //synchronized (process_gate) {
                                                 Process_Gate.getProcess_gate().getProcess_list().Schedule_Process(instance);

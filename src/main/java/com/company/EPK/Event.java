@@ -2,7 +2,7 @@ package com.company.EPK;
 
 import java.util.List;
 
-public class Event extends Node {
+public class Event extends EPK_Node {
     private String Event_Tag;
     private int successor = 1;
     private boolean is_Start_Event;
@@ -10,7 +10,7 @@ public class Event extends Node {
 
     //Konstruktor Intermetierende Events
 
-    public Event(List<Node> Next_Elem, int ID, String Event_Tag) {
+    public Event(List<EPK_Node> Next_Elem, int ID, String Event_Tag) {
         super(Next_Elem, ID);
         if (Event_Tag == null) {
             String a = "Event ";
@@ -27,7 +27,7 @@ public class Event extends Node {
 
     //Konstruktor Start Event
 
-    public Event(List<Node> Next_Elem, int ID, String Event_Tag, boolean is_Start_Event) {
+    public Event(List<EPK_Node> Next_Elem, int ID, String Event_Tag, boolean is_Start_Event) {
         super(Next_Elem, ID);
         if (Event_Tag == null) {
             String a = "Event ";
@@ -61,9 +61,8 @@ public class Event extends Node {
     }
 
 
-
     //Allgemeiner Standart Konstruktor
-    public Event(List<Node> Next_Elem, int ID, String Event_Tag, boolean is_Start_Event, boolean is_End_Event) {
+    public Event(List<EPK_Node> Next_Elem, int ID, String Event_Tag, boolean is_Start_Event, boolean is_End_Event) {
         super(Next_Elem, ID);
         if (Event_Tag == null) {
             String a = "Event ";

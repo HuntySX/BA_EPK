@@ -1,7 +1,7 @@
 package com.company.UI.EPKUI;
 
 import com.company.EPK.Event;
-import com.company.EPK.Node;
+import com.company.EPK.EPK_Node;
 import com.dlsc.formsfx.model.structure.Field;
 import com.dlsc.formsfx.model.structure.Form;
 import com.dlsc.formsfx.model.structure.Group;
@@ -17,12 +17,12 @@ import java.util.List;
 public class UI_Event_Ending extends Event implements UI_Instantiable {
 
     private VBox Box;
-    private List<Node> Nodelist;
+    private List<EPK_Node> nodelist;
     private IntegerProperty UI_ID = new SimpleIntegerProperty();
     private StringProperty tag;
     private BooleanProperty is_Start = new SimpleBooleanProperty(false);
     private BooleanProperty is_End = new SimpleBooleanProperty(true);
-    private MultiSelectionField<Node> Next_Elems;
+    private MultiSelectionField<EPK_Node> Next_Elems;
 
     public UI_Event_Ending(int ID, UI_EPK EPK) {
         super(null, ID, null);
@@ -37,9 +37,9 @@ public class UI_Event_Ending extends Event implements UI_Instantiable {
                                 Field.ofIntegerType(UI_ID).label("ID").editable(false),
                                 Field.ofStringType(tag).label("Knotenname")))));
         Box.getChildren().add(new Separator());
-        this.Nodelist = EPK.getAll_Elems();
-        MultiSelectionField<Node> Next_Elems = Field.ofMultiSelectionType(Nodelist).label("Nachfolger").editable(false);
-        SimpleListViewControl<Node> lv = new SimpleListViewControl<>();
+        this.nodelist = EPK.getAll_Elems();
+        MultiSelectionField<EPK_Node> Next_Elems = Field.ofMultiSelectionType(nodelist).label("Nachfolger").editable(false);
+        SimpleListViewControl<EPK_Node> lv = new SimpleListViewControl<>();
         lv.setField(Next_Elems);
         Box.getChildren().add(lv);
         Box.getChildren().add(new Separator());

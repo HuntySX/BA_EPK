@@ -2,7 +2,7 @@ package com.company.UI.EPKUI;
 
 import com.company.EPK.Activating_Function;
 import com.company.EPK.Activating_Start_Event;
-import com.company.EPK.Node;
+import com.company.EPK.EPK_Node;
 import com.company.Enums.Start_Event_Type;
 import com.company.Run.Discrete_Event_Generator;
 import com.dlsc.formsfx.model.structure.*;
@@ -17,12 +17,12 @@ import java.util.List;
 public class UI_Event_Activating_Starter extends Activating_Start_Event implements UI_Instantiable {
 
     private VBox Box;
-    private List<Node> Nodelist;
+    private List<EPK_Node> nodelist;
     private IntegerProperty UI_ID = new SimpleIntegerProperty();
     private StringProperty tag;
     private BooleanProperty is_Start = new SimpleBooleanProperty(true);
     private BooleanProperty is_End = new SimpleBooleanProperty(false);
-    private MultiSelectionField<Node> Next_Elems;
+    private MultiSelectionField<EPK_Node> Next_Elems;
     private SingleSelectionField<Start_Event_Type> Start_Event_Type;
     private SingleSelectionField<UI_Activate_Function> Activating_Function;
     private IntegerProperty to_Instantiate;
@@ -44,10 +44,10 @@ public class UI_Event_Activating_Starter extends Activating_Start_Event implemen
                                 Field.ofStringType(tag).label("Knotenname")))));
         Box.getChildren().add(new Separator());
 
-        this.Nodelist = EPK.getAll_Elems();
+        this.nodelist = EPK.getAll_Elems();
         this.Activating_Functions = EPK.getAll_Activating_Functions();
-        Next_Elems = Field.ofMultiSelectionType(Nodelist).label("Nachfolger");
-        SimpleListViewControl<Node> lv = new SimpleListViewControl<>();
+        Next_Elems = Field.ofMultiSelectionType(nodelist).label("Nachfolger");
+        SimpleListViewControl<EPK_Node> lv = new SimpleListViewControl<>();
         lv.setField(Next_Elems);
         Box.getChildren().add(lv);
         Activating_Function = Field.ofSingleSelectionType(Activating_Functions).label("Aktivierungsfunktion").tooltip("Bitte die " +
@@ -66,7 +66,7 @@ public class UI_Event_Activating_Starter extends Activating_Start_Event implemen
                 Field.ofBooleanType(is_End).label("Endevent").editable(false)))));
     }
 
-    public UI_Event_Activating_Starter(Activating_Function function, int ID, Discrete_Event_Generator generator, List<Node> Next_Elem, String Event_Tag, boolean is_Start_Event) {
+    public UI_Event_Activating_Starter(Activating_Function function, int ID, Discrete_Event_Generator generator, List<EPK_Node> Next_Elem, String Event_Tag, boolean is_Start_Event) {
         super(function, ID, generator, Next_Elem, Event_Tag, is_Start_Event);
     }
 

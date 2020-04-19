@@ -5,7 +5,7 @@ import javafx.scene.control.TitledPane;
 
 public class TitledPaneCell extends Cell {
 
-    public TitledPaneCell(String id) {
+    public TitledPaneCell(int id) {
         super(id);
 
         TitledPane view = new TitledPane();

@@ -7,7 +7,7 @@ import java.util.List;
 
 public class EPK {
 
-    private List<Node> elements;
+    private List<EPK_Node> elements;
     private List<Event> events;
     private List<Function> functions;
     private List<Con_Join> connector_Join;
@@ -17,7 +17,7 @@ public class EPK {
     private List<Simulation_Instance> Instances;
     private List<Start_Event> discrete_start_Events;
 
-    public EPK(List<Node> elements, List<Event> events, List<Function> functions, List<Con_Join> connector_Join, List<Con_Split> connector_Split) {
+    public EPK(List<EPK_Node> elements, List<Event> events, List<Function> functions, List<Con_Join> connector_Join, List<Con_Split> connector_Split) {
         this.elements = elements;
         this.events = events;
         this.functions = functions;
@@ -26,7 +26,7 @@ public class EPK {
         this.Instances = new ArrayList<>();
     }
 
-    public EPK(List<Node> elements, List<Event> events, List<Function> functions, List<Con_Join> connector_Join, List<Con_Split> connector_Split, List<Start_Event> discrete_start_Events) {
+    public EPK(List<EPK_Node> elements, List<Event> events, List<Function> functions, List<Con_Join> connector_Join, List<Con_Split> connector_Split, List<Start_Event> discrete_start_Events) {
         this.elements = elements;
         this.events = events;
         this.functions = functions;
@@ -84,7 +84,7 @@ public class EPK {
         }
     }
 
-    public List<Node> getElements() {
+    public List<EPK_Node> getElements() {
         return elements;
     }
 

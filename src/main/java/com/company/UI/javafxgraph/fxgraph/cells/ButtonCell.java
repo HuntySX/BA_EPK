@@ -5,11 +5,10 @@ import javafx.scene.control.Button;
 
 public class ButtonCell extends Cell {
 
-    public ButtonCell(String id) {
+    public ButtonCell(int id) {
         super(id);
 
-        Button view = new Button(id);
-
+        Button view = new Button(Integer.toString(id));
         setView(view);
 
     }

@@ -1,7 +1,7 @@
 package com.company.UI.EPKUI;
 
 import com.company.EPK.Event;
-import com.company.EPK.Node;
+import com.company.EPK.EPK_Node;
 import com.company.Enums.Start_Event_Type;
 import com.dlsc.formsfx.model.structure.*;
 import com.dlsc.formsfx.view.controls.SimpleListViewControl;
@@ -15,12 +15,12 @@ import java.util.List;
 public class UI_Event_Starter extends Event implements UI_Instantiable {
 
     private VBox Box;
-    private List<Node> Nodelist;
+    private List<EPK_Node> nodelist;
     private IntegerProperty UI_ID = new SimpleIntegerProperty();
     private StringProperty tag;
     private BooleanProperty is_Start = new SimpleBooleanProperty(true);
     private BooleanProperty is_End = new SimpleBooleanProperty(false);
-    private MultiSelectionField<Node> Next_Elems;
+    private MultiSelectionField<EPK_Node> Next_Elems;
     private SingleSelectionField<Start_Event_Type> Start_Event_Type;
     private IntegerProperty to_Instantiate;
 
@@ -38,9 +38,9 @@ public class UI_Event_Starter extends Event implements UI_Instantiable {
                                 Field.ofStringType(tag).label("Knotenname")))));
         Box.getChildren().add(new Separator());
 
-        this.Nodelist = EPK.getAll_Elems();
-        Next_Elems = Field.ofMultiSelectionType(Nodelist).label("Nachfolger");
-        SimpleListViewControl<Node> lv = new SimpleListViewControl<>();
+        this.nodelist = EPK.getAll_Elems();
+        Next_Elems = Field.ofMultiSelectionType(nodelist).label("Nachfolger");
+        SimpleListViewControl<EPK_Node> lv = new SimpleListViewControl<>();
         lv.setField(Next_Elems);
         Box.getChildren().add(lv);
         Box.getChildren().add(new Separator());
@@ -57,7 +57,7 @@ public class UI_Event_Starter extends Event implements UI_Instantiable {
     }
 
 
-    public UI_Event_Starter(List<Node> Next_Elem, int ID, String Event_Tag) {
+    public UI_Event_Starter(List<EPK_Node> Next_Elem, int ID, String Event_Tag) {
         super(Next_Elem, ID, Event_Tag, true);
     }
 

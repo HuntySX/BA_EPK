@@ -12,16 +12,16 @@ public class Event_Con_Split extends Connector {
     private Split_Decide_Type Decide_Type;
     private boolean is_Event_Driven;
 
-    public Event_Con_Split(List<Node> Next_Elem, int ID, Contype contype, Split_Decide_Type decide_type) {
+    public Event_Con_Split(List<EPK_Node> Next_Elem, int ID, Contype contype, Split_Decide_Type decide_type) {
         super(Next_Elem, ID, contype);
         this.Decide_Type = decide_type;
 
     }
 
-    public List<Node> choose_Next() {
+    public List<EPK_Node> choose_Next() {
 
-        List<Node> Next_Elem = this.getNext_Elem();
-        List<Node> Result = new ArrayList<>();
+        List<EPK_Node> Next_Elem = this.getNext_Elem();
+        List<EPK_Node> Result = new ArrayList<>();
         if (Decide_Type == Split_Decide_Type.NORMAL) {
             //TODO Gaussian
         } else if (Decide_Type == Split_Decide_Type.SINGLE_RANDOM) {
@@ -40,12 +40,12 @@ public class Event_Con_Split extends Connector {
                     count_Elem_Quantity++;
                 }
 
-                List<Node> Working_On_Nodes = getNext_Elem();
+                List<EPK_Node> working_On_EPK_Nodes = getNext_Elem();
                 for (int i = count_Elem_Quantity; i > 0; i--) {
-                    int count_Elem = Working_On_Nodes.size();
+                    int count_Elem = working_On_EPK_Nodes.size();
                     count_Elem = rand.nextInt(count_Elem);
-                    Result.add(Working_On_Nodes.get(count_Elem));
-                    Working_On_Nodes.remove(i);
+                    Result.add(working_On_EPK_Nodes.get(count_Elem));
+                    working_On_EPK_Nodes.remove(i);
                 }
             }
         } else if (Decide_Type == Split_Decide_Type.EXPONENTIAL) {

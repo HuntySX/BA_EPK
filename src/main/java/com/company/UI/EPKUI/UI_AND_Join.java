@@ -1,7 +1,7 @@
 package com.company.UI.EPKUI;
 
 import com.company.EPK.Event_Con_Join;
-import com.company.EPK.Node;
+import com.company.EPK.EPK_Node;
 import com.company.Enums.Contype;
 import com.dlsc.formsfx.model.structure.Field;
 import com.dlsc.formsfx.model.structure.Form;
@@ -19,9 +19,9 @@ import java.util.List;
 public class UI_AND_Join extends Event_Con_Join implements UI_Instantiable {
 
     private VBox Box;
-    private List<Node> Nodelist;
+    private List<EPK_Node> nodelist;
     private IntegerProperty UI_ID = new SimpleIntegerProperty();
-    private MultiSelectionField<Node> Next_Elems;
+    private MultiSelectionField<EPK_Node> Next_Elems;
 
     public UI_AND_Join(int ID, UI_EPK EPK) {
         super(null, ID, Contype.AND);
@@ -33,16 +33,16 @@ public class UI_AND_Join extends Event_Con_Join implements UI_Instantiable {
                                 Field.ofIntegerType(UI_ID).label("ID").editable(false)))));
         Box.getChildren().add(new Separator());
 
-        this.Nodelist = EPK.getAll_Elems();
-        Next_Elems = Field.ofMultiSelectionType(Nodelist).label("Nachfolger");
-        SimpleListViewControl<Node> NList = new SimpleListViewControl<>();
+        this.nodelist = EPK.getAll_Elems();
+        Next_Elems = Field.ofMultiSelectionType(nodelist).label("Nachfolger");
+        SimpleListViewControl<EPK_Node> NList = new SimpleListViewControl<>();
         NList.setField(Next_Elems);
         Box.getChildren().add(NList);
         Box.getChildren().add(new Separator());
 
     }
 
-    public UI_AND_Join(List<Node> Next_Elem, int ID, Contype contype) {
+    public UI_AND_Join(List<EPK_Node> Next_Elem, int ID, Contype contype) {
         super(Next_Elem, ID, contype);
     }
 

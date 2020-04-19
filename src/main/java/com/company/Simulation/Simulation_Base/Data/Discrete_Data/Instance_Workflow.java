@@ -1,10 +1,8 @@
 package com.company.Simulation.Simulation_Base.Data.Discrete_Data;
 
-import com.company.EPK.Function;
-import com.company.EPK.Node;
+import com.company.EPK.EPK_Node;
 import com.company.Simulation.Simulation_Base.Data.Shared_Data.User;
 
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,17 +11,17 @@ public class Instance_Workflow {
 
     private Event_Instance Instance;
     private LocalTime to_Start;
-    private Node node;
+    private EPK_Node EPKNode;
     private List<User> Active_User;
     private List<Resource> Active_Resource;
     private boolean Working;
     private boolean Waiting;
     private int waiting_Ticket;
 
-    public Instance_Workflow(Event_Instance instance, LocalTime to_Start, Node node) {
+    public Instance_Workflow(Event_Instance instance, LocalTime to_Start, EPK_Node EPKNode) {
         Instance = instance;
         this.to_Start = to_Start;
-        this.node = node;
+        this.EPKNode = EPKNode;
         this.Active_Resource = new ArrayList<>();
         this.Active_User = new ArrayList<>();
         Waiting = false;
@@ -54,8 +52,8 @@ public class Instance_Workflow {
         return to_Start;
     }
 
-    public Node getNode() {
-        return node;
+    public EPK_Node getEPKNode() {
+        return EPKNode;
     }
 
     public void addActiveUser(User u) {
@@ -111,7 +109,7 @@ public class Instance_Workflow {
     public String toString() {
         return "Instance_Workflow{" +
                 "to_Start=" + to_Start +
-                ", node=" + node +
+                ", node=" + EPKNode +
                 '}';
     }
 }

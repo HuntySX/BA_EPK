@@ -17,29 +17,29 @@ public class Event_Con_Join extends Connector {
     private List<Event_Instance> Throughput_Instances;
 
 
-    public Event_Con_Join(List<Node> Next_Elem, int ID, Contype contype) {
+    public Event_Con_Join(List<EPK_Node> Next_Elem, int ID, Contype contype) {
         super(Next_Elem, ID, contype);
         Throughput_Instances = new ArrayList<>();
     }
 
     public Gate_Check_Status check_Previous_Elem(Instance_Workflow instance) {
 
-        List<Node> Finished_Nodes = instance.getInstance().getFinished_Work();
-        List<Node> Scheduled_Nodes = instance.getInstance().getScheduled_Work();
+        List<EPK_Node> finished_EPK_Nodes = instance.getInstance().getFinished_Work();
+        List<EPK_Node> scheduled_EPK_Nodes = instance.getInstance().getScheduled_Work();
 
         boolean Check_Single_Predecessor = false;
         boolean Check_Multiple_Predecessor = true;
-        List<Node> Predecessors = new ArrayList<>();
+        List<EPK_Node> Predecessors = new ArrayList<>();
 
         if (this.getContype() == EAGER_XOR) {
 
-            if (!Scheduled_Nodes.isEmpty()) {
+            if (!scheduled_EPK_Nodes.isEmpty()) {
                 return WAIT;
                 //TODO Check Scheduled Nodes for Functions, to Exclude Race Conditioning Gates
             } else {
 
                 for (Nodemap m : Mapped_Branch_Elements) {
-                    if (Finished_Nodes.contains(m.getFinished_Elem())) {
+                    if (finished_EPK_Nodes.contains(m.getFinished_Elem())) {
                         if (Check_Single_Predecessor) {
                             Check_Multiple_Predecessor = true;
                             break;
@@ -61,15 +61,15 @@ public class Event_Con_Join extends Connector {
             }
             Check_Single_Predecessor = false;
             Check_Multiple_Predecessor = false;
-            Finished_Nodes = instance.getInstance().getFinished_Work();
+            finished_EPK_Nodes = instance.getInstance().getFinished_Work();
 
 
             for (Nodemap m : Mapped_Branch_Elements) {
                 Predecessors.add(m.getFinished_Elem());
             }
 
-            for (Node n : Finished_Nodes) {
-                for (Node m : Predecessors) {
+            for (EPK_Node n : finished_EPK_Nodes) {
+                for (EPK_Node m : Predecessors) {
                     if (n.getID() == m.getID()) {
                         if (Check_Single_Predecessor) {
                             Check_Multiple_Predecessor = true;
@@ -91,22 +91,22 @@ public class Event_Con_Join extends Connector {
                 return WAIT;
             }
         } else if (this.getContype() == EAGER_OR) {
-            Finished_Nodes = instance.getInstance().getFinished_Work();
-            Scheduled_Nodes = instance.getInstance().getScheduled_Work();
+            finished_EPK_Nodes = instance.getInstance().getFinished_Work();
+            scheduled_EPK_Nodes = instance.getInstance().getScheduled_Work();
             List<Nodemap> Finishing_Map = new ArrayList<>();
-            if (!Scheduled_Nodes.isEmpty()) {
+            if (!scheduled_EPK_Nodes.isEmpty()) {
                 return WAIT;
                 //TODO Check Scheduled Notes for Functions, to Exclude Race Conditioning Gates
             } else {
 
 
                 for (Nodemap m : Mapped_Branch_Elements) {
-                    if (Finished_Nodes.contains(m.getStarted_Elem()) || Scheduled_Nodes.contains(m.getStarted_Elem())) {
+                    if (finished_EPK_Nodes.contains(m.getStarted_Elem()) || scheduled_EPK_Nodes.contains(m.getStarted_Elem())) {
                         Finishing_Map.add(m);
                     }
                 }
                 for (Nodemap m : Finishing_Map) {
-                    if (!Finished_Nodes.contains(m.getFinished_Elem())) {
+                    if (!finished_EPK_Nodes.contains(m.getFinished_Elem())) {
                         return WAIT;
                     }
                 }
@@ -124,8 +124,8 @@ public class Event_Con_Join extends Connector {
                 Predecessors.add(m.getFinished_Elem());
             }
 
-            for (Node n : Finished_Nodes) {
-                for (Node m : Predecessors) {
+            for (EPK_Node n : finished_EPK_Nodes) {
+                for (EPK_Node m : Predecessors) {
                     if (n.getID() == m.getID()) {
                         Check_Single_Predecessor = true;
                         break;
@@ -144,7 +144,7 @@ public class Event_Con_Join extends Connector {
 
         } else {
             for (Nodemap m : Mapped_Branch_Elements) {
-                if (!Finished_Nodes.contains(m)) {
+                if (!finished_EPK_Nodes.contains(m)) {
                     return WAIT;
                 }
             }

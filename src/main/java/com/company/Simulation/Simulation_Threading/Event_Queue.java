@@ -30,9 +30,9 @@ public class Event_Queue implements Runnable {
         this.EQ = EQ;
     }
 
-    public void to_append(List<Node> Nodes, Simulation_Instance transport_event) {
+    public void to_append(List<EPK_Node> EPKNodes, Simulation_Instance transport_event) {
 
-        for (Node a : Nodes) {
+        for (EPK_Node a : EPKNodes) {
             if (a instanceof Function) {
                 transport_event.getWorkflowMonitor().add_Workflow(a, Scheduled);
                 synchronized (Process_Gate.getProcess_gate()) {
@@ -84,27 +84,27 @@ public class Event_Queue implements Runnable {
                 synchronized (transport_event.getInstance_lock()) {
                     {
                         Workflow_Monitor Workflow = transport_event.getWorkflowMonitor();
-                        List<Node> Elements = Workflow.get_Elements();
-                        for (Node n : Elements) {
+                        List<EPK_Node> Elements = Workflow.get_Elements();
+                        for (EPK_Node n : Elements) {
                             Process_Status processStatus = Workflow.getProcess_Status().get(Workflow.get_Elements().indexOf(n));
 
                             if (processStatus == Pending) {
 
                                 if (n instanceof Con_Split) {
                                     Workflow.getProcess_Status().set(Workflow.get_Elements().indexOf(n), Finished);
-                                    List<Node> to_append = ((Con_Split) n).choose_Next(transport_event);
+                                    List<EPK_Node> to_append = ((Con_Split) n).choose_Next(transport_event);
                                     to_append(to_append, transport_event);
                                     break;
                                 } else if (n instanceof Con_Join) {
                                     if (((Con_Join) n).check_Previous_Elem(transport_event)) {
                                         Workflow.getProcess_Status().set(Workflow.get_Elements().indexOf(n), Finished);
-                                        List<Node> to_append = (n.getNext_Elem());
+                                        List<EPK_Node> to_append = (n.getNext_Elem());
                                         to_append(to_append, transport_event);
                                         break;
                                     }
                                 } else {
                                     Workflow.getProcess_Status().set(Workflow.get_Elements().indexOf(n), Finished);
-                                    List<Node> to_append = (n.getNext_Elem());
+                                    List<EPK_Node> to_append = (n.getNext_Elem());
                                     to_append(to_append, transport_event);
                                     break;
                                 }

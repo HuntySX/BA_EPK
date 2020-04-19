@@ -1,6 +1,6 @@
 package com.company.UI.EPKUI;
 
-import com.company.EPK.Node;
+import com.company.EPK.EPK_Node;
 import com.company.EPK.Workforce;
 import com.company.Enums.Decide_Activation_Type;
 import com.company.Enums.Split_Decide_Type;
@@ -12,8 +12,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class UI_EPK {
-    private Node Active_Elem;
-    private List<Node> All_Elems;
+    private EPK_Node Active_Elem;
+    private List<EPK_Node> All_Elems;
     private List<UI_Event> Events;
     private List<UI_Event_Starter> Start_Events;
     private List<UI_Event_Ending> End_Events;
@@ -59,7 +59,7 @@ public class UI_EPK {
         return Start_Event_Types;
     }
 
-    public List<Node> getAll_Elems() {
+    public List<EPK_Node> getAll_Elems() {
         return All_Elems;
     }
 

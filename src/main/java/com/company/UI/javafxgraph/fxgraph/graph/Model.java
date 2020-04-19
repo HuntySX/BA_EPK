@@ -1,5 +1,8 @@
 package com.company.UI.javafxgraph.fxgraph.graph;
 
+import com.company.UI.EPKUI.UI_EPK;
+import com.company.UI.EPKUI.UI_Event;
+import com.company.UI.UI_Button_Active_Type;
 import com.company.UI.javafxgraph.fxgraph.cells.*;
 
 import java.util.ArrayList;
@@ -9,6 +12,8 @@ import java.util.Map;
 
 public class Model {
 
+    Map<Integer, Cell> cellMap; // <id,cell>
+    private UI_EPK EPK;
     Cell graphParent;
 
     List<Cell> allCells;
@@ -18,12 +23,11 @@ public class Model {
     List<Edge> allEdges;
     List<Edge> addedEdges;
     List<Edge> removedEdges;
-
-    Map<String, Cell> cellMap; // <id,cell>
+    private int UI_ID = 1;
 
     public Model() {
-
-        graphParent = new Cell("_ROOT_");
+        EPK = new UI_EPK();
+        graphParent = new Cell(0, null);
 
         // clear model, create lists
         clear();
@@ -39,7 +43,7 @@ public class Model {
         addedEdges = new ArrayList<>();
         removedEdges = new ArrayList<>();
 
-        cellMap = new HashMap<>(); // <id,cell>
+        cellMap = new HashMap<Integer, Cell>(); // <id,cell>
 
     }
 
@@ -72,7 +76,76 @@ public class Model {
         return allEdges;
     }
 
-    public void addCell(String id, CellType type) {
+    public void addCell(int id, UI_Button_Active_Type Btn_Type) {
+
+        switch (Btn_Type) {
+
+            case EVENT:
+                int unique_ID = getUniqueCellID();
+                UI_Event Event = new UI_Event(unique_ID, EPK);
+                addCell();
+                break;
+
+            case FUNCTION:
+                TriangleCell circleCell = new TriangleCell(id);
+                addCell(circleCell);
+                break;
+
+            case AND_JOIN:
+                LabelCell labelCell = new LabelCell(id);
+                addCell(labelCell);
+                break;
+
+            case OR_JOIN:
+                ImageCell imageCell = new ImageCell(id);
+                addCell(imageCell);
+                break;
+
+            case XOR_JOIN:
+                ButtonCell buttonCell = new ButtonCell(id);
+                addCell(buttonCell);
+                break;
+
+            case AND_SPLIT:
+                TitledPaneCell titledPaneCell = new TitledPaneCell(id);
+                addCell(titledPaneCell);
+                break;
+
+            case OR_SPLIT:
+                ImageCell imageCell = new ImageCell(id);
+                addCell(imageCell);
+                break;
+
+            case XOR_SPLIT:
+                ButtonCell buttonCell = new ButtonCell(id);
+                addCell(buttonCell);
+                break;
+
+            case START_EVENT:
+                TitledPaneCell titledPaneCell = new TitledPaneCell(id);
+                addCell(titledPaneCell);
+                break;
+
+            case END_EVENT:
+                ImageCell imageCell = new ImageCell(id);
+                addCell(imageCell);
+                break;
+
+            case ACTIVATING_FUNCTION:
+                ButtonCell buttonCell = new ButtonCell(id);
+                addCell(buttonCell);
+                break;
+
+            case ACTIVATING_START_EVENT:
+                TitledPaneCell titledPaneCell = new TitledPaneCell(id);
+                addCell(titledPaneCell);
+                break;
+        }
+
+    }
+
+    @Deprecated
+    public void addCell(int id, CellType type) {
 
         switch (type) {
 
@@ -170,5 +243,11 @@ public class Model {
         addedEdges.clear();
         removedEdges.clear();
 
+    }
+
+    public int getUniqueCellID() {
+        int id = UI_ID;
+        UI_ID++;
+        return id;
     }
 }
