@@ -1,6 +1,5 @@
 package com.company.UI;
 
-import com.company.UI.javafxgraph.fxgraph.graph.CellType;
 import com.company.UI.javafxgraph.fxgraph.graph.Graph;
 import com.company.UI.javafxgraph.fxgraph.graph.Model;
 import com.company.UI.javafxgraph.fxgraph.layout.base.Layout;
@@ -32,7 +31,7 @@ public class Main extends Application {
         FXMLLoader loader = new FXMLLoader(url);
         loader.setLocation(url);
         Parent root = loader.load();
-        Scene scene = new Scene(root, 1024, 768);
+        Scene scene = new Scene(root, 1600, 900);
 
         Borderpanecon borderpanecon = (Borderpanecon) loader.getController();
         BorderPane pane = borderpanecon.getCanvaspane();
@@ -42,11 +41,16 @@ public class Main extends Application {
 
         graph = new Graph(Box, borderpanecon);
 
+        borderpanecon.setModel(graph.getModel());
+        borderpanecon.setEPK(graph.getModel().getEPK());
+        borderpanecon.setPrimaryStage(primaryStage);
+
         pane.setCenter(graph.getScrollPane());
 
         //scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm()); not working
 
         primaryStage.setScene(scene);
+        primaryStage.setTitle("EPCSim");
         primaryStage.show();
 
         addGraphComponents();
@@ -60,22 +64,6 @@ public class Main extends Application {
         Model model = graph.getModel();
 
         graph.beginUpdate();
-
-        model.addCell("Cell A", CellType.RECTANGLE);
-        model.addCell("Cell B", CellType.RECTANGLE);
-        model.addCell("Cell C", CellType.RECTANGLE);
-        model.addCell("Cell D", CellType.TRIANGLE);
-        model.addCell("Cell E", CellType.TRIANGLE);
-        model.addCell("Cell F", CellType.RECTANGLE);
-        model.addCell("Cell G", CellType.RECTANGLE);
-
-        model.addEdge("Cell A", "Cell B");
-        model.addEdge("Cell A", "Cell C");
-        model.addEdge("Cell B", "Cell C");
-        model.addEdge("Cell C", "Cell D");
-        model.addEdge("Cell B", "Cell E");
-        model.addEdge("Cell D", "Cell F");
-        model.addEdge("Cell D", "Cell G");
 
         graph.endUpdate();
 

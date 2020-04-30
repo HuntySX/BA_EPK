@@ -134,4 +134,22 @@ public class Function extends EPK_Node {
                 ", ID=" + getID() +
                 '}';
     }
+
+    @Override
+    public boolean CheckSettings() {
+        boolean Check = true;
+        if (Needed_Resources == null || Needed_Resources.isEmpty()) {
+            Check = false;
+        }
+        if (Needed_Workforce == null || Needed_Workforce.isEmpty()) {
+            Check = false;
+        }
+        if (WorkingTime == null) {
+            Check = false;
+        }
+        if (Function_tag == null || Function_tag.equals("")) {
+            Check = false;
+        }
+        return Check;
+    }
 }

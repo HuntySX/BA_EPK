@@ -25,7 +25,7 @@ public class Graph {
 
     public Graph(VBox Box, Borderpanecon controller) {
 
-        this.model = new Model();
+        this.model = new Model(this);
         this.VBox = Box;
         this.controller = controller;
 
@@ -97,5 +97,10 @@ public class Graph {
 
     public double getScale() {
         return this.scrollPane.getScaleValue();
+    }
+
+    public Borderpanecon getBorderpanecontroller() {
+
+        return controller;
     }
 }

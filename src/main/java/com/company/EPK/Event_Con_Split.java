@@ -55,4 +55,13 @@ public class Event_Con_Split extends Connector {
         }
         return Result;
     }
+
+    @Override
+    public boolean CheckSettings() {
+        boolean Check = true;
+        if (Decide_Type == null) {
+            Check = false;
+        }
+        return Check;
+    }
 }

@@ -5,7 +5,7 @@ import com.company.Simulation.Simulation_Base.Data.Shared_Data.Simulation_Instan
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class EPK_Node {
+public abstract class EPK_Node implements UI_Check_Settings {
 
     private List<EPK_Node> Next_Elem;
     private int ID;
@@ -53,4 +53,12 @@ public abstract class EPK_Node {
         instance.add_Next_Elements(this.Next_Elem);
     }
 
+    @Override
+    public boolean CheckSettings() {
+        boolean Check = true;
+        if (Next_Elem == null || Next_Elem.isEmpty()) {
+            Check = false;
+        }
+        return Check;
+    }
 }

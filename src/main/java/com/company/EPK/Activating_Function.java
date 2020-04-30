@@ -116,4 +116,19 @@ public class Activating_Function extends Function {
         }
         return false; //TODO Delete;
     }
+
+    @Override
+    public boolean CheckSettings() {
+        boolean Check = true;
+        if (Start_Event == null) {
+            Check = false;
+        }
+        if (Instantiate_Time == null) {
+            Check = false;
+        }
+        if (DecisionType == null) {
+            Check = false;
+        }
+        return Check;
+    }
 }

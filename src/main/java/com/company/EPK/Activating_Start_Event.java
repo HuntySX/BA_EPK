@@ -36,5 +36,19 @@ public class Activating_Start_Event extends Event {
         Generator = generator;
     }
 
+    public Activating_Function getActivating_Function() {
+        return Function;
+    }
 
+    @Override
+    public boolean CheckSettings() {
+        boolean Check = true;
+        if (Function == null) {
+            Check = false;
+        }
+        if (start_event_type == null) {
+            Check = false;
+        }
+        return Check;
+    }
 }

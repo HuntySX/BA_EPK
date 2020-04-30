@@ -6,13 +6,19 @@ import com.company.Enums.Decide_Activation_Type;
 import com.company.Enums.Split_Decide_Type;
 import com.company.Enums.Start_Event_Type;
 import com.company.Simulation.Simulation_Base.Data.Discrete_Data.Resource;
+import com.company.UI.javafxgraph.fxgraph.cells.UI_View_Gen;
+import com.company.UI.javafxgraph.fxgraph.graph.Graph;
+import com.company.UI.javafxgraph.fxgraph.graph.Model;
 import javafx.scene.layout.VBox;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
+import static com.company.Enums.Start_Event_Type.*;
+
 public class UI_EPK {
-    private EPK_Node Active_Elem;
+    private UI_View_Gen Active_Elem_For_Connection;
     private List<EPK_Node> All_Elems;
     private List<UI_Event> Events;
     private List<UI_Event_Starter> Start_Events;
@@ -30,11 +36,13 @@ public class UI_EPK {
     private List<Decide_Activation_Type> Decide_Activation_Types;
     private List<Resource> All_Resources;
     private List<Workforce> All_Workforces;
+    private Model model;
     private VBox Box;
+    private Graph graph;
 
-
-    public UI_EPK() {
-        Active_Elem = null;
+    public UI_EPK(Model model, Graph graph) {
+        this.model = model;
+        Active_Elem_For_Connection = null;
         All_Elems = new ArrayList<>();
         Events = new ArrayList<>();
         Start_Events = new ArrayList<>();
@@ -53,26 +61,29 @@ public class UI_EPK {
         All_Resources = new ArrayList<>();
         All_Workforces = new ArrayList<>();
         Box = new VBox();
+        this.graph = graph;
     }
 
     public List<Start_Event_Type> getStart_Event_Types() {
-        return Start_Event_Types;
+        List<Start_Event_Type> Types = new ArrayList<>();
+        Types.addAll(Arrays.asList(NORMAL, RANDOM, EXPONENTIAL));
+        return Types;
     }
-
     public List<EPK_Node> getAll_Elems() {
         return All_Elems;
     }
-
     public List<Resource> getAll_Resources() {
         return All_Resources;
     }
-
     public List<Workforce> getAll_Workforces() {
         return All_Workforces;
     }
-
     public List<Decide_Activation_Type> getDecide_Activation_Types() {
-        return Decide_Activation_Types;
+        List<Decide_Activation_Type> List = new ArrayList<>();
+        List.addAll(Arrays.asList(com.company.Enums.Decide_Activation_Type.NORMAL,
+                com.company.Enums.Decide_Activation_Type.RANDOM,
+                com.company.Enums.Decide_Activation_Type.EXPONENTIAL));
+        return List;
     }
 
     public List<UI_Activate_Function> getAll_Activating_Functions() {
@@ -81,6 +92,66 @@ public class UI_EPK {
 
     public List<UI_Event_Activating_Starter> getAll_Activating_Start_Events() {
         return Activating_Start_Events;
+    }
+
+    public UI_View_Gen getActive_Elem() {
+        return Active_Elem_For_Connection;
+    }
+
+    public void setActive_Elem_For_Connection(UI_View_Gen active_Elem_For_Connection) {
+        Active_Elem_For_Connection = active_Elem_For_Connection;
+    }
+
+    public List<UI_Event> getEvents() {
+        return Events;
+    }
+
+    public List<UI_Event_Starter> getStart_Events() {
+        return Start_Events;
+    }
+
+    public List<UI_Event_Ending> getEnd_Events() {
+        return End_Events;
+    }
+
+    public List<UI_Func> getFunctions() {
+        return Functions;
+    }
+
+    public List<UI_XOR_Split> getXOR_Splits() {
+        return XOR_Splits;
+    }
+
+    public List<UI_OR_Split> getOR_Splits() {
+        return OR_Splits;
+    }
+
+    public List<UI_AND_Split> getAND_Splits() {
+        return AND_Splits;
+    }
+
+    public List<UI_XOR_Join> getXOR_Joins() {
+        return XOR_Joins;
+    }
+
+    public List<UI_OR_Join> getOR_Joins() {
+        return OR_Joins;
+    }
+
+    public List<UI_AND_Join> getAND_Joins() {
+        return AND_Joins;
+    }
+
+    public VBox getBox() {
+        return Box;
+    }
+
+    public Model getModel() {
+        return model;
+    }
+
+    public Graph getGraph() {
+        return graph;
     }
 
     public List<UI_Con_Type> get_UI_Con_Type() {

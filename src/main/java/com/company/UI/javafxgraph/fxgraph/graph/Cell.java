@@ -1,11 +1,9 @@
 package com.company.UI.javafxgraph.fxgraph.graph;
 
 import com.company.EPK.EPK_Node;
-import com.company.UI.EPKUI.UI_Instantiable;
 import javafx.scene.Node;
 import javafx.scene.layout.Pane;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -51,6 +49,10 @@ public class Cell extends Pane {
 
     public Node getLabel() {
         return this.label;
+    }
+
+    public EPK_Node getEPKNode() {
+        return UI_Node;
     }
 
     public void setView(Node view, Node label) {

@@ -2,6 +2,7 @@ package com.company.UI;
 
 public enum UI_Button_Active_Type {
     NORMAL,
+    CONNECT,
     EVENT,
     FUNCTION,
     AND_JOIN,

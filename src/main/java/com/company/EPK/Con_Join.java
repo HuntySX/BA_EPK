@@ -62,5 +62,15 @@ public class Con_Join extends Connector {
         }*/
     }
 
-
+    @Override
+    public boolean CheckSettings() {
+        boolean Check = true;
+        if (Pre_Elem == null || Pre_Elem.isEmpty()) {
+            Check = false;
+        }
+        if (event_gate == null) {
+            Check = false;
+        }
+        return Check;
+    }
 }

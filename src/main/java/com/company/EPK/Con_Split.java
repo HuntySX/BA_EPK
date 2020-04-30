@@ -88,4 +88,25 @@ public class Con_Split extends Connector {
         }
         return result;
     }
+
+    @Override
+    public boolean CheckSettings() {
+        boolean Check = true;
+        if (Pathfi == null) {
+            Check = false;
+        }
+        if (Pathfinder == null) {
+            Check = false;
+        }
+        if (Single_Elem == null || Single_Elem.isEmpty()) {
+            Check = false;
+        }
+        if (Status == null) {
+            Check = false;
+        }
+        if (Decide_Type == null) {
+            Check = false;
+        }
+        return Check;
+    }
 }

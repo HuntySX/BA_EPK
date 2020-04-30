@@ -1,0 +1,6 @@
+<svg xmlns:lucid="lucid" xmlns="http://www.w3.org/2000/svg" width="260" height="160">
+    <g lucid:page-tab-id="0_0" fill="#fff">
+        <path d="M-100-60h1760v1360H-100z"/>
+        <path d="M64 20h132l44 60-44 60H64L20 80z" stroke="#000" stroke-width="2"/>
+    </g>
+</svg>

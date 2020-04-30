@@ -93,5 +93,17 @@ public class Event extends EPK_Node {
         this.is_End_Event = is_End_Event;
     }
 
+    public String getEvent_Tag() {
+        return Event_Tag;
+    }
 
+    @Override
+    public boolean CheckSettings() {
+        boolean Check = true;
+
+        if (Event_Tag == null || Event_Tag.equals("")) {
+            Check = false;
+        }
+        return Check;
+    }
 }

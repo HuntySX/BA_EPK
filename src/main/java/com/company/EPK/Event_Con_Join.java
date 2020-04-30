@@ -152,4 +152,14 @@ public class Event_Con_Join extends Connector {
         }
 
     }
+
+    @Override
+    public boolean CheckSettings() {
+        boolean Check = true;
+        /*if(Mapped_Branch_Elements == null || Mapped_Branch_Elements.isEmpty())
+        {
+            Check = false;
+        }*/
+        return Check;
+    }
 }

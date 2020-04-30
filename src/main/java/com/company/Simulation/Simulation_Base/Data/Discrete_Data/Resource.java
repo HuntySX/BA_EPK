@@ -66,4 +66,13 @@ public class Resource {
     public int getID() {
         return r_ID;
     }
+
+    @Override
+    public String toString() {
+        return "Resource{" +
+                "r_ID=" + r_ID +
+                ", name='" + name + '\'' +
+                ", count=" + count +
+                '}';
+    }
 }

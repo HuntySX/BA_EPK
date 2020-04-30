@@ -25,4 +25,5 @@ public class Nodemap {
     public void setFinished_Elem(EPK_Node finished_Elem) {
         Finished_Elem = finished_Elem;
     }
+
 }

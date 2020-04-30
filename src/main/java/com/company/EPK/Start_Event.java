@@ -11,8 +11,8 @@ public class Start_Event extends Event {
     private Discrete_Event_Generator Generator;
     private int to_Instantiate;
 
-    public Start_Event(Start_Event_Type type, Discrete_Event_Generator generator, int to_Instantiate, List<EPK_Node> Next_Elem, String Event_Tag, boolean is_Start_Event) {
-        super(Next_Elem, 0, Event_Tag, is_Start_Event); //TODO ID HIER FALSCH, Muss richtig weitergegeben werden!!!!
+    public Start_Event(Start_Event_Type type, int ID, Discrete_Event_Generator generator, int to_Instantiate, List<EPK_Node> Next_Elem, String Event_Tag, boolean is_Start_Event) {
+        super(Next_Elem, ID, Event_Tag, is_Start_Event); //TODO ID HIER FALSCH, Muss richtig weitergegeben werden!!!!
         this.to_Instantiate = to_Instantiate;
         this.Generator = generator;
         this.start_event_type = type;
@@ -40,5 +40,14 @@ public class Start_Event extends Event {
 
     public void setTo_Instantiate(int to_Instantiate) {
         this.to_Instantiate = to_Instantiate;
+    }
+
+    @Override
+    public boolean CheckSettings() {
+        boolean Check = true;
+        if (start_event_type == null) {
+            Check = false;
+        }
+        return Check;
     }
 }
