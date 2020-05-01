@@ -6,6 +6,7 @@ import com.company.Enums.Decide_Activation_Type;
 import com.company.Enums.Split_Decide_Type;
 import com.company.Enums.Start_Event_Type;
 import com.company.Simulation.Simulation_Base.Data.Discrete_Data.Resource;
+import com.company.Simulation.Simulation_Base.Data.Shared_Data.User;
 import com.company.UI.javafxgraph.fxgraph.cells.UI_View_Gen;
 import com.company.UI.javafxgraph.fxgraph.graph.Graph;
 import com.company.UI.javafxgraph.fxgraph.graph.Model;
@@ -36,9 +37,11 @@ public class UI_EPK {
     private List<Decide_Activation_Type> Decide_Activation_Types;
     private List<Resource> All_Resources;
     private List<Workforce> All_Workforces;
+    private List<User> All_Users;
     private Model model;
     private VBox Box;
     private Graph graph;
+    private int UniqueUserID;
 
     public UI_EPK(Model model, Graph graph) {
         this.model = model;
@@ -62,6 +65,10 @@ public class UI_EPK {
         All_Workforces = new ArrayList<>();
         Box = new VBox();
         this.graph = graph;
+        this.All_Workforces = new ArrayList<>();
+        this.All_Resources = new ArrayList<>();
+        this.All_Users = new ArrayList<>();
+        this.UniqueUserID = 1;
     }
 
     public List<Start_Event_Type> getStart_Event_Types() {
@@ -69,15 +76,57 @@ public class UI_EPK {
         Types.addAll(Arrays.asList(NORMAL, RANDOM, EXPONENTIAL));
         return Types;
     }
+
     public List<EPK_Node> getAll_Elems() {
         return All_Elems;
     }
+
     public List<Resource> getAll_Resources() {
         return All_Resources;
     }
+
+    public List<User> getAll_Users() {
+        return All_Users;
+    }
+
+    public void AddUser(User user) {
+        All_Users.add(user);
+    }
+
+    public void RemoveUser(User user) {
+        if (All_Users.contains(user)) {
+            All_Users.remove(user);
+        }
+    }
+
+    public void AddResource(Resource resource) {
+        if (!All_Resources.contains(resource)) {
+            All_Resources.add(resource);
+        }
+    }
+
+    public void RemoveResource(Resource resource) {
+        if (All_Resources.contains(resource)) {
+            All_Resources.remove(resource);
+        }
+    }
+
+    public void AddWorkforce(Workforce workforce) {
+        if (!All_Workforces.contains(workforce)) {
+            All_Workforces.add(workforce);
+        }
+    }
+
+    public void RemoveWorkforce(Workforce workforce) {
+        if (All_Workforces.contains(workforce)) {
+            All_Workforces.remove(workforce);
+        }
+    }
+
     public List<Workforce> getAll_Workforces() {
         return All_Workforces;
     }
+
     public List<Decide_Activation_Type> getDecide_Activation_Types() {
         List<Decide_Activation_Type> List = new ArrayList<>();
         List.addAll(Arrays.asList(com.company.Enums.Decide_Activation_Type.NORMAL,
@@ -169,5 +218,11 @@ public class UI_EPK {
         List.add(Split_Decide_Type.EXPONENTIAL);
         List.add(Split_Decide_Type.FULL);
         return List;
+    }
+
+    public int getUniqueUserID() {
+        int id = UniqueUserID;
+        UniqueUserID++;
+        return id;
     }
 }

@@ -3,6 +3,7 @@ package com.company.UI;
 import com.company.UI.EPKUI.UI_EPK;
 import com.company.UI.EPKUI.UI_Instantiable;
 import com.company.UI.EPKUI.UI_TEST_EPK;
+import com.company.UI.EPKUI.UI_USER_MANAGEMENT;
 import com.company.UI.javafxgraph.fxgraph.graph.Model;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -31,7 +32,10 @@ public class Borderpanecon implements Initializable {
     Model model;
     UI_EPK EPK;
     Stage primarystage;
+    Stage ThisStage;
 
+    @FXML
+    Button UserMan;
     @FXML
     Button Testing;
     @FXML
@@ -94,6 +98,10 @@ public class Borderpanecon implements Initializable {
 
     public void setModel(Model model) {
         this.model = model;
+    }
+
+    public void setThisStage(Stage stage) {
+        this.ThisStage = stage;
     }
 
     public void setEPK(UI_EPK EPK) {
@@ -182,6 +190,31 @@ public class Borderpanecon implements Initializable {
             newWindow.initModality(Modality.WINDOW_MODAL);
             newWindow.setX(primarystage.getX() + 200);
             newWindow.setY(primarystage.getY() + 100);
+            newWindow.show();
+
+        } else if (e.getSource() == UserMan) {
+
+            URL url = new File("src/main/java/com/company/UI/javafxgraph/User_UI.fxml").toURI().toURL();
+            FXMLLoader loader = new FXMLLoader(url);
+            loader.setLocation(url);
+            Parent root = loader.load();
+            Scene scene = new Scene(root, 800, 500);
+
+            UI_USER_MANAGEMENT USER_UI = (UI_USER_MANAGEMENT) loader.getController();
+
+
+            Stage newWindow = new Stage();
+            USER_UI.setEPK(EPK);
+            USER_UI.setMainStage(ThisStage);
+            USER_UI.setThisstage(newWindow);
+            newWindow.setTitle("EPCSim User-Management");
+            newWindow.setScene(scene);
+            newWindow.setResizable(false);
+            newWindow.initOwner(primarystage);
+            newWindow.initModality(Modality.WINDOW_MODAL);
+            newWindow.setX(primarystage.getX() + 200);
+            newWindow.setY(primarystage.getY() + 100);
+            USER_UI.generateUI();
             newWindow.show();
 
         }

@@ -3,6 +3,7 @@ package com.company.Simulation.Simulation_Base.Data.Shared_Data;
 import com.company.EPK.Function;
 import com.company.EPK.Workforce;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class User {
@@ -19,6 +20,7 @@ public class User {
         this.last_Name = last_Name;
         this.p_ID = p_ID;
         this.active = true;
+        Workforce = new ArrayList<>();
         this.efficiency = efficiency;
     }
 
@@ -82,5 +84,13 @@ public class User {
 
     public List<Workforce> getWorkforce() {
         return Workforce;
+    }
+
+    @Override
+    public String toString() {
+        return first_Name + '\'' +
+                ", last_Name='" + last_Name + '\'' +
+                ", [p_ID=" + p_ID +
+                "]";
     }
 }
