@@ -3,6 +3,7 @@ package com.company.UI.EPKUI;
 import com.company.EPK.EPK_Node;
 import com.company.EPK.Workforce;
 import com.company.Enums.Decide_Activation_Type;
+import com.company.Enums.Option_Event_Choosing;
 import com.company.Enums.Split_Decide_Type;
 import com.company.Enums.Start_Event_Type;
 import com.company.Simulation.Simulation_Base.Data.Discrete_Data.Resource;
@@ -16,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static com.company.Enums.Option_Event_Choosing.*;
 import static com.company.Enums.Start_Event_Type.*;
 
 public class UI_EPK {
@@ -42,6 +44,9 @@ public class UI_EPK {
     private VBox Box;
     private Graph graph;
     private int UniqueUserID;
+    private int UniqueResourceID;
+    private int UniqueWorkforceID;
+    private UI_Settings UI_Settings;
 
     public UI_EPK(Model model, Graph graph) {
         this.model = model;
@@ -69,6 +74,9 @@ public class UI_EPK {
         this.All_Resources = new ArrayList<>();
         this.All_Users = new ArrayList<>();
         this.UniqueUserID = 1;
+        this.UniqueResourceID = 1;
+        this.UniqueWorkforceID = 1;
+        this.UI_Settings = null;
     }
 
     public List<Start_Event_Type> getStart_Event_Types() {
@@ -224,5 +232,35 @@ public class UI_EPK {
         int id = UniqueUserID;
         UniqueUserID++;
         return id;
+    }
+
+    public int getUniqueResourceID() {
+        int id = UniqueResourceID;
+        UniqueResourceID++;
+        return id;
+    }
+
+    public int getUniqueWorkforceID() {
+        int id = UniqueWorkforceID;
+        UniqueWorkforceID++;
+        return id;
+    }
+
+    public com.company.UI.EPKUI.UI_Settings getUI_Settings() {
+        return UI_Settings;
+    }
+
+    public void setUI_Settings(com.company.UI.EPKUI.UI_Settings UI_Settings) {
+        this.UI_Settings = UI_Settings;
+    }
+
+    public List<Option_Event_Choosing> getAll_Event_Choosings() {
+        List<Option_Event_Choosing> List = new ArrayList<>();
+        List.add(FIFO);
+        List.add(BY_CUSTOMER_RELATION);
+        List.add(BY_LARGEST_MARGIN);
+        List.add(BY_LARGEST_INVEST);
+        List.add(DEFAULT);
+        return List;
     }
 }

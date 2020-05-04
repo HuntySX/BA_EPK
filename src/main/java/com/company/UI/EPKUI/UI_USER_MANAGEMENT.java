@@ -1,24 +1,22 @@
 package com.company.UI.EPKUI;
 
-import com.company.EPK.*;
-import com.company.Simulation.Simulation_Base.Data.Discrete_Data.Resource;
+import com.company.EPK.Workforce;
 import com.company.Simulation.Simulation_Base.Data.Shared_Data.User;
 import com.dlsc.formsfx.model.structure.*;
 import com.dlsc.formsfx.view.renderer.FormRenderer;
-import javafx.beans.property.SimpleStringProperty;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.Label;
+import javafx.scene.control.Separator;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import org.apache.commons.math3.analysis.function.Add;
 
 import java.net.URL;
-import java.security.Permission;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -90,7 +88,7 @@ public class UI_USER_MANAGEMENT implements Initializable {
         Editbox.getChildren().clear();
         User user = new User("", "", EPK.getUniqueUserID(), 1);
         IntegerField P_ID = Field.ofIntegerType(user.getP_ID()).label("ID: ").editable(false);
-        ;
+        List<Workforce> Workforces_to_Add = new ArrayList<>();
         StringField FirstName = Field.ofStringType(user.getFirst_Name()).label("Firstname:");
         StringField LastName = Field.ofStringType(user.getLast_Name()).label("Lastname: ");
         DoubleField Efficiency = Field.ofDoubleType(user.getEfficiency()).label("Efficiency: ");
@@ -103,6 +101,14 @@ public class UI_USER_MANAGEMENT implements Initializable {
                 user.setEfficiency(Efficiency.getValue().floatValue());
                 user.setFirst_Name(FirstName.getValue());
                 user.setLast_Name(LastName.getValue());
+                for (Workforce w : Workforces_to_Add) {
+                    if (!user.getWorkforces().contains(w)) {
+                        user.getWorkforces().add(w);
+                    }
+                    if (!w.getGranted_to().contains(user)) {
+                        w.getGranted_to().add(user);
+                    }
+                }
                 EPK.AddUser(user);
                 generateUI();
             }
@@ -111,10 +117,10 @@ public class UI_USER_MANAGEMENT implements Initializable {
 
         Label AddedWorkforces = new Label();
         String Workforcelabel = new String("Added Workforces: [");
-        for (Workforce added_force : user.getWorkforce()) {
-            Workforcelabel.concat("; " + added_force.toString());
+        for (Workforce added_force : user.getWorkforces()) {
+            Workforcelabel = Workforcelabel.concat("; " + added_force.toString());
         }
-        Workforcelabel.concat("]");
+        Workforcelabel = Workforcelabel.concat("]");
         AddedWorkforces.setText(Workforcelabel);
 
         SingleSelectionField<Workforce> Workforcelist = Field.ofSingleSelectionType(Workforces).label("Workforces: ");
@@ -124,32 +130,31 @@ public class UI_USER_MANAGEMENT implements Initializable {
             public void handle(ActionEvent actionEvent) {
                 Workforce force = Workforcelist.getSelection();
                 if (force != null) {
-                    if (!user.getWorkforce().contains(force)) {
-                        user.getWorkforce().add(force);
+                    if (!Workforces_to_Add.contains(force)) {
+                        Workforces_to_Add.add(force);
                         String Workforcelabel = "Added Workforces: [";
-                        for (Workforce added_force : user.getWorkforce()) {
-                            Workforcelabel.concat("; " + added_force.toString());
+                        for (Workforce added_force : Workforces_to_Add) {
+                            Workforcelabel = Workforcelabel.concat("; " + added_force.toString());
                         }
-                        Workforcelabel.concat("]");
+                        Workforcelabel = Workforcelabel.concat("]");
                         AddedWorkforces.setText(Workforcelabel);
                     }
                 }
             }
         });
-
         Button Remove_Workforce = new Button("Remove Workforce");
         Remove_Workforce.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
                 Workforce force = Workforcelist.getSelection();
                 if (force != null) {
-                    if (user.getWorkforce().contains(force)) {
-                        user.getWorkforce().remove(force);
+                    if (Workforces_to_Add.contains(force)) {
+                        Workforces_to_Add.remove(force);
                         String Workforcelabel = new String("Added Workforces: [ ");
-                        for (Workforce added_force : user.getWorkforce()) {
-                            Workforcelabel.concat("; " + added_force.toString());
+                        for (Workforce added_force : Workforces_to_Add) {
+                            Workforcelabel = Workforcelabel.concat("; " + added_force.toString());
                         }
-                        Workforcelabel.concat(" ]");
+                        Workforcelabel = Workforcelabel.concat(" ]");
                         AddedWorkforces.setText(Workforcelabel);
                     }
                 }
@@ -176,7 +181,8 @@ public class UI_USER_MANAGEMENT implements Initializable {
         StringField FirstName = Field.ofStringType(user.getFirst_Name()).label("Firstname:");
         StringField LastName = Field.ofStringType(user.getLast_Name()).label("Lastname: ");
         DoubleField Efficiency = Field.ofDoubleType(user.getEfficiency()).label("Efficiency: ");
-
+        List<Workforce> Workforces_to_Add = new ArrayList<>();
+        List<Workforce> Workforces_to_Remove = new ArrayList<>();
         ButtonBar Save = new ButtonBar();
         Button Save_Button = new Button("Save User");
         Save_Button.setOnAction(new EventHandler<ActionEvent>() {
@@ -185,6 +191,18 @@ public class UI_USER_MANAGEMENT implements Initializable {
                 user.setEfficiency(Efficiency.getValue().floatValue());
                 user.setFirst_Name(FirstName.getValue());
                 user.setLast_Name(LastName.getValue());
+                for (Workforce w : Workforces_to_Add) {
+                    if (!user.getWorkforces().contains(w)) {
+                        user.getWorkforces().add(w);
+                    }
+                    if (!w.getGranted_to().contains(user)) {
+                        w.getGranted_to().add(user);
+                    }
+                }
+                for (Workforce w : Workforces_to_Remove) {
+                    user.getWorkforces().remove(w);
+                    w.getGranted_to().remove(user);
+                }
                 generateUI();
             }
         });
@@ -192,10 +210,10 @@ public class UI_USER_MANAGEMENT implements Initializable {
 
         Label AddedWorkforces = new Label();
         String Workforcelabel = new String("Added Workforces: [");
-        for (Workforce added_force : user.getWorkforce()) {
-            Workforcelabel.concat("; " + added_force.toString());
+        for (Workforce added_force : user.getWorkforces()) {
+            Workforcelabel = Workforcelabel.concat("; " + added_force.toString());
         }
-        Workforcelabel.concat("]");
+        Workforcelabel = Workforcelabel.concat("]");
         AddedWorkforces.setText(Workforcelabel);
 
         SingleSelectionField<Workforce> Workforcelist = Field.ofSingleSelectionType(Workforces).label("Workforces: ");
@@ -205,13 +223,16 @@ public class UI_USER_MANAGEMENT implements Initializable {
             public void handle(ActionEvent actionEvent) {
                 Workforce force = Workforcelist.getSelection();
                 if (force != null) {
-                    if (!user.getWorkforce().contains(force)) {
-                        user.getWorkforce().add(force);
+                    if (!user.getWorkforces().contains(force) && !Workforces_to_Add.contains(force)) {
+                        Workforces_to_Add.add(force);
                         String Workforcelabel = "Added Workforces: [";
-                        for (Workforce added_force : user.getWorkforce()) {
-                            Workforcelabel.concat("; " + added_force.toString());
+                        for (Workforce added_force : user.getWorkforces()) {
+                            Workforcelabel = Workforcelabel.concat("; " + added_force.toString());
                         }
-                        Workforcelabel.concat("]");
+                        for (Workforce added_force : Workforces_to_Add) {
+                            Workforcelabel = Workforcelabel.concat("; " + added_force.toString());
+                        }
+                        Workforcelabel = Workforcelabel.concat("]");
                         AddedWorkforces.setText(Workforcelabel);
                     }
                 }
@@ -224,15 +245,18 @@ public class UI_USER_MANAGEMENT implements Initializable {
             public void handle(ActionEvent actionEvent) {
                 Workforce force = Workforcelist.getSelection();
                 if (force != null) {
-                    if (user.getWorkforce().contains(force)) {
-                        user.getWorkforce().remove(force);
-                        String Workforcelabel = new String("Added Workforces: [ ");
-                        for (Workforce added_force : user.getWorkforce()) {
-                            Workforcelabel.concat("; " + added_force.toString());
-                        }
-                        Workforcelabel.concat(" ]");
-                        AddedWorkforces.setText(Workforcelabel);
+                    if (user.getWorkforces().contains(force) || Workforces_to_Add.contains(force)) {
+                        Workforces_to_Remove.add(force);
                     }
+
+                    String Workforcelabel = new String("Added Workforces: [ ");
+                    for (Workforce added_force : user.getWorkforces()) {
+                        if (!Workforces_to_Remove.contains(added_force)) {
+                            Workforcelabel = Workforcelabel.concat("; " + added_force.toString());
+                        }
+                    }
+                    Workforcelabel = Workforcelabel.concat(" ]");
+                    AddedWorkforces.setText(Workforcelabel);
                 }
             }
         });
@@ -265,9 +289,9 @@ public class UI_USER_MANAGEMENT implements Initializable {
             }
         });
         Save.getButtons().add(Save_Button);
-
+        List<Workforce> emptyList = new ArrayList<>();
         Label AddedWorkforces = new Label(" ");
-        SingleSelectionField<Workforce> Workforcelist = Field.ofSingleSelectionType(Workforces).label("Workforces: ");
+        SingleSelectionField<Workforce> Workforcelist = Field.ofSingleSelectionType(emptyList).label("Workforces: ");
         Button Add_Workforce = new Button("Add Workforce");
         Add_Workforce.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -290,7 +314,7 @@ public class UI_USER_MANAGEMENT implements Initializable {
         FirstName.editable(false);
         LastName.editable(false);
         Efficiency.editable(false);
-        Workforcelist.editable(false);
+        Workforcelist.editable(true);
         Add_Workforce.setDisable(true);
         Remove_Workforce.setDisable(true);
         Save_Button.setDisable(true);

@@ -1,318 +1,254 @@
 package com.company.UI.EPKUI;
 
-import com.company.EPK.*;
-import com.dlsc.formsfx.model.structure.Field;
-import com.dlsc.formsfx.model.structure.Form;
-import com.dlsc.formsfx.model.structure.Group;
-import com.dlsc.formsfx.model.structure.SingleSelectionField;
+import com.company.EPK.Function;
+import com.company.Simulation.Simulation_Base.Data.Discrete_Data.Resource;
+import com.dlsc.formsfx.model.structure.*;
 import com.dlsc.formsfx.view.renderer.FormRenderer;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.Label;
+import javafx.scene.control.Separator;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.ResourceBundle;
 
 public class UI_RESOURCE_MANAGEMENT implements Initializable {
+
     @FXML
     Button OK_Button;
     @FXML
-    VBox Error_Box;
+    VBox Choosebox;
+    @FXML
+    VBox Editbox;
+    @FXML
+    VBox Showbox;
+
     private UI_EPK EPK;
-    private List<UI_Error_Message> Messages;
-    private TextArea Area;
-    private Stage stage;
+    private List<Resource> Resources;
+    private Stage Mainstage;
+    private Stage this_stage;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-
-        this.Messages = new ArrayList<>();
-
+        this.Resources = new ArrayList<>();
     }
 
     public void setEPK(UI_EPK EPK) {
         this.EPK = EPK;
     }
 
-    public void setStage(Stage stage) {
-        this.stage = stage;
+    public void setMainStage(Stage stage) {
+        this.Mainstage = stage;
     }
 
-    public void generateTest() {
+    public void setThisstage(Stage stage) {
+        this_stage = stage;
+    }
 
-
-        List<EPK_Node> All_Elems = EPK.getAll_Elems();
-        Messages = RunTests(All_Elems);
-        Error_Box.getChildren().add(new Separator());
-        Label label = new Label("Error messages: ");
-        Error_Box.getChildren().add(label);
-        SingleSelectionField<UI_Error_Message> UI_MESSAGES = Field.ofSingleSelectionType(Messages).label("Fehler");
-        FormRenderer MESSAGES_UI = new FormRenderer(Form.of(Group.of(UI_MESSAGES)));
-        Error_Box.getChildren().add(MESSAGES_UI);
-        Button btn = new Button("Show Selected Error");
-        btn.setOnAction(new EventHandler<ActionEvent>() {
+    public void generateUI() {
+        Choosebox.getChildren().clear();
+        Resources = EPK.getAll_Resources();
+        generateShowUI();
+        Label label = new Label("Choose resource to edit: ");
+        SingleSelectionField<Resource> UI_Resources = Field.ofSingleSelectionType(Resources).label("Resources");
+        FormRenderer RESOURCE_UI = new FormRenderer(Form.of(Group.of(UI_Resources)));
+        Choosebox.getChildren().add(RESOURCE_UI);
+        Button button1 = new Button("Edit selected resource");
+        button1.setOnAction(actionEvent -> {
+            Resource resource = UI_Resources.getSelection();
+            if (resource != null) {
+                showEditResourceUI(resource);
+            }
+        });
+        Button button2 = new Button("New resource");
+        button2.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
-                UI_Error_Message Mess = UI_MESSAGES.getSelection();
-                if (Mess != null) {
-                    if (Area != null) {
-                        Area.clear();
-                        Area.setText(Mess.generateErrorText());
-                    } else {
-                        Area = new TextArea(Mess.generateErrorText());
-                        Area.setWrapText(true);
-                        Error_Box.getChildren().add(Area);
-                    }
-                }
+                showNewResourceUI();
             }
         });
         ButtonBar bar = new ButtonBar();
-        bar.getButtons().add(btn);
-        Error_Box.getChildren().add(bar);
-        Error_Box.getChildren().add(new Separator());
+        bar.getButtons().add(button1);
+        bar.getButtons().add(button2);
+        Choosebox.getChildren().add(bar);
     }
 
-    private List<UI_Error_Message> RunTests(List<EPK_Node> all_elems) {
+    private void showNewResourceUI() {
+        Editbox.getChildren().clear();
+        Resource resource = new Resource("", 0, EPK.getUniqueResourceID());
+        IntegerField R_ID = Field.ofIntegerType(resource.getID()).label("ID: ").editable(false);
+        StringField Resourcename = Field.ofStringType(resource.getName()).label("Resourcename:");
+        IntegerField Count = Field.ofIntegerType(resource.getCount()).label("Quantity: ");
 
-        List<UI_Error_Message> Error_Messages = new ArrayList<>();
-
-        Error_Messages.addAll(ReachableTest(all_elems));
-        Error_Messages.addAll(SettingsTest(all_elems));
-        Error_Messages.addAll(GraphTest(all_elems));
-        Error_Messages.addAll(Missing_Sisterblock_Test(all_elems));
-        return Error_Messages;
-    }
-
-    private List<UI_Error_Message> Missing_Sisterblock_Test(List<EPK_Node> all_elems) {
-        List<UI_Error_Message> Error_Messages = new ArrayList<>();
-        for (EPK_Node node : all_elems) {
-            if (node instanceof Activating_Function) {
-                if (((Activating_Function) node).getStart_Event() == null) {
-                    UI_Error_Message Message = new UI_Error_Message(
-                            Type_Of_Error.ACTIVATING_MISSING_SISTERBLOCK, node, null);
-                    Error_Messages.add(Message);
+        ButtonBar Save = new ButtonBar();
+        Button Save_Button = new Button("Save resource");
+        Save_Button.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                resource.setCount(Count.getValue());
+                resource.setName(Resourcename.getValue());
+                EPK.AddResource(resource);
+                generateUI();
+            }
+        });
+        Save.getButtons().add(Save_Button);
+        Label AddedFunctions = new Label();
+        String Functionlabel = new String("Added functions: [");
+        for (Function added_function : resource.getUsed_In()) {
+            Functionlabel.concat("; " + added_function.toString());
+        }
+        Functionlabel.concat("]");
+        AddedFunctions.setText(Functionlabel);
+        List<Function> AddedFunctionlist = resource.getUsed_In();
+        SingleSelectionField<Function> Functionlist = Field.ofSingleSelectionType(AddedFunctionlist).label("Used in: ");
+        Button Clear_functions = new Button("Clear functions");
+        Clear_functions.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                if (AddedFunctionlist != null && !AddedFunctionlist.isEmpty()) {
+                    for (Function f : AddedFunctionlist) {
+                        f.removeResourcebyID(resource);
+                    }
+                    AddedFunctionlist.clear();
+                    String Functionlabel = "Added functions: [ ";
+                    Functionlabel.concat("]");
+                    AddedFunctions.setText(Functionlabel);
                 }
             }
-        }
-        return Error_Messages;
+        });
+
+        Clear_functions.setDisable(true);
+        ButtonBar Functionbar = new ButtonBar();
+        Functionbar.getButtons().add(Clear_functions);
+
+        FormRenderer EDIT_UI = new FormRenderer(Form.of(Group.of(R_ID, Resourcename, Count)));
+        FormRenderer FUNCTION_UI = new FormRenderer(Form.of(Group.of(Functionlist)));
+        Editbox.getChildren().add(EDIT_UI);
+        Editbox.getChildren().add(AddedFunctions);
+        Editbox.getChildren().add(FUNCTION_UI);
+        Editbox.getChildren().add(Functionbar);
+        Editbox.getChildren().add(new Separator());
+        Editbox.getChildren().add(Save);
     }
 
-    private List<UI_Error_Message> GraphTest(List<EPK_Node> all_elems) {
-        List<UI_Error_Message> Error_Messages = new ArrayList<>();
-        for (EPK_Node node : all_elems) {
-            if (node instanceof Event && !((Event) node).is_End_Event()) {
-                if (node.getNext_Elem().size() > 1) {
-                    UI_Error_Message Message = new UI_Error_Message(
-                            Type_Of_Error.EPK_RULE_MISSED_TOO_MANY_SUCESSORS, node, node.getNext_Elem());
-                    Messages.add(Message);
-                }
-                if (node.getNext_Elem().size() < 1 && !(node instanceof Start_Event)) {
-                    UI_Error_Message Message = new UI_Error_Message(
-                            Type_Of_Error.EPK_RULE_MISSED_TOO_FEW_SUCESSORS, node, null);
-                    Messages.add(Message);
-                }
-                for (EPK_Node next : node.getNext_Elem()) {
-                    if (next instanceof Event || next instanceof Event_Con_Split) {
-                        UI_Error_Message Message = new UI_Error_Message(
-                                Type_Of_Error.EPK_RULE_MISSED_WRONG_SUCESSORS, node, Collections.singletonList(next));
-                        Messages.add(Message);
+    private void showEditResourceUI(Resource resource) {
+
+        Editbox.getChildren().clear();
+        IntegerField R_ID = Field.ofIntegerType(resource.getID()).label("ID: ").editable(false);
+        StringField Resourcename = Field.ofStringType(resource.getName()).label("Resourcename:");
+        IntegerField Count = Field.ofIntegerType(resource.getCount()).label("Quantity: ");
+
+        ButtonBar Save = new ButtonBar();
+        Button Save_Button = new Button("Save resource");
+        Save_Button.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                resource.setCount(Count.getValue());
+                resource.setName(Resourcename.getValue());
+                EPK.AddResource(resource);
+                generateUI();
+            }
+        });
+        Save.getButtons().add(Save_Button);
+
+        Label AddedFunctions = new Label();
+        String Functionlabel = new String("Added functions: [");
+        for (Function added_function : resource.getUsed_In()) {
+            Functionlabel.concat("; " + added_function.toString());
+        }
+        Functionlabel.concat("]");
+        AddedFunctions.setText(Functionlabel);
+        List<Function> AddedFunctionlist = resource.getUsed_In();
+        SingleSelectionField<Function> Functionlist = Field.ofSingleSelectionType(AddedFunctionlist).label("Used in: ");
+        Button Clear_functions = new Button("Clear functions");
+        Clear_functions.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                if (AddedFunctionlist != null && !AddedFunctionlist.isEmpty()) {
+                    for (Function f : AddedFunctionlist) {
+                        f.removeResourcebyID(resource);
                     }
-                }
-            } else if (node instanceof Function && !(node instanceof Activating_Function)) {
-                if (node.getNext_Elem().size() > 1) {
-                    UI_Error_Message Message = new UI_Error_Message(
-                            Type_Of_Error.EPK_RULE_MISSED_TOO_MANY_SUCESSORS, node, node.getNext_Elem());
-                    Error_Messages.add(Message);
-                }
-                if (node.getNext_Elem().size() < 1) {
-                    UI_Error_Message Message = new UI_Error_Message(
-                            Type_Of_Error.EPK_RULE_MISSED_TOO_FEW_SUCESSORS, node, null);
-                    Error_Messages.add(Message);
-                }
-                for (EPK_Node next : node.getNext_Elem()) {
-                    if (next instanceof Function) {
-                        UI_Error_Message Message = new UI_Error_Message(
-                                Type_Of_Error.EPK_RULE_MISSED_WRONG_SUCESSORS, node, Collections.singletonList(next));
-                        Error_Messages.add(Message);
-                    }
-                }
-            } else if (node instanceof Activating_Start_Event) {
-                if (node.getNext_Elem().size() > 1) {
-                    UI_Error_Message Message = new UI_Error_Message(
-                            Type_Of_Error.EPK_RULE_MISSED_TOO_MANY_SUCESSORS, node, node.getNext_Elem());
-                    Error_Messages.add(Message);
-                }
-                for (EPK_Node next : node.getNext_Elem()) {
-                    if (next instanceof Event || next instanceof Event_Con_Split) {
-                        UI_Error_Message Message = new UI_Error_Message(
-                                Type_Of_Error.EPK_RULE_MISSED_WRONG_SUCESSORS, node, Collections.singletonList(next));
-                        Error_Messages.add(Message);
-                    }
-                }
-                if (((Activating_Start_Event) node).getActivating_Function() == null) {
-                    UI_Error_Message Message = new UI_Error_Message(
-                            Type_Of_Error.ACTIVATING_MISSING_SISTERBLOCK, node, null);
-                    Error_Messages.add(Message);
-                }
-            } else if (node instanceof Activating_Function) {
-                if (node.getNext_Elem().size() > 1) {
-                    UI_Error_Message Message = new UI_Error_Message(
-                            Type_Of_Error.EPK_RULE_MISSED_TOO_MANY_SUCESSORS, node, node.getNext_Elem());
-                    Error_Messages.add(Message);
-                }
-                if (node.getNext_Elem().size() < 1) {
-                    UI_Error_Message Message = new UI_Error_Message(
-                            Type_Of_Error.EPK_RULE_MISSED_TOO_FEW_SUCESSORS, node, null);
-                    Error_Messages.add(Message);
-                }
-                for (EPK_Node next : node.getNext_Elem()) {
-                    if (next instanceof Function) {
-                        UI_Error_Message Message = new UI_Error_Message(
-                                Type_Of_Error.EPK_RULE_MISSED_WRONG_SUCESSORS, node, Collections.singletonList(next));
-                        Error_Messages.add(Message);
-                    }
-                }
-                if (((Activating_Function) node).getStart_Event() == null) {
-                    UI_Error_Message Message = new UI_Error_Message(
-                            Type_Of_Error.ACTIVATING_MISSING_SISTERBLOCK, node, null);
-                    Error_Messages.add(Message);
-                }
-            } else if (node instanceof Event && ((Event) node).is_End_Event()) {
-                if (node.getNext_Elem().size() > 0) {
-                    UI_Error_Message Message = new UI_Error_Message(
-                            Type_Of_Error.EPK_RULE_MISSED_TOO_MANY_SUCESSORS, node, node.getNext_Elem());
-                    Error_Messages.add(Message);
-                }
-            } else if (node instanceof Event_Con_Join) {
-                if (node.getNext_Elem().size() > 1) {
-                    UI_Error_Message Message = new UI_Error_Message(
-                            Type_Of_Error.EPK_RULE_MISSED_TOO_MANY_SUCESSORS, node, node.getNext_Elem());
-                    Error_Messages.add(Message);
-                }
-                if (node.getNext_Elem().size() < 1) {
-                    UI_Error_Message Message = new UI_Error_Message(
-                            Type_Of_Error.EPK_RULE_MISSED_TOO_FEW_SUCESSORS, node, node.getNext_Elem());
-                    Error_Messages.add(Message);
-                }
-                if (node.getNext_Elem().size() == 1) {
-                    EPK_Node next_Elem = node.getNext_Elem().get(0);
-                    List<EPK_Node> PredecessorList = get_PredecessorList(all_elems, node);
-                    if (PredecessorList.size() <= 1) {
-                        UI_Error_Message Message = new UI_Error_Message(
-                                Type_Of_Error.EPK_RULE_MISSED_TOO_FEW_PREDECESSORS, node, PredecessorList);
-                        Error_Messages.add(Message);
-                    }
-                    for (EPK_Node check : PredecessorList) {
-                        if (next_Elem instanceof Function && check instanceof Function ||
-                                (next_Elem instanceof Event && check instanceof Event)) {
-                            List<EPK_Node> Error = new ArrayList<>();
-                            Error.add(next_Elem);
-                            Error.add(check);
-                            UI_Error_Message Message = new UI_Error_Message(
-                                    Type_Of_Error.EPK_RULE_MISSED_GATE_SUCC_PRE_TYPE, node, Error);
-                            Error_Messages.add(Message);
-                        }
-                    }
-                }
-            } else if (node instanceof Event_Con_Split) {
-                if (node.getNext_Elem().size() <= 1) {
-                    UI_Error_Message Message = new UI_Error_Message(
-                            Type_Of_Error.EPK_RULE_MISSED_TOO_FEW_SUCESSORS, node, node.getNext_Elem());
-                    Messages.add(Message);
-                }
-                List<EPK_Node> PredecessorList = get_PredecessorList(all_elems, node);
-                if (PredecessorList.size() > 1) {
-                    UI_Error_Message Message = new UI_Error_Message(
-                            Type_Of_Error.EPK_RULE_MISSED_TOO_MANY_PREDECESSORS, node, PredecessorList);
-                    Messages.add(Message);
-                }
-                if (PredecessorList.size() < 1) {
-                    UI_Error_Message Message = new UI_Error_Message(
-                            Type_Of_Error.EPK_RULE_MISSED_TOO_FEW_PREDECESSORS, node, PredecessorList);
-                    Messages.add(Message);
-                }
-                if (PredecessorList.size() == 1) {
-                    EPK_Node Predecessor = PredecessorList.get(0);
-                    for (EPK_Node check : node.getNext_Elem()) {
-                        if (Predecessor instanceof Function && check instanceof Function ||
-                                (Predecessor instanceof Event && check instanceof Event)) {
-                            List<EPK_Node> Error = new ArrayList<>();
-                            Error.add(Predecessor);
-                            Error.add(check);
-                            UI_Error_Message Message = new UI_Error_Message(
-                                    Type_Of_Error.EPK_RULE_MISSED_GATE_SUCC_PRE_TYPE, node, Error);
-                            Messages.add(Message);
-                        }
-                    }
+                    AddedFunctionlist.clear();
+                    String Functionlabel = "Added functions: [ ";
+                    Functionlabel.concat("]");
+                    AddedFunctions.setText(Functionlabel);
                 }
             }
-        }
-        return Error_Messages;
+        });
+
+        Clear_functions.setDisable(false);
+        ButtonBar Functionbar = new ButtonBar();
+        Functionbar.getButtons().add(Clear_functions);
+
+        FormRenderer EDIT_UI = new FormRenderer(Form.of(Group.of(R_ID, Resourcename, Count)));
+        FormRenderer FUNCTION_UI = new FormRenderer(Form.of(Group.of(Functionlist)));
+        Editbox.getChildren().add(EDIT_UI);
+        Editbox.getChildren().add(AddedFunctions);
+        Editbox.getChildren().add(FUNCTION_UI);
+        Editbox.getChildren().add(Functionbar);
+        Editbox.getChildren().add(new Separator());
+        Editbox.getChildren().add(Save);
     }
 
-    private List<UI_Error_Message> SettingsTest(List<EPK_Node> all_elems) {
-        List<UI_Error_Message> Error_Messages = new ArrayList<>();
-        for (EPK_Node node : all_elems) {
-            if (!((UI_Check_Settings) node).CheckSettings()) {
-                UI_Error_Message Message = new UI_Error_Message(
-                        Type_Of_Error.MISSING_OR_WRONG_SETTINGS, node, null);
-                Error_Messages.add(Message);
+    private void generateShowUI() {
+        Editbox.getChildren().clear();
+        StringField R_ID = Field.ofStringType("").label("ID: ").editable(false);
+        StringField Resourcename = Field.ofStringType("").label("Resourcename:");
+        StringField Count = Field.ofStringType("").label("Quantity: ");
+
+        ButtonBar Save = new ButtonBar();
+        Button Save_Button = new Button("Save resource");
+        Save_Button.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+
             }
-        }
-        return Error_Messages;
+        });
+        Save.getButtons().add(Save_Button);
+        Save_Button.setDisable(true);
+
+        Label AddedFunctions = new Label();
+        String Functionlabel = new String("Added functions: [ ");
+        Functionlabel.concat("]");
+        AddedFunctions.setText(Functionlabel);
+        List<Function> emptylist = new ArrayList<>();
+        SingleSelectionField<Function> Functionlist = Field.ofSingleSelectionType(emptylist).label("Used in: ");
+        Button Clear_functions = new Button("Clear functions");
+        Clear_functions.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+            }
+        });
+        Save_Button.setDisable(true);
+        Clear_functions.setDisable(true);
+        ButtonBar Functionbar = new ButtonBar();
+        Functionbar.getButtons().add(Clear_functions);
+
+        R_ID.editable(false);
+        Resourcename.editable(false);
+        Count.editable(false);
+        FormRenderer EDIT_UI = new FormRenderer(Form.of(Group.of(R_ID, Resourcename, Count)));
+        FormRenderer FUNCTION_UI = new FormRenderer(Form.of(Group.of(Functionlist)));
+        Editbox.getChildren().add(EDIT_UI);
+        Editbox.getChildren().add(AddedFunctions);
+        Editbox.getChildren().add(FUNCTION_UI);
+        Editbox.getChildren().add(Functionbar);
+        Editbox.getChildren().add(new Separator());
+        Editbox.getChildren().add(Save);
     }
 
-    private List<UI_Error_Message> ReachableTest(List<EPK_Node> all_elems) {
-        List<ReachableTest_ListObject> Testlist = new ArrayList<>();
-        for (EPK_Node node : all_elems) {
-            ReachableTest_ListObject Object = new ReachableTest_ListObject(node, false);
-            Testlist.add(Object);
-        }
-
-        for (ReachableTest_ListObject Object : Testlist) {
-            for (EPK_Node node : Object.getNode().getNext_Elem()) {
-                Object.findAndActivate(Testlist, node);
-            }
-        }
-        List<UI_Error_Message> Error_Messages = new ArrayList<>();
-        for (ReachableTest_ListObject Object : Testlist) {
-            if (!Object.isFound() && !(Object.getNode() instanceof Start_Event)) {
-                UI_Error_Message Message = new UI_Error_Message(
-                        Type_Of_Error.NOT_REACHABLE, Object.getNode(), null);
-                Error_Messages.add(Message);
-            }
-        }
-
-        return Error_Messages;
-    }
-
-    private List<EPK_Node> get_PredecessorList(List<EPK_Node> all_elems, EPK_Node node) {
-        List<EPK_Node> Predecessors = new ArrayList<>();
-        for (EPK_Node check : all_elems) {
-            if (check.getNext_Elem().contains(node)) {
-                Predecessors.add(check);
-            }
-        }
-        return Predecessors;
-    }
 
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == OK_Button) {
-            stage.close();
-            System.out.println();
+            this_stage.close();
         }
-    }
-
-    public void initializeTest(UI_EPK epk, Stage stage) {
-        this.EPK = epk;
-        this.stage = stage;
-        generateTest();
     }
 }

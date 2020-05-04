@@ -1,7 +1,9 @@
 package com.company.Simulation.Simulation_Base.Data.Discrete_Data.Bib;
 
 import com.company.EPK.*;
-import com.company.Simulation.Simulation_Base.Data.Discrete_Data.*;
+import com.company.Simulation.Simulation_Base.Data.Discrete_Data.Event_Calendar;
+import com.company.Simulation.Simulation_Base.Data.Discrete_Data.Instance_Workflow;
+import com.company.Simulation.Simulation_Base.Data.Discrete_Data.Resource;
 import com.company.Simulation.Simulation_Base.Data.Shared_Data.Settings;
 import com.company.Simulation.Simulation_Base.Data.Shared_Data.User;
 
@@ -50,7 +52,7 @@ public class Check_Condition_For_Event {
                     boolean workforcefound = false;
                     for (User user : Users) {
                         if (!user.isActive()) {
-                            for (Workforce work : user.getWorkforce()) {
+                            for (Workforce work : user.getWorkforces()) {
                                 if (work.getW_ID() == workforce.getW_ID()) {
                                     workforcefound = true;
                                     break;

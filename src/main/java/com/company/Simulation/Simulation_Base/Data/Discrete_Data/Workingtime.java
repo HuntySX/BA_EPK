@@ -12,6 +12,12 @@ public class Workingtime {
         Seconds = seconds;
     }
 
+    public Workingtime() {
+        Hours = 0;
+        Minutes = 0;
+        Seconds = 0;
+    }
+
     public int getHours() {
         return Hours;
     }

@@ -5,9 +5,9 @@ import com.company.Enums.Gate_Check_Status;
 import com.company.Run.Discrete_Event_Generator;
 import com.company.Simulation.Simulation_Base.Data.Discrete_Data.*;
 import com.company.Simulation.Simulation_Base.Data.Discrete_Data.Bib.Event_Decider;
-import com.company.Simulation.Simulation_Base.Data.Shared_Data.Settings;
 import com.company.Simulation.Simulation_Base.Data.Printer_Gate;
 import com.company.Simulation.Simulation_Base.Data.Printer_Queue;
+import com.company.Simulation.Simulation_Base.Data.Shared_Data.Settings;
 import com.company.Simulation.Simulation_Base.Data.Shared_Data.User;
 
 import java.time.LocalTime;
@@ -255,7 +255,7 @@ public class Discrete_Event_Simulator {
             //CHECK FOR USER WORKFORCE AVAILABLE
             for (User u : users) {
                 if (!u.isActive()) {
-                    List<Workforce> capable = u.getWorkforce();
+                    List<Workforce> capable = u.getWorkforces();
                     for (Workforce cap : capable) {
                         if (workforces.contains(cap)) {
                             if (CalculateUsers.contains(u)) {

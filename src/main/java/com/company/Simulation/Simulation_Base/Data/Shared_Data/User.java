@@ -13,14 +13,14 @@ public class User {
     private List<Function> allowed_Processes;
     private boolean active;
     private float efficiency;
-    private List<Workforce> Workforce;
+    private List<Workforce> Workforces;
 
     public User(String first_Name, String last_Name, int p_ID, float efficiency) {
         this.first_Name = first_Name;
         this.last_Name = last_Name;
         this.p_ID = p_ID;
         this.active = true;
-        Workforce = new ArrayList<>();
+        Workforces = new ArrayList<>();
         this.efficiency = efficiency;
     }
 
@@ -82,8 +82,8 @@ public class User {
         this.efficiency = efficiency;
     }
 
-    public List<Workforce> getWorkforce() {
-        return Workforce;
+    public List<Workforce> getWorkforces() {
+        return Workforces;
     }
 
     @Override
@@ -92,5 +92,17 @@ public class User {
                 ", last_Name='" + last_Name + '\'' +
                 ", [p_ID=" + p_ID +
                 "]";
+    }
+
+    public void removeWorkforceByID(Workforce workforce) {
+        List<Workforce> to_Delete = new ArrayList<>();
+        for (Workforce w : Workforces) {
+            if (w.getPermission().equals(workforce.getPermission())) {
+                to_Delete.add(w);
+            }
+        }
+        if (!to_Delete.isEmpty()) {
+            Workforces.removeAll(to_Delete);
+        }
     }
 }

@@ -5,6 +5,7 @@ import com.company.Simulation.Simulation_Base.Data.Discrete_Data.Resource;
 import com.company.Simulation.Simulation_Base.Data.Discrete_Data.Workingtime;
 import com.company.Simulation.Simulation_Base.Data.Threading_Data.Process_instance;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -17,7 +18,6 @@ public class Function extends EPK_Node {
     private List<Workforce> Needed_Workforce;
     private Consumer<Process_instance> ConsumableMethod;
     private Workingtime WorkingTime;
-
     public Function(String function_tag, Function_Type type, int ID) {
         super(ID);
         if (function_tag == null) {
@@ -29,6 +29,9 @@ public class Function extends EPK_Node {
             this.Function_tag = function_tag;
         }
         this.function_type = type;
+        Needed_Workforce = new ArrayList<>();
+        Needed_Resources = new ArrayList<>();
+        WorkingTime = new Workingtime();
     }
 
     public Function() {
@@ -152,4 +155,29 @@ public class Function extends EPK_Node {
         }
         return Check;
     }
+
+    public void removeResourcebyID(Resource resource) {
+        List<Resource> to_Delete = new ArrayList<>();
+        for (Resource r : Needed_Resources) {
+            if (r.getID() == resource.getID()) {
+                to_Delete.add(r);
+            }
+        }
+        if (!to_Delete.isEmpty()) {
+            Needed_Resources.removeAll(to_Delete);
+        }
+    }
+
+    public void removeWorkforceByID(Workforce workforce) {
+        List<Workforce> to_Delete = new ArrayList<>();
+        for (Workforce w : Needed_Workforce) {
+            if (w.getW_ID() == workforce.getW_ID()) {
+                to_Delete.add(w);
+            }
+        }
+        if (!to_Delete.isEmpty()) {
+            Needed_Workforce.removeAll(to_Delete);
+        }
+    }
+
 }

@@ -1,9 +1,6 @@
 package com.company.UI;
 
-import com.company.UI.EPKUI.UI_EPK;
-import com.company.UI.EPKUI.UI_Instantiable;
-import com.company.UI.EPKUI.UI_TEST_EPK;
-import com.company.UI.EPKUI.UI_USER_MANAGEMENT;
+import com.company.UI.EPKUI.*;
 import com.company.UI.javafxgraph.fxgraph.graph.Model;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -34,6 +31,12 @@ public class Borderpanecon implements Initializable {
     Stage primarystage;
     Stage ThisStage;
 
+    @FXML
+    Button SimulationMan;
+    @FXML
+    Button WorkforcesMan;
+    @FXML
+    Button ResourceMan;
     @FXML
     Button UserMan;
     @FXML
@@ -217,7 +220,77 @@ public class Borderpanecon implements Initializable {
             USER_UI.generateUI();
             newWindow.show();
 
+        } else if (e.getSource() == ResourceMan) {
+            URL url = new File("src/main/java/com/company/UI/javafxgraph/Resource_UI.fxml").toURI().toURL();
+            FXMLLoader loader = new FXMLLoader(url);
+            loader.setLocation(url);
+            Parent root = loader.load();
+            Scene scene = new Scene(root, 800, 500);
+
+            UI_RESOURCE_MANAGEMENT RESOURCE_UI = (UI_RESOURCE_MANAGEMENT) loader.getController();
+            Stage newWindow = new Stage();
+            RESOURCE_UI.setEPK(EPK);
+            RESOURCE_UI.setMainStage(ThisStage);
+            RESOURCE_UI.setThisstage(newWindow);
+            newWindow.setTitle("EPCSim Resource-Management");
+            newWindow.setScene(scene);
+            newWindow.setResizable(false);
+            newWindow.initOwner(primarystage);
+            newWindow.initModality(Modality.WINDOW_MODAL);
+            newWindow.setX(primarystage.getX() + 200);
+            newWindow.setY(primarystage.getY() + 100);
+            RESOURCE_UI.generateUI();
+            newWindow.show();
+        } else if (e.getSource() == WorkforcesMan) {
+            URL url = new File("src/main/java/com/company/UI/javafxgraph/Workforce_UI.fxml").toURI().toURL();
+            FXMLLoader loader = new FXMLLoader(url);
+            loader.setLocation(url);
+            Parent root = loader.load();
+            Scene scene = new Scene(root, 1200, 800);
+
+            UI_WORKFORCE_MANAGEMENT WORKFORCE_UI = (UI_WORKFORCE_MANAGEMENT) loader.getController();
+            Stage newWindow = new Stage();
+            WORKFORCE_UI.setEPK(EPK);
+            WORKFORCE_UI.setMainStage(ThisStage);
+            WORKFORCE_UI.setThisstage(newWindow);
+            newWindow.setTitle("EPCSim Workforce-Management");
+            newWindow.setScene(scene);
+            newWindow.setResizable(false);
+            newWindow.initOwner(primarystage);
+            newWindow.initModality(Modality.WINDOW_MODAL);
+            newWindow.setX(primarystage.getX() + 200);
+            newWindow.setY(primarystage.getY() + 100);
+            WORKFORCE_UI.generateUI();
+            newWindow.show();
+        } else if (e.getSource() == SimulationMan) {
+            UI_Settings Settings = EPK.getUI_Settings();
+            if (Settings == null) {
+                Settings = new UI_Settings();
+                EPK.setUI_Settings(Settings);
+            }
+            URL url = new File("src/main/java/com/company/UI/javafxgraph/Simulation_UI.fxml").toURI().toURL();
+            FXMLLoader loader = new FXMLLoader(url);
+            loader.setLocation(url);
+            Parent root = loader.load();
+            Scene scene = new Scene(root, 1200, 800);
+
+            UI_SIMULATION_MANAGEMENT SIMULATION_UI = (UI_SIMULATION_MANAGEMENT) loader.getController();
+            Stage newWindow = new Stage();
+            SIMULATION_UI.setEPK(EPK);
+            SIMULATION_UI.setSettings(Settings);
+            SIMULATION_UI.setMainStage(ThisStage);
+            SIMULATION_UI.setThisstage(newWindow);
+            newWindow.setTitle("EPCSim Workforce-Management");
+            newWindow.setScene(scene);
+            newWindow.setResizable(false);
+            newWindow.initOwner(primarystage);
+            newWindow.initModality(Modality.WINDOW_MODAL);
+            newWindow.setX(primarystage.getX() + 200);
+            newWindow.setY(primarystage.getY() + 100);
+            SIMULATION_UI.generateUI();
+            newWindow.show();
         }
+
 
     }
 

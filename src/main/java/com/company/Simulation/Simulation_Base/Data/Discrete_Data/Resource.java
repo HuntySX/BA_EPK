@@ -3,6 +3,7 @@ package com.company.Simulation.Simulation_Base.Data.Discrete_Data;
 import com.company.EPK.Function;
 import com.company.Simulation.Simulation_Base.Data.Shared_Data.User;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Resource {
@@ -17,6 +18,7 @@ public class Resource {
         this.r_ID = r_ID;
         this.name = name;
         this.count = count;
+        this.Used_In = new ArrayList<>();
     }
 
     public Resource(String name, int count, List<User> allowed_Users, int r_ID) {
@@ -24,6 +26,7 @@ public class Resource {
         this.name = name;
         this.count = count;
         Allowed_Users = allowed_Users;
+        this.Used_In = new ArrayList<>();
     }
 
     public String getName() {

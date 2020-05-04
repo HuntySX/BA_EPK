@@ -1,25 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
 <?import javafx.scene.Cursor?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.ButtonBar?>
-<?import javafx.scene.control.Menu?>
-<?import javafx.scene.control.MenuBar?>
-<?import javafx.scene.control.MenuItem?>
-<?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.control.Separator?>
-<?import javafx.scene.control.ToolBar?>
-<?import javafx.scene.image.Image?>
-<?import javafx.scene.image.ImageView?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
 <?import javafx.scene.text.TextFlow?>
-
 <AnchorPane xmlns:fx="http://javafx.com/fxml/1" minHeight="459.0" minWidth="809.0"
-            xmlns="http://javafx.com/javafx/11.0.1" fx:controller="com.company.UI.Borderpanecon">
+            xmlns="http://javafx.com/javafx/8.0.111" fx:controller="com.company.UI.Borderpanecon">
     <children>
         <BorderPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="520.0"
                     minWidth="809.0" prefHeight="520.0" prefWidth="809.0" AnchorPane.bottomAnchor="0.0"
@@ -52,11 +40,20 @@
                         </MenuBar>
                         <ToolBar maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
                             <items>
-                                <Button fx:id="Testing" mnemonicParsing="false" onAction="#actionPerformed"
-                                        text="Test EPC"/>
-                                <Button fx:id="UserMan" mnemonicParsing="false" onAction="#actionPerformed"
-                                        text="Button"/>
-                                <Button mnemonicParsing="false" text="Button"/>
+                                <ButtonBar>
+                                    <buttons>
+                                        <Button fx:id="Testing" mnemonicParsing="false" onAction="#actionPerformed"
+                                                text="Test EPC"/>
+                                        <Button fx:id="UserMan" mnemonicParsing="false" onAction="#actionPerformed"
+                                                text="Users"/>
+                                        <Button fx:id="ResourceMan" mnemonicParsing="false" onAction="#actionPerformed"
+                                                text="Resources"/>
+                                        <Button fx:id="WorkforcesMan" mnemonicParsing="false"
+                                                onAction="#actionPerformed" text="Workforces"/>
+                                        <Button fx:id="SimulationMan" mnemonicParsing="false"
+                                                onAction="#actionPerformed" text="Simulation settings"/>
+                                    </buttons>
+                                </ButtonBar>
                             </items>
                         </ToolBar>
                     </children>
