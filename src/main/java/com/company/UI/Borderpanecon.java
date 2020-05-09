@@ -1,6 +1,8 @@
 package com.company.UI;
 
+import com.company.EPK.*;
 import com.company.UI.EPKUI.*;
+import com.company.UI.javafxgraph.fxgraph.cells.UI_View_Gen;
 import com.company.UI.javafxgraph.fxgraph.graph.Model;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -75,6 +77,8 @@ public class Borderpanecon implements Initializable {
     Button Activating_Function;
     @FXML
     Button Delete;
+    @FXML
+    Button Save_Node;
 
 
     @Override
@@ -246,7 +250,7 @@ public class Borderpanecon implements Initializable {
             FXMLLoader loader = new FXMLLoader(url);
             loader.setLocation(url);
             Parent root = loader.load();
-            Scene scene = new Scene(root, 1200, 800);
+            Scene scene = new Scene(root, 800, 500);
 
             UI_WORKFORCE_MANAGEMENT WORKFORCE_UI = (UI_WORKFORCE_MANAGEMENT) loader.getController();
             Stage newWindow = new Stage();
@@ -289,6 +293,34 @@ public class Borderpanecon implements Initializable {
             newWindow.setY(primarystage.getY() + 100);
             SIMULATION_UI.generateUI();
             newWindow.show();
+        } else if (e.getSource() == Delete) {
+            UI_View_Gen Active_Elem = EPK.getActive_Elem();
+            EPK.getAll_Elems().remove(Active_Elem.getNodeView());
+            for (EPK_Node node : EPK.getAll_Elems()) {
+                node.getNext_Elem().remove(Active_Elem.getEPKNode());
+                if (node instanceof Activating_Function) {
+                    if (((Activating_Function) node).getStart_Event().equals(Active_Elem)) {
+                        ((Activating_Function) node).setStart_Event(null);
+                    }
+                } else if (node instanceof Activating_Start_Event) {
+                    if (((Activating_Start_Event) node).getActivating_Function().equals(Active_Elem)) {
+                        ((Activating_Start_Event) node).setFunction(null);
+                    }
+                } else if (node instanceof Event_Con_Join) {
+
+                } else if (node instanceof Event_Con_Split) {
+
+                }
+            }
+
+            model.removebySourceEdge(Active_Elem.getCellId());
+            model.removebyTargetEdge(Active_Elem.getCellId());
+            model.getRemovedCells().add(model.getCellByID(Active_Elem.getCellId()));
+            model.getGraph().endUpdate();
+
+        } else if (e.getSource() == Save_Node) {
+            UI_View_Gen Active_Elem = EPK.getActive_Elem();
+            ((UI_Instantiable) Active_Elem.getNodeView()).save_Settings();
         }
 
 

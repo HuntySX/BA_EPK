@@ -165,14 +165,14 @@ public class UI_WORKFORCE_MANAGEMENT implements Initializable {
         Label ManageUserFunctionLabel = new Label();
         String Managementlabel = new String("Users: [ ");
         for (User granted_User : workforce.getGranted_to()) {
-            Managementlabel.concat("; " + granted_User.toString());
+            Managementlabel = Managementlabel.concat("; " + granted_User.toString());
         }
-        Managementlabel.concat("] / Functions: [ ");
+        Managementlabel = Managementlabel.concat("] / Functions: [ ");
 
         for (Function used_in : workforce.getUsed_in()) {
-            Managementlabel.concat("; " + used_in.toString());
+            Managementlabel = Managementlabel.concat(used_in.toString() + "; ");
         }
-        Managementlabel.concat("]");
+        Managementlabel = Managementlabel.concat("]");
         ManageUserFunctionLabel.setText(Managementlabel);
         List<User> AddedUserlist = workforce.getGranted_to();
         List<Function> AddedFunctionlist = workforce.getUsed_in();

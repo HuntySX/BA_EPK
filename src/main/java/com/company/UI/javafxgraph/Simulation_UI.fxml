@@ -63,10 +63,9 @@
                 <ButtonBar maxHeight="35.0" maxWidth="1190.0" minHeight="35.0" minWidth="1190.0" prefHeight="35.0"
                            prefWidth="1190.0">
                     <buttons>
-                        <Button fx:id="OK_Button" cancelButton="true" defaultButton="true" mnemonicParsing="false"
-                                onAction="#actionPerformed" text="Save"/>
-                        <Button fx:id="CANCEL_Button" cancelButton="true" defaultButton="true" layoutX="725.0"
-                                layoutY="15.0" mnemonicParsing="false" onAction="#actionPerformed" text="Cancel"/>
+                        <Button fx:id="OK_Button" mnemonicParsing="false" onAction="#actionPerformed" text="Save"/>
+                        <Button fx:id="CANCEL_Button" layoutX="725.0" layoutY="15.0" mnemonicParsing="false"
+                                onAction="#actionPerformed" text="Cancel"/>
                     </buttons>
                 </ButtonBar>
             </children>

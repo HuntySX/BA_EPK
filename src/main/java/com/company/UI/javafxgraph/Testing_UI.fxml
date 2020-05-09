@@ -29,8 +29,7 @@
       <ButtonBar maxHeight="35.0" maxWidth="590.0" minHeight="35.0" minWidth="590.0" prefHeight="35.0" prefWidth="590.0"
                  BorderPane.alignment="CENTER">
          <buttons>
-            <Button fx:id="OK_Button" cancelButton="true" defaultButton="true" mnemonicParsing="false"
-                    onAction="#actionPerformed" text="OK"/>
+            <Button fx:id="OK_Button" mnemonicParsing="false" onAction="#actionPerformed" text="OK"/>
          </buttons>
          <BorderPane.margin>
             <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>

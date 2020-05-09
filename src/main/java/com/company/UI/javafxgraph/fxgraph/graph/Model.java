@@ -189,6 +189,10 @@ public class Model {
 
     }
 
+    public Cell getCellByID(int ID) {
+        return cellMap.get(ID);
+    }
+
     public void removeEdge(int sourceID, int targetID) {
 
 
@@ -203,6 +207,37 @@ public class Model {
         }
         if (Search != null) {
             removedEdges.add(Search);
+
+        }
+    }
+
+    public void removebyTargetEdge(int targetID) {
+
+        List<Edge> Searches = new ArrayList<>();
+        for (Edge E : allEdges) {
+            if (E.target.getCellId() == targetID) {
+                Searches.add(E);
+                break;
+            }
+        }
+        if (!Searches.isEmpty()) {
+            removedEdges.addAll(Searches);
+
+        }
+    }
+
+    public void removebySourceEdge(int sourceID) {
+
+
+        List<Edge> Searches = new ArrayList<>();
+        for (Edge E : allEdges) {
+            if (E.source.getCellId() == sourceID) {
+                Searches.add(E);
+                break;
+            }
+        }
+        if (!Searches.isEmpty()) {
+            removedEdges.addAll(Searches);
 
         }
     }
@@ -260,5 +295,9 @@ public class Model {
 
     public UI_EPK getEPK() {
         return EPK;
+    }
+
+    public Graph getGraph() {
+        return graph;
     }
 }

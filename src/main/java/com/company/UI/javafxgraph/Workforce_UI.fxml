@@ -63,8 +63,7 @@
                 <ButtonBar maxHeight="35.0" maxWidth="790.0" minHeight="35.0" minWidth="790.0" prefHeight="35.0"
                            prefWidth="790.0">
                     <buttons>
-                        <Button fx:id="OK_Button" cancelButton="true" defaultButton="true" mnemonicParsing="false"
-                                onAction="#actionPerformed" text="OK"/>
+                        <Button fx:id="OK_Button" mnemonicParsing="false" onAction="#actionPerformed" text="OK"/>
                     </buttons>
                 </ButtonBar>
             </children>

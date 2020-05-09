@@ -247,7 +247,10 @@
                             </VBox.margin>
                             <buttons>
                                 <Button fx:id="Delete" alignment="CENTER" contentDisplay="CENTER"
-                                        mnemonicParsing="false" onAction="#actionPerformed" text="Knoten Löschen"/>
+                                        mnemonicParsing="false" onAction="#actionPerformed" text="Delete node"/>
+                                <Button fx:id="Save_Node" alignment="CENTER" contentDisplay="CENTER" layoutX="405.0"
+                                        layoutY="11.0" mnemonicParsing="false" onAction="#actionPerformed"
+                                        text="Save changes"/>
                             </buttons>
                         </ButtonBar>
                     </children>

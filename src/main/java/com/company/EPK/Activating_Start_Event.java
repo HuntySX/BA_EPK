@@ -36,6 +36,10 @@ public class Activating_Start_Event extends Event {
         Generator = generator;
     }
 
+    public void setFunction(Activating_Function function) {
+        Function = function;
+    }
+
     public Activating_Function getActivating_Function() {
         return Function;
     }

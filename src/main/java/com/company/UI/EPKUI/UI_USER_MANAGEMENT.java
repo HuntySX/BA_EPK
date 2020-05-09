@@ -113,6 +113,25 @@ public class UI_USER_MANAGEMENT implements Initializable {
                 generateUI();
             }
         });
+
+        Button Remove_Button = new Button("Remove user");
+        Remove_Button.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+
+                List<Workforce> User_Workforce_List = user.getWorkforces();
+                for (Workforce w : Workforces) {
+                    if (w.getGranted_to().contains(user)) {
+                        w.getGranted_to().remove(user);
+                    }
+                }
+                user.getWorkforces().clear();
+                EPK.getAll_Users().remove(user);
+                generateUI();
+            }
+        });
+        Remove_Button.setDisable(true);
+        Save.getButtons().add(Remove_Button);
         Save.getButtons().add(Save_Button);
 
         Label AddedWorkforces = new Label();
@@ -206,6 +225,25 @@ public class UI_USER_MANAGEMENT implements Initializable {
                 generateUI();
             }
         });
+
+        Button Remove_Button = new Button("Remove user");
+        Remove_Button.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+
+                List<Workforce> User_Workforce_List = user.getWorkforces();
+                for (Workforce w : Workforces) {
+                    if (w.getGranted_to().contains(user)) {
+                        w.getGranted_to().remove(user);
+                    }
+                }
+                user.getWorkforces().clear();
+                EPK.getAll_Users().remove(user);
+                generateUI();
+            }
+        });
+        Remove_Button.setDisable(false);
+        Save.getButtons().add(Remove_Button);
         Save.getButtons().add(Save_Button);
 
         Label AddedWorkforces = new Label();
@@ -288,6 +326,15 @@ public class UI_USER_MANAGEMENT implements Initializable {
             public void handle(ActionEvent actionEvent) {
             }
         });
+
+        Button Remove_Button = new Button("Remove user");
+        Remove_Button.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+            }
+        });
+        Remove_Button.setDisable(true);
+        Save.getButtons().add(Remove_Button);
         Save.getButtons().add(Save_Button);
         List<Workforce> emptyList = new ArrayList<>();
         Label AddedWorkforces = new Label(" ");
