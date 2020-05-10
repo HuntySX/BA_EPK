@@ -72,10 +72,9 @@ public class Resource {
 
     @Override
     public String toString() {
-        return "Resource{" +
-                "r_ID=" + r_ID +
-                ", name='" + name + '\'' +
-                ", count=" + count +
+        return "ID=" + r_ID +
+                ", Name='" + name + '\'' +
+                ", Count=" + count +
                 '}';
     }
 }

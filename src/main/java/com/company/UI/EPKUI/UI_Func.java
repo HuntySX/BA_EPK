@@ -14,10 +14,13 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
 import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
 import javafx.scene.layout.VBox;
 
+import java.awt.*;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -29,8 +32,8 @@ public class UI_Func extends Function implements UI_Instantiable {
     private ObservableList<EPK_Node> nodelist;
     private List<Workforce> Workforces;
     private List<Resource> Resources;
-    private ObservableList<Integer> needed_resource_List;
-    private ObservableList<Workforce> needed_workforces_List;
+    private List<Resource> needed_resource_List;
+    private List<Workforce> needed_workforces_List;
 
     private IntegerProperty UI_ID;
     private StringProperty tag;
@@ -44,8 +47,9 @@ public class UI_Func extends Function implements UI_Instantiable {
     private IntegerField UI_WORKINGTIME_HOURS_FIELD;
     private IntegerField UI_WORKINGTIME_MINUTES_FIELD;
     private IntegerField UI_WORKINGTIME_SECONDS_FIELD;
-    private MultiSelectionField<Resource> UI_NEEDED_RESOURCES_FIELD;
-    private MultiSelectionField<Workforce> UI_NEEDED_WORKFORCES_FIELD;
+    private IntegerField UI_RESOURCE_COUNT;
+    private SingleSelectionField<Resource> UI_NEEDED_RESOURCES_FIELD;
+    private SingleSelectionField<Workforce> UI_NEEDED_WORKFORCES_FIELD;
     private SingleSelectionField<EPK_Node> UI_NEXT_ELEMENTS;
 
     private FormRenderer RESOURCES_UI;
@@ -62,26 +66,13 @@ public class UI_Func extends Function implements UI_Instantiable {
         this.EPK = EPK;
         this.Resources = EPK.getAll_Resources();
         this.Workforces = EPK.getAll_Workforces();
-        needed_resource_List = FXCollections.observableArrayList();
-        needed_resource_List.addListener((ListChangeListener<Integer>) e -> {
-            while (e.next()) {
-                if (e.wasAdded()) {
-                    System.out.println("changed to: " + needed_resource_List.get(e.getFrom()).toString());
-                }
-            }
-        });
+        needed_resource_List = new ArrayList<>();
+        needed_workforces_List = new ArrayList<>();
         UI_ID = new SimpleIntegerProperty(ID);
         StringBuilder ID_Build = new StringBuilder("Function: ");
         ID_Build.append(ID);
         this.tag = new SimpleStringProperty(ID_Build.toString());
         this.nodelist = FXCollections.observableArrayList();
-
-        //TEST
-        Resource R1 = new Resource("A", 10, 1);
-        Resource R2 = new Resource("B", 10, 2);
-
-        Resources.add(R1);
-        Resources.add(R2);
 
         nodelist.addListener((ListChangeListener<EPK_Node>) e -> {
             while (e.next()) {
@@ -92,6 +83,11 @@ public class UI_Func extends Function implements UI_Instantiable {
                 }
             }
         });
+    }
+
+    @Override
+    public VBox Get_UI() {
+
 
         UI_ID_FIELD = Field.ofIntegerType(UI_ID).label("ID").editable(false);
         UI_TAG_FIELD = Field.ofStringType(tag).label("Knotenname:");
@@ -99,17 +95,16 @@ public class UI_Func extends Function implements UI_Instantiable {
         UI_WORKINGTIME_MINUTES_FIELD = Field.ofIntegerType(Workingtime_Minutes).label("Minuten").placeholder("0").tooltip("Arbeitszeitminuten");
         UI_WORKINGTIME_SECONDS_FIELD = Field.ofIntegerType(Workingtime_Seconds).label("Sekunden").placeholder("60").tooltip("Arbeitszeitsekunden");
 
-        UI_NEEDED_RESOURCES_FIELD = Field.ofMultiSelectionType(Resources, Arrays.asList()).label("Benötigte Ressourcen").tooltip("Benötigte Ressourcen");
-        UI_NEEDED_WORKFORCES_FIELD = Field.ofMultiSelectionType(Workforces, Arrays.asList()).label("Benötigte Arbeitskraft").tooltip("Benötigte Arbeitskraft");
+        UI_NEEDED_RESOURCES_FIELD = Field.ofSingleSelectionType(Resources).label("Benötigte Ressourcen").tooltip("Benötigte Ressourcen");
+        UI_RESOURCE_COUNT = Field.ofIntegerType(0).label("Count").tooltip("Choose number of selected resource to add to the function");
+        UI_NEEDED_WORKFORCES_FIELD = Field.ofSingleSelectionType(Workforces).label("Benötigte Arbeitskraft").tooltip("Benötigte Arbeitskraft");
 
-        RESOURCES_UI = new FormRenderer(Form.of(Group.of(UI_NEEDED_RESOURCES_FIELD)));
+        RESOURCES_UI = new FormRenderer(Form.of(Group.of(UI_NEEDED_RESOURCES_FIELD, UI_RESOURCE_COUNT)));
         WORKFORCES_UI = new FormRenderer(Form.of(Group.of(UI_NEEDED_WORKFORCES_FIELD)));
         WORKINGTIME_UI = new FormRenderer(Form.of(Group.of(UI_WORKINGTIME_HOURS_FIELD, UI_WORKINGTIME_MINUTES_FIELD, UI_WORKINGTIME_SECONDS_FIELD)));
         ID_TAG_UI = new FormRenderer(Form.of(Group.of(UI_ID_FIELD, UI_TAG_FIELD)));
-    }
 
-    @Override
-    public VBox Get_UI() {
+
         Box.getChildren().clear();
         Box.getChildren().add(ID_TAG_UI);
         Box.getChildren().add(new Separator());
@@ -130,14 +125,133 @@ public class UI_Func extends Function implements UI_Instantiable {
                 }
             }
         });
+        Label AddedResources = new Label();
+        String Resourcelabel = "Added Resources: [ ";
+        for (Resource added_res : needed_resource_List) {
+            Resourcelabel = Resourcelabel.concat("; " + added_res.toString());
+        }
+        Resourcelabel = Resourcelabel.concat("]");
+        AddedResources.setText(Resourcelabel);
+
+        Button Add_Resource = new Button("Add resource");
+        Add_Resource.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                Resource resource = UI_NEEDED_RESOURCES_FIELD.getSelection();
+                Integer count = UI_RESOURCE_COUNT.getValue();
+                if (resource != null && count != 0) {
+                    boolean found = false;
+                    for (Resource in_List : needed_resource_List) {
+                        if (in_List.getID() == resource.getID()) {
+                            found = true;
+                            in_List.setCount(in_List.getCount() + count);
+                            break;
+                        }
+                    }
+
+                    if (!found) {
+                        Resource to_Add = new Resource(resource.getName(), count, resource.getID());
+                        needed_resource_List.add(to_Add);
+                    }
+                    String Resourcelabel = "Added Resources: [";
+                    for (Resource added_res : needed_resource_List) {
+                        Resourcelabel = Resourcelabel.concat("; " + added_res.toString());
+                    }
+                    Resourcelabel = Resourcelabel.concat("]");
+                    AddedResources.setText(Resourcelabel);
+                }
+            }
+        });
+
+        Button Remove_Resource = new Button("Remove resource");
+        Remove_Resource.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                Resource resource = UI_NEEDED_RESOURCES_FIELD.getSelection();
+                Resource to_Delete = null;
+                if (resource != null) {
+                    for (Resource in_List : needed_resource_List) {
+                        if (in_List.getID() == resource.getID()) {
+                            to_Delete = in_List;
+                            break;
+                        }
+                    }
+                    if (to_Delete != null) {
+                        needed_resource_List.remove(to_Delete);
+                        String Resourcelabel = "Added Resources: [";
+                        for (Resource added_res : needed_resource_List) {
+                            Resourcelabel = Resourcelabel.concat("; " + added_res.toString());
+                        }
+                        Resourcelabel = Resourcelabel.concat("]");
+                        AddedResources.setText(Resourcelabel);
+                    }
+                }
+            }
+        });
+        ButtonBar Resourcebar = new ButtonBar();
+        Resourcebar.getButtons().add(Add_Resource);
+        Resourcebar.getButtons().add(Remove_Resource);
+
+        Label AddedWorkforces = new Label();
+        String WorkforceLabel = "Added Workforces: [";
+        for (Workforce added_force : needed_workforces_List) {
+            WorkforceLabel = WorkforceLabel.concat("; " + added_force.toString());
+        }
+        WorkforceLabel = WorkforceLabel.concat("]");
+        AddedWorkforces.setText(WorkforceLabel);
+
+        Button Add_Workforce = new Button("Add Workforce");
+        Add_Workforce.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                Workforce force = UI_NEEDED_WORKFORCES_FIELD.getSelection();
+                if (force != null) {
+                    if (!needed_workforces_List.contains(force)) {
+                        needed_workforces_List.add(force);
+                        String Workforcelabel = "Added Workforces: [ ";
+                        for (Workforce added_force : needed_workforces_List) {
+                            Workforcelabel = Workforcelabel.concat("; " + added_force.toString());
+                        }
+                        Workforcelabel = Workforcelabel.concat(" ]");
+                        AddedWorkforces.setText(Workforcelabel);
+                    }
+                }
+            }
+        });
+        Button Remove_Workforce = new Button("Remove Workforce");
+        Remove_Workforce.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                Workforce force = UI_NEEDED_WORKFORCES_FIELD.getSelection();
+                if (force != null) {
+                    if (needed_workforces_List.contains(force)) {
+                        needed_workforces_List.remove(force);
+                        String Workforcelabel = new String("Added Workforces: [ ");
+                        for (Workforce added_force : needed_workforces_List) {
+                            Workforcelabel = Workforcelabel.concat("; " + added_force.toString());
+                        }
+                        Workforcelabel = Workforcelabel.concat(" ]");
+                        AddedWorkforces.setText(Workforcelabel);
+                    }
+                }
+            }
+        });
+        ButtonBar WorkforcesBar = new ButtonBar();
+        WorkforcesBar.getButtons().add(Add_Workforce);
+        WorkforcesBar.getButtons().add(Remove_Workforce);
+
         Box.getChildren().add(btn);
         Box.getChildren().add(new Separator());
         Box.getChildren().add(new Label("Arbeitsstunden"));
         Box.getChildren().add(WORKINGTIME_UI);
         Box.getChildren().add(new Label("Benötigte Ressourcen"));
+        Box.getChildren().add(AddedResources);
         Box.getChildren().add(RESOURCES_UI);
+        Box.getChildren().add(Resourcebar);
         Box.getChildren().add(new Label("Benötigte Arbeitskraft"));
+        Box.getChildren().add(AddedWorkforces);
         Box.getChildren().add(WORKFORCES_UI);
+        Box.getChildren().add(WorkforcesBar);
 
         return Box;
     }
