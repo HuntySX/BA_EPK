@@ -56,8 +56,16 @@ public class Function extends EPK_Node {
         }
         this.concurrently = concurrently;
         this.ConsumableMethod = null;
-        this.Needed_Resources = Needed_Resources;
-        this.Needed_Workforce = Needed_Workforce;
+        if (Needed_Resources == null) {
+            this.Needed_Resources = new ArrayList<>();
+        } else {
+            this.Needed_Resources = Needed_Resources;
+        }
+        if (Needed_Workforce == null) {
+            this.Needed_Workforce = new ArrayList<>();
+        } else {
+            this.Needed_Workforce = Needed_Workforce;
+        }
         this.WorkingTime = new Workingtime(Workinghours, Workingminutes, Workingseconds);
     }
 

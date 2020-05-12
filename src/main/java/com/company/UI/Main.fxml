@@ -241,13 +241,11 @@
                 </VBox>
             </left>
             <right>
-                <VBox maxHeight="800.0" maxWidth="400.0" minHeight="800.0" minWidth="500.0"
+                <VBox maxHeight="774.0" maxWidth="520.0" minHeight="520.0" minWidth="500.0" prefHeight="520.0"
                       BorderPane.alignment="CENTER">
                     <children>
-                        <ScrollPane fitToHeight="true" fitToWidth="true" hbarPolicy="ALWAYS"
-                                    maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308"
-                                    minHeight="774.0" minWidth="500.0" pannable="true" prefHeight="1200.0"
-                                    vbarPolicy="ALWAYS">
+                        <ScrollPane fitToHeight="true" fitToWidth="true" hbarPolicy="ALWAYS" minHeight="520.0"
+                                    minWidth="500.0" pannable="true" vbarPolicy="ALWAYS">
                             <content>
                                 <VBox fx:id="Rightbox" maxHeight="1.7976931348623157E308"
                                       maxWidth="1.7976931348623157E308" minWidth="480.0"/>

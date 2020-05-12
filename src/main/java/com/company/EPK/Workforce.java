@@ -52,6 +52,17 @@ public class Workforce {
         return used_In;
     }
 
+    public void AddUsedIn(Function f) {
+        if (!used_In.contains(f)) {
+            used_In.add(f);
+        }
+    }
+
+    public void removeUsedIn(Function f) {
+        used_In.remove(f);
+    }
+
+
     @Override
     public String toString() {
         return "[ " +

@@ -46,7 +46,7 @@ public class UI_AND_Join extends Event_Con_Join implements UI_Instantiable {
         this.EPK = EPK;
         this.UI_ID = new SimpleIntegerProperty(ID);
         this.prev_nodelist = new ArrayList<>();
-        this.Chosen_Previous_List = new ArrayList<>();
+        this.Chosen_Previous_List = getMapped_Branch_Elements_AND();
         StringBuilder ID_Build = new StringBuilder("Event: ");
         ID_Build.append(ID);
         UI_ID_FIELD = Field.ofIntegerType(UI_ID).label("ID").editable(false);
@@ -102,25 +102,27 @@ public class UI_AND_Join extends Event_Con_Join implements UI_Instantiable {
         Next_ElemBar.getButtons().add(btn);
         Box.getChildren().add(Next_ElemBar);
 
-        Button Save_Selection = new Button("Auswahl speichern");
+        Button Save_Selection = new Button("Add previous");
         Save_Selection.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
                 EPK_Node Chosen_Previous = UI_PREVIOUS_ELEMS.getSelection();
-                if (Chosen_Previous != null) {
+                if (Chosen_Previous != null && !Chosen_Previous_List.contains(Chosen_Previous)) {
+
                     Chosen_Previous_List.add(Chosen_Previous);
-                    StringBuilder LabelString = new StringBuilder("");
-                    for (EPK_Node node : Chosen_Previous_List) {
-                        LabelString.append(node.toString());
-                        LabelString.append("\n");
-                    }
-                    if (!LabelString.equals("")) {
-                        SelectionLabel.setText(LabelString.toString());
-                    }
+
+                }
+                StringBuilder LabelString = new StringBuilder("");
+                for (EPK_Node node : Chosen_Previous_List) {
+                    LabelString.append(node.toString());
+                    LabelString.append("\n");
+                }
+                if (!LabelString.equals("")) {
+                    SelectionLabel.setText(LabelString.toString());
                 }
             }
         });
-        Button Delete_Selection = new Button("Auswahl löschen");
+        Button Delete_Selection = new Button("Delete previous");
         Delete_Selection.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
@@ -153,7 +155,6 @@ public class UI_AND_Join extends Event_Con_Join implements UI_Instantiable {
         Bar.getButtons().add(Save_Selection);
         Bar.getButtons().add(Delete_Selection);
         Box.getChildren().add(Bar);
-
 
         return Box;
     }

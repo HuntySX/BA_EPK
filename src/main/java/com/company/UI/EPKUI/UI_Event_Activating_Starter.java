@@ -15,6 +15,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
 import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
 import javafx.scene.layout.VBox;
@@ -106,6 +107,9 @@ public class UI_Event_Activating_Starter extends Activating_Start_Event implemen
         Box.getChildren().add(NEXT_ELEMS_UI);
         Box.getChildren().add(new Separator());
         Button btn = new Button("Verbindung entfernen");
+        if (Chosen_Starter != null) {
+            Activating_Event_Label.setText("Ausgewählte Aktivierende Funktion: " + Chosen_Starter.toString());
+        }
         btn.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
@@ -124,11 +128,27 @@ public class UI_Event_Activating_Starter extends Activating_Start_Event implemen
             public void handle(ActionEvent actionEvent) {
                 Chosen_Starter = Activating_Function.getSelection();
                 if (Chosen_Starter != null) {
-                    Activating_Event_Label.setText("Ausgewählte Aktivierende Funktion: \n" + Chosen_Starter.toString());
+                    Activating_Event_Label.setText("Ausgewählte Aktivierende Funktion: " + Chosen_Starter.toString());
+                    setFunction(Chosen_Starter);
+                }
+            }
+        });
+        Button Remove_Selection = new Button("Delete Activating");
+        Remove_Selection.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                Chosen_Starter = Activating_Function.getSelection();
+                if (Chosen_Starter != null && getActivating_Function() != null && getActivating_Function().equals(Chosen_Starter)) {
+                    Chosen_Starter = null;
+                    setFunction(null);
+                    Activating_Event_Label.setText("Ausgewählte Aktivierende Funktion: ");
                 }
             }
         });
 
+        ButtonBar Selection = new ButtonBar();
+        Selection.getButtons().add(Save_Selection);
+        Selection.getButtons().add(Remove_Selection);
         Activating_Function = Field.ofSingleSelectionType(Activating_Functions).label("Aktivierende" +
                 "Funktion").tooltip("Bitte wählen sie Die Funktion hier aus, die eine Instanz" +
                 "der Simulation an dieser Stelle auslösen würde.");
@@ -143,7 +163,8 @@ public class UI_Event_Activating_Starter extends Activating_Start_Event implemen
         Box.getChildren().add(new Separator());
         Box.getChildren().add(Activating_Event_Label);
         Box.getChildren().add(ACTIVATING_FUNCTION_UI);
-        Box.getChildren().add(Save_Selection);
+        Box.getChildren().add(Selection);
+
         return Box;
     }
 

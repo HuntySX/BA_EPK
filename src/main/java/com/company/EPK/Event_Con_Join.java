@@ -15,11 +15,21 @@ public class Event_Con_Join extends Connector {
 
     private List<Nodemap> Mapped_Branch_Elements;
     private List<Event_Instance> Throughput_Instances;
-
+    private List<EPK_Node> Mapped_Branch_Elements_AND;
 
     public Event_Con_Join(List<EPK_Node> Next_Elem, int ID, Contype contype) {
         super(Next_Elem, ID, contype);
+        Mapped_Branch_Elements = new ArrayList<>();
         Throughput_Instances = new ArrayList<>();
+        Mapped_Branch_Elements_AND = new ArrayList<>();
+    }
+
+    public List<EPK_Node> getMapped_Branch_Elements_AND() {
+        return Mapped_Branch_Elements_AND;
+    }
+
+    public void setMapped_Branch_Elements_AND(List<EPK_Node> mapped_Branch_Elements_AND) {
+        Mapped_Branch_Elements_AND = mapped_Branch_Elements_AND;
     }
 
     public Gate_Check_Status check_Previous_Elem(Instance_Workflow instance) {
@@ -143,7 +153,7 @@ public class Event_Con_Join extends Connector {
             }
 
         } else {
-            for (Nodemap m : Mapped_Branch_Elements) {
+            for (EPK_Node m : Mapped_Branch_Elements_AND) {
                 if (!finished_EPK_Nodes.contains(m)) {
                     return WAIT;
                 }
@@ -151,6 +161,42 @@ public class Event_Con_Join extends Connector {
             return ADVANCE;
         }
 
+    }
+
+    public void AddNode(EPK_Node to_wait_for) {
+        if (this.getContype() == AND && !Mapped_Branch_Elements_AND.contains(to_wait_for)) {
+            Mapped_Branch_Elements_AND.add(to_wait_for);
+        }
+    }
+
+    public void AddMap(EPK_Node start, EPK_Node end) {
+        boolean mapped = false;
+        for (Nodemap added_Node : Mapped_Branch_Elements) {
+            if (added_Node.containsboth(start, end)) {
+                mapped = true;
+                break;
+            }
+        }
+        if (!mapped) {
+            Nodemap to_Map = new Nodemap(start, end);
+            Mapped_Branch_Elements.add(to_Map);
+        }
+    }
+
+    public List<Nodemap> getMapped_Branch_Elements() {
+        return Mapped_Branch_Elements;
+    }
+
+    public void setMapped_Branch_Elements(List<Nodemap> mapped_Branch_Elements) {
+        Mapped_Branch_Elements = mapped_Branch_Elements;
+    }
+
+    public List<Event_Instance> getThroughput_Instances() {
+        return Throughput_Instances;
+    }
+
+    public void setThroughput_Instances(List<Event_Instance> throughput_Instances) {
+        Throughput_Instances = throughput_Instances;
     }
 
     @Override

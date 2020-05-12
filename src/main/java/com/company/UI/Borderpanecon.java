@@ -1,6 +1,7 @@
 package com.company.UI;
 
 import com.company.EPK.*;
+import com.company.Enums.Contype;
 import com.company.UI.EPKUI.*;
 import com.company.UI.javafxgraph.fxgraph.cells.UI_View_Gen;
 import com.company.UI.javafxgraph.fxgraph.graph.Model;
@@ -20,6 +21,8 @@ import javafx.stage.Stage;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 
 import static com.company.UI.UI_Button_Active_Type.*;
@@ -133,9 +136,7 @@ public class Borderpanecon implements Initializable {
 
     public void actionPerformed(ActionEvent e) throws IOException {
 
-        if (e.getSource() == Delete) {
-            System.out.println("Palaber " + ((UI_Instantiable) EPK.getActive_Elem().getNodeView()).get_Next_Elem_ID());
-        } else if (e.getSource() == Normal) {
+        if (e.getSource() == Normal) {
             Btn_Type = NORMAL;
             System.out.println("Normal");
         } else if (e.getSource() == Event) {
@@ -296,20 +297,31 @@ public class Borderpanecon implements Initializable {
         } else if (e.getSource() == Delete) {
             UI_View_Gen Active_Elem = EPK.getActive_Elem();
             EPK.getAll_Elems().remove(Active_Elem.getNodeView());
+
             for (EPK_Node node : EPK.getAll_Elems()) {
                 node.getNext_Elem().remove(Active_Elem.getEPKNode());
                 if (node instanceof Activating_Function) {
-                    if (((Activating_Function) node).getStart_Event().equals(Active_Elem)) {
+                    if (((Activating_Function) node).getStart_Event() != null && ((Activating_Function) node).getStart_Event().equals(Active_Elem.getEPKNode())) {
                         ((Activating_Function) node).setStart_Event(null);
                     }
                 } else if (node instanceof Activating_Start_Event) {
-                    if (((Activating_Start_Event) node).getActivating_Function().equals(Active_Elem)) {
+                    if (((Activating_Start_Event) node).getActivating_Function() != null &&
+                            ((Activating_Start_Event) node).getActivating_Function().equals(Active_Elem.getEPKNode())) {
                         ((Activating_Start_Event) node).setFunction(null);
                     }
                 } else if (node instanceof Event_Con_Join) {
-
-                } else if (node instanceof Event_Con_Split) {
-
+                    if (((Event_Con_Join) node).getContype() == Contype.AND) {
+                        ((Event_Con_Join) node).getMapped_Branch_Elements_AND().remove(Active_Elem.getEPKNode());
+                    } else {
+                        List<Nodemap> Mapped_Elems = ((Event_Con_Join) node).getMapped_Branch_Elements();
+                        List<Nodemap> Mark_For_deletion = new ArrayList<>();
+                        for (Nodemap map : Mapped_Elems) {
+                            if (map.contains(Active_Elem.getEPKNode())) {
+                                Mark_For_deletion.add(map);
+                            }
+                        }
+                        Mapped_Elems.removeAll(Mark_For_deletion);
+                    }
                 }
             }
 
@@ -317,6 +329,7 @@ public class Borderpanecon implements Initializable {
             model.removebyTargetEdge(Active_Elem.getCellId());
             model.getRemovedCells().add(model.getCellByID(Active_Elem.getCellId()));
             model.getGraph().endUpdate();
+
 
         } else if (e.getSource() == Save_Node) {
             UI_View_Gen Active_Elem = EPK.getActive_Elem();

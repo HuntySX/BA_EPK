@@ -2,6 +2,7 @@ package com.company.UI.EPKUI;
 
 import com.company.EPK.EPK_Node;
 import com.company.EPK.Event_Con_Join;
+import com.company.EPK.Nodemap;
 import com.company.Enums.Contype;
 import com.company.UI.javafxgraph.fxgraph.cells.UI_View_Gen;
 import com.dlsc.formsfx.model.structure.*;
@@ -34,15 +35,16 @@ public class UI_XOR_Join extends Event_Con_Join implements UI_Instantiable {
     private IntegerField UI_ID_FIELD;
     private IntegerProperty UI_ID;
     private SingleSelectionField<EPK_Node> UI_NEXT_ELEMENTS_FIELD;
-    private SingleSelectionField<EPK_Node> UI_PREVIOUS_ELEMS;
+    private SingleSelectionField<EPK_Node> UI_PREVIOUS_ELEMS_START;
+    private SingleSelectionField<EPK_Node> UI_PREVIOUS_ELEMS_END;
     private BooleanProperty IS_EAGER = new SimpleBooleanProperty(true);
     private BooleanField UI_IS_EAGER;
     private Label SelectionLabel = new Label();
     private FormRenderer ID_TAG_UI;
     private FormRenderer NEXT_ELEMS_UI;
     private FormRenderer IS_EAGER_UI;
-    private List<EPK_Node> Chosen_Previous_List;
-    private EPK_Node Chosen_Previous;
+    private List<Nodemap> Chosen_Previous_List;
+
 
     public UI_XOR_Join(int ID, UI_EPK EPK, VBox Rightbox) {
         super(null, ID, null);
@@ -51,7 +53,7 @@ public class UI_XOR_Join extends Event_Con_Join implements UI_Instantiable {
         this.EPK = EPK;
         this.UI_ID = new SimpleIntegerProperty(ID);
         this.prev_nodelist = new ArrayList<>();
-        this.Chosen_Previous_List = new ArrayList<>();
+        this.Chosen_Previous_List = getMapped_Branch_Elements();
         StringBuilder ID_Build = new StringBuilder("Event: ");
         ID_Build.append(ID);
         UI_ID_FIELD = Field.ofIntegerType(UI_ID).label("ID").editable(false);
@@ -111,17 +113,27 @@ public class UI_XOR_Join extends Event_Con_Join implements UI_Instantiable {
         ButtonBar Next_ElemBar = new ButtonBar();
         Next_ElemBar.getButtons().add(btn);
         Box.getChildren().add(Next_ElemBar);
-
-        Button Save_Selection = new Button("Auswahl speichern");
+        Button Save_Selection = new Button("Add Path");
         Save_Selection.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
-                EPK_Node Chosen_Previous = UI_PREVIOUS_ELEMS.getSelection();
-                if (Chosen_Previous != null) {
-                    Chosen_Previous_List.add(Chosen_Previous);
+                EPK_Node Chosen_Previous_Start = UI_PREVIOUS_ELEMS_START.getSelection();
+                EPK_Node Chosen_Previous_End = UI_PREVIOUS_ELEMS_END.getSelection();
+                if (Chosen_Previous_Start != null && Chosen_Previous_End != null) {
+                    boolean found = false;
+                    for (Nodemap m : Chosen_Previous_List) {
+                        if (m.containsboth(Chosen_Previous_Start, Chosen_Previous_End)) {
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found) {
+                        Nodemap new_Map = new Nodemap(Chosen_Previous_Start, Chosen_Previous_End);
+                        getMapped_Branch_Elements().add(new_Map);
+                    }
                     StringBuilder LabelString = new StringBuilder("");
-                    for (EPK_Node node : Chosen_Previous_List) {
-                        LabelString.append(node.toString());
+                    for (Nodemap map : Chosen_Previous_List) {
+                        LabelString.append(map.toString());
                         LabelString.append("\n");
                     }
                     if (!LabelString.equals("")) {
@@ -130,16 +142,27 @@ public class UI_XOR_Join extends Event_Con_Join implements UI_Instantiable {
                 }
             }
         });
-        Button Delete_Selection = new Button("Auswahl löschen");
+        Button Delete_Selection = new Button("Delete Path");
         Delete_Selection.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
-                EPK_Node Chosen_to_Delete = UI_PREVIOUS_ELEMS.getSelection();
-                if (Chosen_to_Delete != null) {
-                    Chosen_Previous_List.remove(Chosen_to_Delete);
+                EPK_Node Chosen_to_Delete_Start = UI_PREVIOUS_ELEMS_START.getSelection();
+                EPK_Node Chosen_to_Delete_End = UI_PREVIOUS_ELEMS_END.getSelection();
+                Nodemap mark_for_deletion = null;
+                if (Chosen_to_Delete_End != null && Chosen_to_Delete_Start != null) {
+                    for (Nodemap m : Chosen_Previous_List) {
+                        if (m.containsboth(Chosen_to_Delete_Start, Chosen_to_Delete_End)) {
+                            mark_for_deletion = m;
+                            break;
+                        }
+                    }
+                    if (mark_for_deletion != null) {
+                        Chosen_Previous_List.remove(mark_for_deletion);
+                    }
+
                     StringBuilder LabelString = new StringBuilder("");
-                    for (EPK_Node node : Chosen_Previous_List) {
-                        LabelString.append(node.toString());
+                    for (Nodemap m : Chosen_Previous_List) {
+                        LabelString.append(m.toString());
                         LabelString.append("\n");
                     }
                     if (!LabelString.equals("")) {
@@ -149,12 +172,16 @@ public class UI_XOR_Join extends Event_Con_Join implements UI_Instantiable {
             }
         });
         prev_nodelist = EPK.getAll_Elems();
-        UI_PREVIOUS_ELEMS = Field.ofSingleSelectionType(prev_nodelist).label("Vorgänger: ")
+        UI_PREVIOUS_ELEMS_START = Field.ofSingleSelectionType(prev_nodelist).label("Path-start: ")
                 .tooltip("Vorgänger werden in der Überprüfung der Instanz zur weitergabe am Gate auf" +
                         "Beendigung geprüft (je nach Gate Regel)");
+        UI_PREVIOUS_ELEMS_END = Field.ofSingleSelectionType(prev_nodelist).label("Path-end: ")
+                .tooltip("Vorgänger werden in der Überprüfung der Instanz zur weitergabe am Gate auf" +
+                        "Beendigung geprüft (je nach Gate Regel)");
+
         FormRenderer PREVIOUS_ELEMS_UI = new FormRenderer(Form.of
                 (Group.of
-                        (UI_PREVIOUS_ELEMS)));
+                        (UI_PREVIOUS_ELEMS_START, UI_PREVIOUS_ELEMS_END)));
 
         Box.getChildren().add(new Separator());
         Box.getChildren().add(IS_EAGER_UI);

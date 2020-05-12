@@ -53,9 +53,6 @@ public class Resource {
         if (!Used_In.contains(Func)) {
             Used_In.add(Func);
         }
-        if (!Func.getNeeded_Resources().contains(this)) {
-            Func.Add_Needed_Resource(this);
-        }
     }
 
     public void setAllowed_Users(List<User> allowed_Users) {
@@ -64,6 +61,16 @@ public class Resource {
 
     public List<Function> getUsed_In() {
         return Used_In;
+    }
+
+    public void addResourceUsed(Function f) {
+        if (!Used_In.contains(f)) {
+            Used_In.add(f);
+        }
+    }
+
+    public void removeResourcesUsed(Function f) {
+        Used_In.remove(f);
     }
 
     public int getID() {

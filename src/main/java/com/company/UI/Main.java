@@ -48,7 +48,7 @@ public class Main extends Application {
         pane.setCenter(graph.getScrollPane());
 
         //scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm()); not working
-
+        primaryStage.setMaximized(true);
         primaryStage.setScene(scene);
         primaryStage.setTitle("EPCSim");
         primaryStage.show();

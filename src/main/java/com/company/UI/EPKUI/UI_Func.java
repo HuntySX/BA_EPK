@@ -51,7 +51,7 @@ public class UI_Func extends Function implements UI_Instantiable {
     private SingleSelectionField<Resource> UI_NEEDED_RESOURCES_FIELD;
     private SingleSelectionField<Workforce> UI_NEEDED_WORKFORCES_FIELD;
     private SingleSelectionField<EPK_Node> UI_NEXT_ELEMENTS;
-
+    private Function self;
     private FormRenderer RESOURCES_UI;
     private FormRenderer WORKFORCES_UI;
     private FormRenderer WORKINGTIME_UI;
@@ -61,13 +61,14 @@ public class UI_Func extends Function implements UI_Instantiable {
 
     public UI_Func(int ID, UI_EPK EPK, VBox Rightbox) {
         super(null, ID, null, false, null, null, 0, 0, 10);
+        self = this;
         this.Box = new VBox();
         this.Rightbox = Rightbox;
         this.EPK = EPK;
         this.Resources = EPK.getAll_Resources();
         this.Workforces = EPK.getAll_Workforces();
-        needed_resource_List = new ArrayList<>();
-        needed_workforces_List = new ArrayList<>();
+        needed_resource_List = getNeeded_Resources();
+        needed_workforces_List = getNeeded_Workforce();
         UI_ID = new SimpleIntegerProperty(ID);
         StringBuilder ID_Build = new StringBuilder("Function: ");
         ID_Build.append(ID);
@@ -152,6 +153,7 @@ public class UI_Func extends Function implements UI_Instantiable {
                     if (!found) {
                         Resource to_Add = new Resource(resource.getName(), count, resource.getID());
                         needed_resource_List.add(to_Add);
+                        resource.add_Used_In(self);
                     }
                     String Resourcelabel = "Added Resources: [";
                     for (Resource added_res : needed_resource_List) {
@@ -178,6 +180,8 @@ public class UI_Func extends Function implements UI_Instantiable {
                     }
                     if (to_Delete != null) {
                         needed_resource_List.remove(to_Delete);
+                        to_Delete = null;
+                        resource.removeResourcesUsed(self);
                         String Resourcelabel = "Added Resources: [";
                         for (Resource added_res : needed_resource_List) {
                             Resourcelabel = Resourcelabel.concat("; " + added_res.toString());
@@ -208,6 +212,7 @@ public class UI_Func extends Function implements UI_Instantiable {
                 if (force != null) {
                     if (!needed_workforces_List.contains(force)) {
                         needed_workforces_List.add(force);
+                        force.AddUsedIn(self);
                         String Workforcelabel = "Added Workforces: [ ";
                         for (Workforce added_force : needed_workforces_List) {
                             Workforcelabel = Workforcelabel.concat("; " + added_force.toString());
@@ -226,6 +231,7 @@ public class UI_Func extends Function implements UI_Instantiable {
                 if (force != null) {
                     if (needed_workforces_List.contains(force)) {
                         needed_workforces_List.remove(force);
+                        force.removeUsedIn(self);
                         String Workforcelabel = new String("Added Workforces: [ ");
                         for (Workforce added_force : needed_workforces_List) {
                             Workforcelabel = Workforcelabel.concat("; " + added_force.toString());

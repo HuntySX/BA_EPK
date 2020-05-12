@@ -19,6 +19,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
 import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
 import javafx.scene.layout.VBox;
@@ -156,10 +157,28 @@ public class UI_Activate_Function extends Activating_Function implements UI_Inst
             public void handle(ActionEvent actionEvent) {
                 Chosen_Starter = ACTIVATING_EVENT_FIELD.getSelection();
                 if (Chosen_Starter != null) {
-                    Activating_Event_Label.setText("Ausgewähltes Start Event: \n" + Chosen_Starter.toString());
+                    Activating_Event_Label.setText("Ausgewähltes Start Event: " + Chosen_Starter.toString());
+                    setStart_Event(Chosen_Starter);
                 }
             }
         });
+
+        Button Remove_Selection = new Button("Delete Activating");
+        Remove_Selection.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                Chosen_Starter = ACTIVATING_EVENT_FIELD.getSelection();
+                if (Chosen_Starter != null && getStart_Event() != null && getStart_Event().equals(Chosen_Starter)) {
+                    Chosen_Starter = null;
+                    setStart_Event(null);
+                    Activating_Event_Label.setText("Ausgewählte Aktivierende Funktion: ");
+                }
+            }
+        });
+
+        ButtonBar Selection = new ButtonBar();
+        Selection.getButtons().add(Save_Selection);
+        Selection.getButtons().add(Remove_Selection);
 
         Box.getChildren().add(btn);
         Box.getChildren().add(new Separator());
@@ -167,7 +186,7 @@ public class UI_Activate_Function extends Activating_Function implements UI_Inst
         Box.getChildren().add(new Separator());
         Box.getChildren().add(Activating_Event_Label);
         Box.getChildren().add(UI_ACTIVATING_EVENT);
-        Box.getChildren().add(Save_Selection);
+        Box.getChildren().add(Selection);
         Box.getChildren().add(new Separator());
         Box.getChildren().add(ORDER_TIME_UI);
         return Box;
