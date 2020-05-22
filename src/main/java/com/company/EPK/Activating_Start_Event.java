@@ -7,7 +7,7 @@ import java.util.List;
 
 import static com.company.Enums.Start_Event_Type.INSTANTIATED;
 
-public class Activating_Start_Event extends Event {
+public class Activating_Start_Event extends Event implements Printable_Node, Is_Tagged {
 
     private Start_Event_Type start_event_type;
     private Discrete_Event_Generator Generator;
@@ -54,5 +54,13 @@ public class Activating_Start_Event extends Event {
             Check = false;
         }
         return Check;
+    }
+
+    public String getTag() {
+        return getEvent_Tag();
+    }
+
+    public Activating_Start_Event returnUpperClass() {
+        return this;
     }
 }

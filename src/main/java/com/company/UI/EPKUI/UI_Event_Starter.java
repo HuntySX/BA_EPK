@@ -3,13 +3,9 @@ package com.company.UI.EPKUI;
 import com.company.EPK.EPK_Node;
 import com.company.EPK.Start_Event;
 import com.company.Enums.Start_Event_Type;
-import com.company.UI.javafxgraph.fxgraph.cells.UI_View_Gen;
 import com.dlsc.formsfx.model.structure.*;
 import com.dlsc.formsfx.view.renderer.FormRenderer;
 import javafx.beans.property.*;
-import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Button;
@@ -24,13 +20,11 @@ public class UI_Event_Starter extends Start_Event implements UI_Instantiable {
 
     private VBox Box;
     private VBox Rightbox;
-    private ObservableList<EPK_Node> nodelist;
+    private List<EPK_Node> nodelist;
     private UI_EPK EPK;
     private List<Start_Event_Type> Event_Types;
     private IntegerProperty UI_ID = new SimpleIntegerProperty();
-    ;
     private IntegerProperty INSTANTIATE_COUNT = new SimpleIntegerProperty();
-    ;
     private IntegerProperty to_Instantiate = new SimpleIntegerProperty();
     private StringProperty tag;
     private BooleanProperty is_Start = new SimpleBooleanProperty(true);
@@ -53,22 +47,12 @@ public class UI_Event_Starter extends Start_Event implements UI_Instantiable {
 
         this.Event_Types = EPK.getStart_Event_Types();
         this.UI_ID = new SimpleIntegerProperty(ID);
-        StringBuilder ID_Build = new StringBuilder("Event: ");
+        StringBuilder ID_Build = new StringBuilder("Start Event: ");
         ID_Build.append(ID);
         this.tag = new SimpleStringProperty(ID_Build.toString());
         UI_ID_FIELD = Field.ofIntegerType(UI_ID).label("ID").editable(false);
         UI_NAMESTRING_FIELD = Field.ofStringType(tag).label("Knotenname:");
-        this.nodelist = FXCollections.observableArrayList();
-        nodelist.addListener((ListChangeListener<EPK_Node>) e -> {
-            while (e.next()) {
-                if (e.wasRemoved()) {
-                    Rightbox.getChildren().clear();
-                    UI_Instantiable Nodeview = (UI_Instantiable) ((UI_View_Gen) EPK.getActive_Elem()).getNodeView();
-                    Rightbox.getChildren().add(Nodeview.Get_UI());
-                }
-            }
-        });
-
+        this.nodelist = getNext_Elem();
         this.INSTANTIATE_COUNT = new SimpleIntegerProperty(100);
         Start_Event_Type = Field.ofSingleSelectionType(Event_Types, 0).label("Starttyp")
                 .tooltip("Die Auswahl des Starttyps entscheidet nach welcher " +
@@ -114,10 +98,10 @@ public class UI_Event_Starter extends Start_Event implements UI_Instantiable {
             public void handle(ActionEvent actionEvent) {
                 EPK_Node Node = Next_Elems.getSelection();
                 if (Node != null) {
-                    nodelist.remove(Node);
                     EPK.getActive_Elem().getEPKNode().getNext_Elem().remove(Node);
                     EPK.getModel().removeEdge(getID(), Node.getID());
                     EPK.getGraph().endUpdate();
+                    EPK.activate();
                 }
             }
         });
@@ -132,7 +116,9 @@ public class UI_Event_Starter extends Start_Event implements UI_Instantiable {
 
     @Override
     public void save_Settings() {
-
+        setEvent_Tag(UI_NAMESTRING_FIELD.getValue());
+        setStart_event_type(Start_Event_Type.getSelection());
+        setTo_Instantiate(UI_INSTANTIATE_COUNT_FIELD.getValue());
     }
 
     @Override
@@ -146,5 +132,10 @@ public class UI_Event_Starter extends Start_Event implements UI_Instantiable {
     @Override
     public int get_Next_Elem_ID() {
         return 0;
+    }
+
+    @Override
+    public EPK_Node getthis() {
+        return super.returnUpperClass();
     }
 }

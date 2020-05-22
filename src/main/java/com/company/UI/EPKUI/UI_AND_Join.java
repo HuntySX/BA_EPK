@@ -3,14 +3,10 @@ package com.company.UI.EPKUI;
 import com.company.EPK.EPK_Node;
 import com.company.EPK.Event_Con_Join;
 import com.company.Enums.Contype;
-import com.company.UI.javafxgraph.fxgraph.cells.UI_View_Gen;
 import com.dlsc.formsfx.model.structure.*;
 import com.dlsc.formsfx.view.renderer.FormRenderer;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
-import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Button;
@@ -19,14 +15,13 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
 import javafx.scene.layout.VBox;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class UI_AND_Join extends Event_Con_Join implements UI_Instantiable {
 
     private VBox Box;
     private VBox Rightbox;
-    private ObservableList<EPK_Node> nodelist;
+    private List<EPK_Node> nodelist;
     private List<EPK_Node> prev_nodelist;
     private UI_EPK EPK;
     private IntegerField UI_ID_FIELD;
@@ -40,26 +35,15 @@ public class UI_AND_Join extends Event_Con_Join implements UI_Instantiable {
     private EPK_Node Chosen_Previous;
 
     public UI_AND_Join(int ID, UI_EPK EPK, VBox Rightbox) {
-        super(null, ID, null);
+        super(null, ID, Contype.AND);
         this.Box = new VBox();
         this.Rightbox = Rightbox;
         this.EPK = EPK;
         this.UI_ID = new SimpleIntegerProperty(ID);
-        this.prev_nodelist = new ArrayList<>();
+        this.prev_nodelist = EPK.getAll_Elems();
         this.Chosen_Previous_List = getMapped_Branch_Elements_AND();
-        StringBuilder ID_Build = new StringBuilder("Event: ");
-        ID_Build.append(ID);
         UI_ID_FIELD = Field.ofIntegerType(UI_ID).label("ID").editable(false);
-        this.nodelist = FXCollections.observableArrayList();
-        nodelist.addListener((ListChangeListener<EPK_Node>) e -> {
-            while (e.next()) {
-                if (e.wasRemoved()) {
-                    Rightbox.getChildren().clear();
-                    UI_Instantiable Nodeview = (UI_Instantiable) ((UI_View_Gen) EPK.getActive_Elem()).getNodeView();
-                    Rightbox.getChildren().add(Nodeview.Get_UI());
-                }
-            }
-        });
+        this.nodelist = getNext_Elem();
         ID_TAG_UI = new FormRenderer(
                 Form.of(
                         Group.of(
@@ -90,10 +74,10 @@ public class UI_AND_Join extends Event_Con_Join implements UI_Instantiable {
             public void handle(ActionEvent actionEvent) {
                 EPK_Node Node = UI_NEXT_ELEMENTS_FIELD.getSelection();
                 if (Node != null) {
-                    nodelist.remove(Node);
                     EPK.getActive_Elem().getEPKNode().getNext_Elem().remove(Node);
                     EPK.getModel().removeEdge(getID(), Node.getID());
                     EPK.getGraph().endUpdate();
+                    EPK.activate();
                 }
             }
         });
@@ -140,7 +124,6 @@ public class UI_AND_Join extends Event_Con_Join implements UI_Instantiable {
                 }
             }
         });
-        prev_nodelist = EPK.getAll_Elems();
         UI_PREVIOUS_ELEMS = Field.ofSingleSelectionType(prev_nodelist).label("Vorgänger: ")
                 .tooltip("Vorgänger werden in der Überprüfung der Instanz zur weitergabe am Gate auf" +
                         "Beendigung geprüft (je nach Gate Regel)");
@@ -172,5 +155,10 @@ public class UI_AND_Join extends Event_Con_Join implements UI_Instantiable {
     public String toString() {
         return "AND-Join [" +
                 "ID: " + UI_ID_FIELD.getValue() + "]";
+    }
+
+    @Override
+    public EPK_Node getthis() {
+        return super.returnUpperClass();
     }
 }

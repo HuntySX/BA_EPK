@@ -1,29 +1,6 @@
 package com.company.Run;
 
-import com.company.EPK.*;
-import com.company.Enums.Classification;
-import com.company.Enums.Contype;
-import com.company.Enums.Function_Type;
-import com.company.Enums.Split_Status;
-import com.company.Simulation.Simulation_Base.Data.Printer_Gate;
-import com.company.Simulation.Simulation_Base.Data.Printer_Queue;
-import com.company.Simulation.Simulation_Base.Data.Threading_Data.Item;
-import com.company.Simulation.Simulation_Base.Data.Shared_Data.User;
-import com.company.Simulation.Simulation_Base.Data.Threading_Data.Warehouse;
-import com.company.Simulation.Simulation_Base.Data.Threading_Data.Buy_Instance;
-import com.company.Simulation.Simulation_Base.Data.Threading_Data.Process_instance;
-import com.company.Simulation.Simulation_Base.Data.Threading_Data.Rep_Instance;
-import com.company.Simulation.Simulation_Base.Data.Shared_Data.Simulation_Instance;
-import com.company.Simulation.Simulation_Threading.*;
-import com.company.Simulation.Simulation_Threading.Threading_Simulator;
-
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.function.BiFunction;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 public class Threading_Generator {
 
@@ -483,6 +460,11 @@ public class Threading_Generator {
         starting_queue.setSQ(SQ);
         warehouse_queue.setT(WQ);
 
+        Printer_Gate pg = Printer_Gate.get_Printer_Gate();
+        Printer_Queue printer_queue = new Printer_Queue();
+        Thread PQ = new Thread(printer_queue);
+        printer_queue.setT(PQ);
+        PQ.start();
 
         EQ.start();
         SQ.start();
@@ -493,7 +475,8 @@ public class Threading_Generator {
             wait(120000);
         }
 
-        PQ.start();*/
+        PQ.start();
+        */
 
     }
 }

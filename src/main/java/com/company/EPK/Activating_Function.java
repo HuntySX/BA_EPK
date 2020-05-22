@@ -12,7 +12,7 @@ import java.util.Random;
 
 import static com.company.Enums.Decide_Activation_Type.*;
 
-public class Activating_Function extends Function {
+public class Activating_Function extends Function implements Printable_Node, Is_Tagged {
 
     private Activating_Start_Event Start_Event;
     private Workingtime Instantiate_Time;
@@ -24,7 +24,11 @@ public class Activating_Function extends Function {
     public Activating_Function(String function_tag, Workingtime instantiate_Time, Function_Type type, int ID, Activating_Start_Event start_Event, Event_Calendar calendar, Decide_Activation_Type decision) {
         super(function_tag, type, ID);
         Start_Event = start_Event;
-        Instantiate_Time = instantiate_Time;
+        if (instantiate_Time == null) {
+            Instantiate_Time = new Workingtime();
+        } else {
+            Instantiate_Time = instantiate_Time;
+        }
         this.Waiting_For_Activation_Instances = new ArrayList<>();
         this.calendar = calendar;
         this.DecisionType = decision;
@@ -131,4 +135,33 @@ public class Activating_Function extends Function {
         }
         return Check;
     }
+
+    public void setInstantiateHours(int Hours) {
+        Instantiate_Time.setHours(Hours);
+    }
+
+    public void setInstantiateMinutes(int Minutes) {
+        Instantiate_Time.setMinutes(Minutes);
+    }
+
+    public void setInstantiateSeconds(int Seconds) {
+        Instantiate_Time.setMinutes(Seconds);
+    }
+
+    public Workingtime getInstantiate_Time() {
+        return Instantiate_Time;
+    }
+
+    public void setInstantiate_Time(Workingtime InstantiateTime) {
+        this.Instantiate_Time = InstantiateTime;
+    }
+
+    public String getTag() {
+        return getFunction_tag();
+    }
+
+    public Activating_Function returnUpperClass() {
+        return this;
+    }
+
 }

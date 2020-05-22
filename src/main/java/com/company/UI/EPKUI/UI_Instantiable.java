@@ -14,4 +14,6 @@ public interface UI_Instantiable {
 
     public int get_Next_Elem_ID();
 
+    public EPK_Node getthis();
+
 }

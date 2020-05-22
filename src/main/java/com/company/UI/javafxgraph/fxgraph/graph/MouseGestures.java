@@ -41,7 +41,6 @@ public class MouseGestures {
                     if (model.getEPK().getActive_Elem() != null) {
                         model.getEPK().getActive_Elem().getEPKNode().add_Next_Elem(((UI_View_Gen) node).getEPKNode());
                         model.addEdge(model.getEPK().getActive_Elem().getCellId(), ((UI_View_Gen) node).getCellId());
-                        ((UI_Instantiable) model.getEPK().getActive_Elem().getEPKNode()).getNodelist().add(((UI_View_Gen) node).getNodeView());
                         graph.endUpdate();
                         model.getEPK().setActive_Elem_For_Connection(null);
                         controller.setBtn_Type(NORMAL);

@@ -263,4 +263,9 @@ public class UI_EPK {
         List.add(DEFAULT);
         return List;
     }
+
+    public void activate() {
+        Box.getChildren().clear();
+        Box = (((UI_Instantiable) getActive_Elem().getEPKNode()).Get_UI());
+    }
 }

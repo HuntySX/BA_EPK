@@ -1,4 +1,4 @@
-package com.company.Print;
+package com.company.Print.ThreadingDriven;
 
 import com.company.Enums.Process_Status;
 
@@ -7,7 +7,7 @@ import java.time.LocalTime;
 public abstract class Print_File {
 
 
-    private int case_ID;
+    private Integer case_ID;
 
     private LocalTime timer;
 
@@ -15,7 +15,7 @@ public abstract class Print_File {
 
     private Process_Status status;
 
-    public Print_File(int case_ID, LocalTime timer, String process, Process_Status status) {
+    public Print_File(Integer case_ID, LocalTime timer, String process, Process_Status status) {
         this.case_ID = case_ID;
         this.timer = timer;
         this.Process = process;

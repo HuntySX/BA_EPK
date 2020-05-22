@@ -4,14 +4,10 @@ import com.company.EPK.EPK_Node;
 import com.company.EPK.Event_Con_Split;
 import com.company.Enums.Contype;
 import com.company.Enums.Split_Decide_Type;
-import com.company.UI.javafxgraph.fxgraph.cells.UI_View_Gen;
 import com.dlsc.formsfx.model.structure.*;
 import com.dlsc.formsfx.view.renderer.FormRenderer;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
-import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Button;
@@ -24,7 +20,7 @@ public class UI_AND_Split extends Event_Con_Split implements UI_Instantiable {
 
     private VBox Box;
     private VBox Rightbox;
-    private ObservableList<EPK_Node> nodelist;
+    private List<EPK_Node> nodelist;
     private UI_EPK EPK;
     private IntegerProperty UI_ID;
     private List<Split_Decide_Type> Decide_Types;
@@ -43,16 +39,7 @@ public class UI_AND_Split extends Event_Con_Split implements UI_Instantiable {
         this.EPK = EPK;
         UI_ID = new SimpleIntegerProperty(ID);
         UI_ID_FIELD = Field.ofIntegerType(UI_ID).label("ID").editable(false);
-        this.nodelist = FXCollections.observableArrayList();
-        nodelist.addListener((ListChangeListener<EPK_Node>) e -> {
-            while (e.next()) {
-                if (e.wasRemoved()) {
-                    Rightbox.getChildren().clear();
-                    UI_Instantiable Nodeview = (UI_Instantiable) ((UI_View_Gen) EPK.getActive_Elem()).getNodeView();
-                    Rightbox.getChildren().add(Nodeview.Get_UI());
-                }
-            }
-        });
+        this.nodelist = getNext_Elem();
 
         ID_UI = new FormRenderer(
                 Form.of(
@@ -90,10 +77,10 @@ public class UI_AND_Split extends Event_Con_Split implements UI_Instantiable {
             public void handle(ActionEvent actionEvent) {
                 EPK_Node Node = UI_NEXT_ELEMENTS_FIELD.getSelection();
                 if (Node != null) {
-                    nodelist.remove(Node);
                     EPK.getActive_Elem().getEPKNode().getNext_Elem().remove(Node);
                     EPK.getModel().removeEdge(getID(), Node.getID());
                     EPK.getGraph().endUpdate();
+                    EPK.activate();
                 }
             }
         });
@@ -105,7 +92,6 @@ public class UI_AND_Split extends Event_Con_Split implements UI_Instantiable {
 
     @Override
     public void save_Settings() {
-
     }
 
     @Override
@@ -117,5 +103,10 @@ public class UI_AND_Split extends Event_Con_Split implements UI_Instantiable {
     public String toString() {
         return "AND-Split [" +
                 "ID: " + UI_ID_FIELD.getValue() + "]";
+    }
+
+    @Override
+    public EPK_Node getthis() {
+        return super.returnUpperClass();
     }
 }

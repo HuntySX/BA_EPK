@@ -4,16 +4,12 @@ import com.company.EPK.EPK_Node;
 import com.company.EPK.Event_Con_Join;
 import com.company.EPK.Nodemap;
 import com.company.Enums.Contype;
-import com.company.UI.javafxgraph.fxgraph.cells.UI_View_Gen;
 import com.dlsc.formsfx.model.structure.*;
 import com.dlsc.formsfx.view.renderer.FormRenderer;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
-import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Button;
@@ -29,7 +25,7 @@ public class UI_XOR_Join extends Event_Con_Join implements UI_Instantiable {
 
     private VBox Box;
     private VBox Rightbox;
-    private ObservableList<EPK_Node> nodelist;
+    private List<EPK_Node> nodelist;
     private List<EPK_Node> prev_nodelist;
     private UI_EPK EPK;
     private IntegerField UI_ID_FIELD;
@@ -47,26 +43,16 @@ public class UI_XOR_Join extends Event_Con_Join implements UI_Instantiable {
 
 
     public UI_XOR_Join(int ID, UI_EPK EPK, VBox Rightbox) {
-        super(null, ID, null);
+        super(null, ID, Contype.EAGER_XOR);
         this.Box = new VBox();
         this.Rightbox = Rightbox;
         this.EPK = EPK;
         this.UI_ID = new SimpleIntegerProperty(ID);
         this.prev_nodelist = new ArrayList<>();
         this.Chosen_Previous_List = getMapped_Branch_Elements();
-        StringBuilder ID_Build = new StringBuilder("Event: ");
-        ID_Build.append(ID);
         UI_ID_FIELD = Field.ofIntegerType(UI_ID).label("ID").editable(false);
-        this.nodelist = FXCollections.observableArrayList();
-        nodelist.addListener((ListChangeListener<EPK_Node>) e -> {
-            while (e.next()) {
-                if (e.wasRemoved()) {
-                    Rightbox.getChildren().clear();
-                    UI_Instantiable Nodeview = (UI_Instantiable) ((UI_View_Gen) EPK.getActive_Elem()).getNodeView();
-                    Rightbox.getChildren().add(Nodeview.Get_UI());
-                }
-            }
-        });
+        this.nodelist = getNext_Elem();
+
         ID_TAG_UI = new FormRenderer(
                 Form.of(
                         Group.of(
@@ -75,7 +61,6 @@ public class UI_XOR_Join extends Event_Con_Join implements UI_Instantiable {
                 "arbeitet der XOR-Join Eager (Alle vorgänger werden auf potentielles Abarbeiten" +
                 "überprüft. Ansonsten arbeitet der XOR-Join Lazy(Sobald eine Instanz ankommt wird" +
                 "auf die gültige Or Bedingung geprüft)").editable(true);
-
         IS_EAGER_UI = new FormRenderer(Form.of(Group.of(UI_IS_EAGER)));
     }
 
@@ -102,10 +87,10 @@ public class UI_XOR_Join extends Event_Con_Join implements UI_Instantiable {
             public void handle(ActionEvent actionEvent) {
                 EPK_Node Node = UI_NEXT_ELEMENTS_FIELD.getSelection();
                 if (Node != null) {
-                    nodelist.remove(Node);
                     EPK.getActive_Elem().getEPKNode().getNext_Elem().remove(Node);
                     EPK.getModel().removeEdge(getID(), Node.getID());
                     EPK.getGraph().endUpdate();
+                    EPK.activate();
                 }
             }
         });
@@ -199,7 +184,11 @@ public class UI_XOR_Join extends Event_Con_Join implements UI_Instantiable {
 
     @Override
     public void save_Settings() {
-
+        if (UI_IS_EAGER.getValue()) {
+            setContype(Contype.EAGER_XOR);
+        } else {
+            setContype(Contype.LAZY_XOR);
+        }
     }
 
     @Override
@@ -211,5 +200,10 @@ public class UI_XOR_Join extends Event_Con_Join implements UI_Instantiable {
     public String toString() {
         return "XOR-Join [" +
                 "ID: " + UI_ID_FIELD.getValue() + "]";
+    }
+
+    @Override
+    public EPK_Node getthis() {
+        return super.returnUpperClass();
     }
 }

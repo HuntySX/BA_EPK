@@ -1,7 +1,12 @@
 package com.company.UI;
 
 import com.company.EPK.*;
-import com.company.Enums.Contype;
+import com.company.Print.EventDriven.*;
+import com.company.Simulation.Simulation_Base.Data.Discrete_Data.Resource;
+import com.company.Simulation.Simulation_Base.Data.Printer_Gate;
+import com.company.Simulation.Simulation_Base.Data.Printer_Queue;
+import com.company.Simulation.Simulation_Base.Data.Shared_Data.Settings;
+import com.company.Simulation.Simulation_Base.Data.Shared_Data.User;
 import com.company.UI.EPKUI.*;
 import com.company.UI.javafxgraph.fxgraph.cells.UI_View_Gen;
 import com.company.UI.javafxgraph.fxgraph.graph.Model;
@@ -25,6 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
+import static com.company.Enums.Contype.AND;
 import static com.company.UI.UI_Button_Active_Type.*;
 
 
@@ -82,6 +88,8 @@ public class Borderpanecon implements Initializable {
     Button Delete;
     @FXML
     Button Save_Node;
+    @FXML
+    Button Generatebtn;
 
 
     @Override
@@ -310,7 +318,7 @@ public class Borderpanecon implements Initializable {
                         ((Activating_Start_Event) node).setFunction(null);
                     }
                 } else if (node instanceof Event_Con_Join) {
-                    if (((Event_Con_Join) node).getContype() == Contype.AND) {
+                    if (((Event_Con_Join) node).getContype() == AND) {
                         ((Event_Con_Join) node).getMapped_Branch_Elements_AND().remove(Active_Elem.getEPKNode());
                     } else {
                         List<Nodemap> Mapped_Elems = ((Event_Con_Join) node).getMapped_Branch_Elements();
@@ -334,9 +342,359 @@ public class Borderpanecon implements Initializable {
         } else if (e.getSource() == Save_Node) {
             UI_View_Gen Active_Elem = EPK.getActive_Elem();
             ((UI_Instantiable) Active_Elem.getNodeView()).save_Settings();
+        } else if (e.getSource() == Generatebtn) {
+            for (EPK_Node Node : EPK.getAll_Elems()) {
+                ((UI_Instantiable) Node).save_Settings();
+            }
+            List<EPK_Node> Final_List = new ArrayList<>();
+            List<Resource> Final_Resource = new ArrayList<>();
+            List<User> Final_User = new ArrayList<>();
+            List<Workforce> Final_Workforce = new ArrayList<>();
+            List<User> UI_Users = EPK.getAll_Users();
+            List<Resource> UI_Resource = EPK.getAll_Resources();
+            List<Workforce> UI_Workforces = EPK.getAll_Workforces();
+            List<EPK_Node> UI_All_Nodes = EPK.getAll_Elems();
+
+            //INSTANTIATE SETTINGS
+
+
+            UI_Settings UISettings = EPK.getUI_Settings();
+            Settings settings = new Settings();
+            settings.setBeginTime(UISettings.getBeginTime());
+            settings.setEndTime(UISettings.getEndTime());
+            settings.setDecide_Event_choosing(UISettings.getDecide_Event_choosing());
+            settings.setMax_RuntimeDays(UISettings.getMax_RuntimeDays());
+            settings.setOptimal_User_Layout(UISettings.isOptimal_User_Layout());
+            settings.setPrint_Only_Function(UISettings.isPrint_Only_Function());
+            settings.setGet_Only_Start_Finishable_Functions(UISettings.isOnly_Start_Finishable_Functions());
+
+            //INSTANTIATE ALL UNITS
+            for (Resource Res : UI_Resource) {
+                Resource newRes = new Resource(Res.getName(), Res.getCount(), Res.getID());
+                Final_Resource.add(newRes);
+            }
+            for (Workforce work : UI_Workforces) {
+                Workforce newWork = new Workforce(work.getW_ID(), work.getPermission());
+                Final_Workforce.add(newWork);
+            }
+            for (User user : UI_Users) {
+                User newUser = new User(user.getFirst_Name(), user.getLast_Name(), user.getP_ID(), user.getEfficiency());
+                Final_User.add(newUser);
+            }
+
+
+            //INSTANTIATE ALL NODES WITHOUT BINDINGS
+            for (EPK_Node Node : UI_All_Nodes) {
+
+                if (Node instanceof Function && !(Node instanceof Activating_Function)) {
+                    Function newFunc = new Function(null, Node.getID(), ((Function) Node).getFunction_tag(),
+                            ((Function) Node).isConcurrently(), ((Function) Node).getNeeded_Resources(), null,
+                            ((Function) Node).getWorkingTime().getHours(), ((Function) Node).getWorkingTime().getMinutes(), ((Function) Node).getWorkingTime().getSeconds());
+                    Final_List.add(newFunc);
+                    //NEXTELEMBINDING
+                } else if (Node instanceof Event && !(Node instanceof Activating_Start_Event) && !(Node instanceof Start_Event)) {
+                    Event newEvent = new Event(null, Node.getID(), ((Event) Node).getEvent_Tag(),
+                            ((Event) Node).is_Start_Event(), ((Event) Node).is_End_Event());
+                    Final_List.add(newEvent);
+                    //NEXTELEMBINDING
+                } else if (Node instanceof Activating_Start_Event) {
+                    Activating_Start_Event newActivateStartEvent = new Activating_Start_Event(null, Node.getID(),
+                            null, null, ((Event) Node).getEvent_Tag(), true);
+                    Final_List.add(newActivateStartEvent);
+                    //ACTIVATE FUNCTION/ NEXTELEMBINDING
+                } else if (Node instanceof Activating_Function) {
+                    Activating_Function newActivatingFunction = new Activating_Function(((Function) Node).getFunction_tag(),
+                            ((Activating_Function) Node).getInstantiate_Time(), ((Function) Node).getFunction_type(), Node.getID(),
+                            null, null, ((Activating_Function) Node).getDecisionType());
+                    newActivatingFunction.setNeeded_Resources(((Activating_Function) Node).getNeeded_Resources());
+                    Final_List.add(newActivatingFunction);
+                    //NEXTELEM;STARTEVENTBINDING
+                } else if (Node instanceof Event_Con_Join) {
+                    Event_Con_Join newCon_Join = new Event_Con_Join(null, Node.getID(), ((Event_Con_Join) Node).getContype());
+                    Final_List.add(newCon_Join);
+                    //MAPPEDBRANCHEDELEMENTS Binding
+                } else if (Node instanceof Event_Con_Split) {
+                    Event_Con_Split newCon_Split = new Event_Con_Split(null, Node.getID(),
+                            ((Event_Con_Split) Node).getContype(), ((Event_Con_Split) Node).getDecide_Type());
+                    Final_List.add(newCon_Split);
+                } else if (Node instanceof Start_Event) {
+                    Start_Event newStart = new Start_Event(((Start_Event) Node).getStart_event_type(), Node.getID(),
+                            null, ((Start_Event) Node).getTo_Instantiate(),
+                            null, ((Start_Event) Node).getEvent_Tag(), ((Start_Event) Node).is_Start_Event());
+                    Final_List.add(newStart);
+                }
+            }
+
+            //Instantiate Bindings
+            for (EPK_Node newNode : Final_List) {
+                EPK_Node UI_Node = null;
+                for (EPK_Node uiNode : UI_All_Nodes) {
+                    if (newNode.getID() == uiNode.getID()) {
+                        UI_Node = uiNode;
+                        break;
+                    }
+                }
+                if (UI_Node != null) {
+                    List<EPK_Node> next_Elems = new ArrayList<>();
+                    List<EPK_Node> UI_Next_elems = UI_Node.getNext_Elem();
+                    if (UI_Next_elems != null && !UI_Next_elems.isEmpty()) {
+                        for (EPK_Node UI_Next_elem : UI_Next_elems) {
+                            for (EPK_Node new_elem : Final_List) {
+                                if (UI_Next_elem.getID() == new_elem.getID()) {
+                                    next_Elems.add(new_elem);
+                                }
+                            }
+                        }
+                    }
+                    if (!next_Elems.isEmpty()) {
+                        newNode.setNext_Elem(next_Elems);
+                    }
+
+                    if (newNode instanceof Function && !(newNode instanceof Activating_Function)) {
+                        for (Workforce force : UI_Workforces) {
+                            List<Function> Used_In = force.getUsed_in();
+                            for (Function Used_In_UI : Used_In) {
+                                if (Used_In_UI.getID() == newNode.getID()) {
+                                    for (Workforce newforce : Final_Workforce) {
+                                        if (newforce.getW_ID() == force.getW_ID()) {
+                                            newforce.getUsed_in().add((Function) newNode);
+                                            ((Function) newNode).getNeeded_Workforce().add(newforce);
+                                            break;
+                                        }
+                                    }
+                                    break;
+                                }
+                            }
+                        }
+                    } else if (newNode instanceof Activating_Start_Event) {
+                        Activating_Function Function = ((Activating_Start_Event) UI_Node).getActivating_Function();
+                        for (EPK_Node Node : Final_List) {
+                            if (Node.getID() == Function.getID()) {
+                                ((Activating_Start_Event) newNode).setFunction(((Activating_Function) Node));
+                                break;
+                            }
+                        }
+                    } else if (newNode instanceof Activating_Function) {
+                        Activating_Start_Event Event = ((Activating_Function) UI_Node).getStart_Event();
+                        for (EPK_Node Node : Final_List) {
+                            if (Node.getID() == Event.getID()) {
+                                ((Activating_Function) newNode).setStart_Event((Activating_Start_Event) Node);
+                                break;
+                            }
+
+                        }
+                        for (Workforce force : UI_Workforces) {
+                            List<Function> Used_In = force.getUsed_in();
+                            for (Function Used_In_UI : Used_In) {
+                                if (Used_In_UI.getID() == newNode.getID()) {
+                                    for (Workforce newforce : Final_Workforce) {
+                                        if (newforce.getW_ID() == force.getW_ID()) {
+                                            newforce.getUsed_in().add((Activating_Function) newNode);
+                                            ((Activating_Function) newNode).getNeeded_Workforce().add(newforce);
+                                            break;
+                                        }
+                                    }
+                                    break;
+                                }
+                            }
+                        }
+
+                    } else if (newNode instanceof Event_Con_Join) {
+
+                        if (((Event_Con_Join) newNode).getContype().equals(AND)) {
+                            List<EPK_Node> MappedElemsAND = ((Event_Con_Join) UI_Node).getMapped_Branch_Elements_AND();
+                            List<EPK_Node> newMap = new ArrayList<>();
+                            for (EPK_Node mapnode : MappedElemsAND) {
+                                for (EPK_Node Node : Final_List) {
+                                    if (Node.getID() == mapnode.getID()) {
+                                        newMap.add(Node);
+                                    }
+                                }
+                            }
+                            if (!newMap.isEmpty()) {
+                                ((Event_Con_Join) newNode).setMapped_Branch_Elements_AND(newMap);
+                            }
+                        } else {
+                            List<Nodemap> MappedElems = ((Event_Con_Join) UI_Node).getMapped_Branch_Elements();
+                            List<Nodemap> newMaps = new ArrayList<>();
+                            for (Nodemap map : MappedElems) {
+                                EPK_Node End = map.getFinished_Elem();
+                                EPK_Node Start = map.getStarted_Elem();
+                                EPK_Node newEnd = null;
+                                EPK_Node newStart = null;
+                                for (EPK_Node Node : Final_List) {
+                                    if (End.getID() == Node.getID()) {
+                                        newEnd = Node;
+                                    } else if (Start.getID() == Node.getID()) {
+
+                                        newStart = Node;
+                                    }
+                                }
+                                if (newEnd != null && newStart != null) {
+                                    Nodemap newMap = new Nodemap(newStart, newEnd);
+                                    newMaps.add(newMap);
+                                }
+                            }
+                            ((Event_Con_Join) newNode).setMapped_Branch_Elements(newMaps);
+                        }
+
+                    }
+                }
+            }
+            for (Resource Res : Final_Resource) {
+                for (Resource UI_Res : UI_Resource) {
+                    if (Res.getID() == UI_Res.getID()) {
+                        List<Function> UI_Res_Func = UI_Res.getUsed_In();
+                        for (Function f : UI_Res_Func) {
+                            for (EPK_Node newfunc : Final_List) {
+                                if ((newfunc instanceof Function && newfunc.getID() == f.getID())) {
+                                    Res.add_Used_In((Function) newfunc);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            for (User newuser : Final_User) {
+                for (User oldUser : UI_Users) {
+                    if (newuser.getP_ID() == oldUser.getP_ID()) {
+                        List<Workforce> Granted = oldUser.getWorkforces();
+                        for (Workforce w : Granted) {
+                            for (Workforce newforce : Final_Workforce) {
+                                if (newforce.getW_ID() == w.getW_ID()) {
+                                    newforce.getGranted_to().add(newuser);
+                                    newuser.getWorkforces().add(newforce);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+
+            List<Print_Event_Driven_File> PrinterList = new ArrayList<>();
+            for (EPK_Node Node : Final_List) {
+                List<Connected_Elem_Print> Next_elems = new ArrayList<>();
+                for (EPK_Node Next : Node.getNext_Elem()) {
+                    Connected_Elem_Print Next_Single_Elem = null;
+                    if (Next instanceof Is_Tagged) {
+                        Next_Single_Elem = new Connected_Elem_Print(Next.getID(), ((Is_Tagged) Next).getTag());
+                    } else {
+                        Next_Single_Elem = new Connected_Elem_Print(Next.getID(), "Gate: " + Next.getID());
+                    }
+                    Next_elems.add(Next_Single_Elem);
+                }
+
+                if (Node instanceof Event && !(Node instanceof Activating_Start_Event)
+                        && !(Node instanceof Start_Event) && !(((Event) Node).is_End_Event())) {
+
+                    Print_Event Ev = new Print_Event(Node.getID(), Next_elems, ((Event) Node).getEvent_Tag(), ((Event) Node).is_Start_Event(), ((Event) Node).is_End_Event());
+                    PrinterList.add(Ev);
+                } else if (Node instanceof Event && !(Node instanceof Activating_Start_Event)
+                        && !(Node instanceof Start_Event) && (((Event) Node).is_End_Event())) {
+
+                    Print_End_Event Ev = new Print_End_Event(Node.getID(), Next_elems, ((Event) Node).getEvent_Tag());
+                    PrinterList.add(Ev);
+                } else if (Node instanceof Event && (Node instanceof Start_Event)) {
+                    Print_Start_Event Ev = new Print_Start_Event(Node.getID(), Next_elems,
+                            ((Start_Event) Node).getEvent_Tag(),
+                            ((Start_Event) Node).getStart_event_type(),
+                            ((Start_Event) Node).getTo_Instantiate());
+                    PrinterList.add(Ev);
+                } else if (Node instanceof Function && !(Node instanceof Activating_Function)) {
+                    List<Connected_Resource_Print> Resource_List = new ArrayList<>();
+                    List<Connected_Workforce_Print> Workforce_List = new ArrayList<>();
+                    for (Resource needed : ((Function) Node).getNeeded_Resources()) {
+                        Connected_Resource_Print res = new Connected_Resource_Print(needed.getID(), needed.getCount(), needed.getName());
+                        Resource_List.add(res);
+                    }
+                    for (Workforce needed : ((Function) Node).getNeeded_Workforce()) {
+                        Connected_Workforce_Print force = new Connected_Workforce_Print(needed.getW_ID(), needed.getPermission());
+                        Workforce_List.add(force);
+                    }
+                    Print_Function Ev = new Print_Function(Node.getID(), Next_elems,
+                            ((Function) Node).getTag(),
+                            ((Function) Node).getFunction_type(),
+                            ((Function) Node).isConcurrently(),
+                            Resource_List, Workforce_List,
+                            ((Function) Node).getWorkingTime());
+                    PrinterList.add(Ev);
+                } else if (Node instanceof Activating_Function) {
+                    List<Connected_Resource_Print> Resource_List = new ArrayList<>();
+                    List<Connected_Workforce_Print> Workforce_List = new ArrayList<>();
+                    for (Resource needed : ((Function) Node).getNeeded_Resources()) {
+                        Connected_Resource_Print res = new Connected_Resource_Print(needed.getID(), needed.getCount(), needed.getName());
+                        Resource_List.add(res);
+                    }
+                    for (Workforce needed : ((Function) Node).getNeeded_Workforce()) {
+                        Connected_Workforce_Print force = new Connected_Workforce_Print(needed.getW_ID(), needed.getPermission());
+                        Workforce_List.add(force);
+                    }
+                    Connected_Elem_Print Start_Event = new Connected_Elem_Print(((Activating_Function) Node).getStart_Event().getID(), ((Activating_Function) Node).getStart_Event().getEvent_Tag());
+                    Print_Activating_Function Ev = new Print_Activating_Function(Node.getID(), Next_elems,
+                            ((Activating_Function) Node).getTag(),
+                            ((Activating_Function) Node).getFunction_type(),
+                            ((Activating_Function) Node).isConcurrently(),
+                            Resource_List, Workforce_List,
+                            ((Activating_Function) Node).getWorkingTime(),
+                            Start_Event,
+                            ((Activating_Function) Node).getInstantiate_Time(),
+                            ((Activating_Function) Node).getDecisionType());
+                    PrinterList.add(Ev);
+                } else if (Node instanceof Activating_Start_Event) {
+                    Connected_Elem_Print Activate_Function = new Connected_Elem_Print(
+                            ((Activating_Start_Event) Node).getActivating_Function().getID(),
+                            ((Activating_Start_Event) Node).getActivating_Function().getFunction_tag());
+                    Print_Activating_Start_Event Ev = new Print_Activating_Start_Event(Node.getID(), Next_elems, ((Activating_Start_Event) Node).getEvent_Tag(), true, false, ((Activating_Start_Event) Node).getStart_event_type(), Activate_Function);
+                    PrinterList.add(Ev);
+                } else if (Node instanceof Event_Con_Join) {
+                    List<Connected_Elem_Print> Mapped_Branched_Elements_AND = new ArrayList<>();
+                    List<Connected_Node_Map_Print> Mapped_Branched_Elements = new ArrayList<>();
+                    for (Nodemap Map : ((Event_Con_Join) Node).getMapped_Branch_Elements()) {
+                        Connected_Elem_Print Start = null;
+                        Connected_Elem_Print End = null;
+                        Connected_Node_Map_Print Nodemap = null;
+                        if (Map.getStarted_Elem() instanceof Is_Tagged) {
+                            Start = new Connected_Elem_Print(Map.getStarted_Elem().getID(), ((Is_Tagged) Map.getStarted_Elem()).getTag());
+                        } else {
+                            Start = new Connected_Elem_Print(Map.getStarted_Elem().getID(), "Gate: " + Map.getStarted_Elem().getID());
+                        }
+                        if (Map.getFinished_Elem() instanceof Is_Tagged) {
+                            End = new Connected_Elem_Print(Map.getFinished_Elem().getID(), ((Is_Tagged) Map.getFinished_Elem()).getTag());
+                        } else {
+                            End = new Connected_Elem_Print(Map.getFinished_Elem().getID(), "Gate: " + Map.getFinished_Elem().getID());
+                        }
+                        Nodemap = new Connected_Node_Map_Print(Start, End);
+                        Mapped_Branched_Elements.add(Nodemap);
+                    }
+                    for (EPK_Node Mapped : ((Event_Con_Join) Node).getMapped_Branch_Elements_AND()) {
+                        Connected_Elem_Print mappedNode = null;
+                        if (Mapped instanceof Is_Tagged) {
+                            mappedNode = new Connected_Elem_Print(Mapped.getID(), ((Is_Tagged) Mapped).getTag());
+                        } else {
+                            mappedNode = new Connected_Elem_Print(Mapped.getID(), "Gate: " + Mapped.getID());
+                        }
+                        Mapped_Branched_Elements_AND.add(mappedNode);
+                    }
+
+                    Print_Event_Con_Join Ev = new Print_Event_Con_Join(Node.getID(), Next_elems, Mapped_Branched_Elements, Mapped_Branched_Elements_AND, ((Event_Con_Join) Node).getContype());
+                    PrinterList.add(Ev);
+                } else if (Node instanceof Event_Con_Split) {
+                    Print_Event_Con_Split Ev = new Print_Event_Con_Split(Node.getID(), Next_elems, ((Event_Con_Split) Node).getDecide_Type(), ((Event_Con_Split) Node).isIs_Event_Driven(), ((Event_Con_Split) Node).getContype());
+                    PrinterList.add(Ev);
+                }
+
+                //TODO GIVE LIST TO RIGHT PRINTER, INSTANTIATE FULL LIST BEFORE. THEN START QUEUE
+                //CHANGE PRINTFILE PRINTER TO SOMETHING ELSE? :D
+
+            }
+            Printer_Gate pg = Printer_Gate.get_Printer_Gate();
+            pg.setNodelistToPrint(PrinterList);
+            Printer_Queue printer_queue = new Printer_Queue();
+            Thread PQ = new Thread(printer_queue);
+            printer_queue.setT(PQ);
+            PQ.start();
         }
-
-
     }
 
     public void activateDeleteButton() {

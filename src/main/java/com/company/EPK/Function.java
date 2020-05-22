@@ -9,7 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
-public class Function extends EPK_Node {
+public class Function extends EPK_Node implements Printable_Node, Is_Tagged {
+
     private String Function_tag;
     private Function_Type function_type;
     private int successor = 1;
@@ -18,6 +19,7 @@ public class Function extends EPK_Node {
     private List<Workforce> Needed_Workforce;
     private Consumer<Process_instance> ConsumableMethod;
     private Workingtime WorkingTime;
+
     public Function(String function_tag, Function_Type type, int ID) {
         super(ID);
         if (function_tag == null) {
@@ -188,4 +190,31 @@ public class Function extends EPK_Node {
         }
     }
 
+    public Function returnUpperClass() {
+        return this;
+    }
+
+    public void setFunction_type(Function_Type function_type) {
+        this.function_type = function_type;
+    }
+
+    public String getTag() {
+        return Function_tag;
+    }
+
+    public int getSuccessor() {
+        return successor;
+    }
+
+    public void setSuccessor(int successor) {
+        this.successor = successor;
+    }
+
+    public void setNeeded_Resources(List<Resource> needed_Resources) {
+        Needed_Resources = needed_Resources;
+    }
+
+    public void setNeeded_Workforce(List<Workforce> needed_Workforce) {
+        Needed_Workforce = needed_Workforce;
+    }
 }

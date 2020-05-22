@@ -2,7 +2,7 @@ package com.company.EPK;
 
 import java.util.List;
 
-public class Event extends EPK_Node {
+public class Event extends EPK_Node implements Printable_Node, Is_Tagged {
     private String Event_Tag;
     private int successor = 1;
     private boolean is_Start_Event;
@@ -97,6 +97,11 @@ public class Event extends EPK_Node {
         return Event_Tag;
     }
 
+    public void setEvent_Tag(String Tag) {
+        this.Event_Tag = Tag;
+    }
+
+
     @Override
     public boolean CheckSettings() {
         boolean Check = true;
@@ -105,5 +110,13 @@ public class Event extends EPK_Node {
             Check = false;
         }
         return Check;
+    }
+
+    public String getTag() {
+        return Event_Tag;
+    }
+
+    public Event returnUpperClass() {
+        return this;
     }
 }

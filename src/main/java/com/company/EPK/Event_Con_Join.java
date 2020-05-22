@@ -11,7 +11,7 @@ import java.util.List;
 import static com.company.Enums.Contype.*;
 import static com.company.Enums.Gate_Check_Status.*;
 
-public class Event_Con_Join extends Connector {
+public class Event_Con_Join extends Connector implements Printable_Node {
 
     private List<Nodemap> Mapped_Branch_Elements;
     private List<Event_Instance> Throughput_Instances;
@@ -191,6 +191,7 @@ public class Event_Con_Join extends Connector {
         Mapped_Branch_Elements = mapped_Branch_Elements;
     }
 
+
     public List<Event_Instance> getThroughput_Instances() {
         return Throughput_Instances;
     }
@@ -207,5 +208,9 @@ public class Event_Con_Join extends Connector {
             Check = false;
         }*/
         return Check;
+    }
+
+    public Event_Con_Join returnUpperClass() {
+        return this;
     }
 }

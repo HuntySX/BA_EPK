@@ -4,13 +4,9 @@ import com.company.EPK.EPK_Node;
 import com.company.EPK.Function;
 import com.company.EPK.Workforce;
 import com.company.Simulation.Simulation_Base.Data.Discrete_Data.Resource;
-import com.company.UI.javafxgraph.fxgraph.cells.UI_View_Gen;
 import com.dlsc.formsfx.model.structure.*;
 import com.dlsc.formsfx.view.renderer.FormRenderer;
 import javafx.beans.property.*;
-import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Button;
@@ -19,9 +15,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
 import javafx.scene.layout.VBox;
 
-import java.awt.*;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class UI_Func extends Function implements UI_Instantiable {
@@ -29,7 +22,7 @@ public class UI_Func extends Function implements UI_Instantiable {
     private VBox Rightbox;
 
     private UI_EPK EPK;
-    private ObservableList<EPK_Node> nodelist;
+    private List<EPK_Node> nodelist;
     private List<Workforce> Workforces;
     private List<Resource> Resources;
     private List<Resource> needed_resource_List;
@@ -73,17 +66,7 @@ public class UI_Func extends Function implements UI_Instantiable {
         StringBuilder ID_Build = new StringBuilder("Function: ");
         ID_Build.append(ID);
         this.tag = new SimpleStringProperty(ID_Build.toString());
-        this.nodelist = FXCollections.observableArrayList();
-
-        nodelist.addListener((ListChangeListener<EPK_Node>) e -> {
-            while (e.next()) {
-                if (e.wasRemoved()) {
-                    Rightbox.getChildren().clear();
-                    UI_Instantiable Nodeview = (UI_Instantiable) ((UI_View_Gen) EPK.getActive_Elem()).getNodeView();
-                    Rightbox.getChildren().add(Nodeview.Get_UI());
-                }
-            }
-        });
+        this.nodelist = getNext_Elem();
     }
 
     @Override
@@ -119,10 +102,10 @@ public class UI_Func extends Function implements UI_Instantiable {
             public void handle(ActionEvent actionEvent) {
                 EPK_Node Node = UI_NEXT_ELEMENTS.getSelection();
                 if (Node != null) {
-                    nodelist.remove(Node);
                     EPK.getActive_Elem().getEPKNode().getNext_Elem().remove(Node);
                     EPK.getModel().removeEdge(getID(), Node.getID());
                     EPK.getGraph().endUpdate();
+                    EPK.activate();
                 }
             }
         });
@@ -269,7 +252,10 @@ public class UI_Func extends Function implements UI_Instantiable {
 
     @Override
     public void save_Settings() {
-
+        setFunction_tag(tag.getValue());
+        setWorkingHours(Workingtime_Hours.getValue());
+        setWorkingMinutes(Workingtime_Minutes.getValue());
+        setWorkingSeconds(Workingtime_Seconds.getValue());
     }
 
     @Override
@@ -284,5 +270,10 @@ public class UI_Func extends Function implements UI_Instantiable {
                 + " Tag: " + tag.getValue() +
                 ']';
 
+    }
+
+    @Override
+    public EPK_Node getthis() {
+        return super.returnUpperClass();
     }
 }

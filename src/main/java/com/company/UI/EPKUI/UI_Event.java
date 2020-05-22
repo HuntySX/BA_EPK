@@ -2,13 +2,9 @@ package com.company.UI.EPKUI;
 
 import com.company.EPK.EPK_Node;
 import com.company.EPK.Event;
-import com.company.UI.javafxgraph.fxgraph.cells.UI_View_Gen;
 import com.dlsc.formsfx.model.structure.*;
 import com.dlsc.formsfx.view.renderer.FormRenderer;
 import javafx.beans.property.*;
-import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Button;
@@ -20,7 +16,7 @@ import java.util.List;
 public class UI_Event extends Event implements UI_Instantiable {
     private VBox Box;
     private VBox Rightbox;
-    private ObservableList<EPK_Node> nodelist;
+    private List<EPK_Node> nodelist;
     private UI_EPK EPK;
 
     private IntegerProperty UI_ID;
@@ -46,17 +42,7 @@ public class UI_Event extends Event implements UI_Instantiable {
         this.tag = new SimpleStringProperty(ID_Build.toString());
         UI_ID_FIELD = Field.ofIntegerType(UI_ID).label("ID").editable(false);
         UI_TAG_FIELD = Field.ofStringType(tag).label("Knotenname:");
-        this.nodelist = FXCollections.observableArrayList();
-
-        nodelist.addListener((ListChangeListener<EPK_Node>) e -> {
-            while (e.next()) {
-                if (e.wasRemoved()) {
-                    Rightbox.getChildren().clear();
-                    UI_Instantiable Nodeview = (UI_Instantiable) ((UI_View_Gen) EPK.getActive_Elem()).getNodeView();
-                    Rightbox.getChildren().add(Nodeview.Get_UI());
-                }
-            }
-        });
+        this.nodelist = getNext_Elem();
 
         ID_TAG_UI = new FormRenderer(
                 Form.of(
@@ -88,10 +74,10 @@ public class UI_Event extends Event implements UI_Instantiable {
             public void handle(ActionEvent actionEvent) {
                 EPK_Node Node = UI_NEXT_ELEMENTS_FIELD.getSelection();
                 if (Node != null) {
-                    nodelist.remove(Node);
                     EPK.getActive_Elem().getEPKNode().getNext_Elem().remove(Node);
                     EPK.getModel().removeEdge(getID(), Node.getID());
                     EPK.getGraph().endUpdate();
+                    EPK.activate();
                 }
             }
         });
@@ -99,6 +85,7 @@ public class UI_Event extends Event implements UI_Instantiable {
         Box.getChildren().add(new FormRenderer(Form.of(Group.of(
                 Field.ofBooleanType(is_Start).label("Startevent").editable(false),
                 Field.ofBooleanType(is_End).label("Endevent").editable(false)))));
+
         return Box;
     }
 
@@ -116,7 +103,11 @@ public class UI_Event extends Event implements UI_Instantiable {
 
     @Override
     public void save_Settings() {
-
+        setEvent_Tag(UI_TAG_FIELD.getValue());
     }
 
+    @Override
+    public EPK_Node getthis() {
+        return super.returnUpperClass();
+    }
 }
