@@ -76,7 +76,7 @@ public class UI_EPK {
         this.UniqueUserID = 1;
         this.UniqueResourceID = 1;
         this.UniqueWorkforceID = 1;
-        this.UI_Settings = null;
+        this.UI_Settings = new UI_Settings();
     }
 
     public List<Start_Event_Type> getStart_Event_Types() {

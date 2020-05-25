@@ -39,7 +39,7 @@ public class UI_Event_Ending extends Event implements UI_Instantiable {
         this.Rightbox = Rightbox;
         this.EPK = EPK;
         UI_ID = new SimpleIntegerProperty(ID);
-        StringBuilder ID_Build = new StringBuilder("Event: ");
+        StringBuilder ID_Build = new StringBuilder("End-Event: ");
         ID_Build.append(ID);
         this.tag = new SimpleStringProperty(ID_Build.toString());
         UI_ID_FIELD = Field.ofIntegerType(UI_ID).label("ID").editable(false);

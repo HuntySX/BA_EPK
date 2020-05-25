@@ -57,7 +57,7 @@ public class UI_Event_Activating_Starter extends Activating_Start_Event implemen
         this.Event_Types = EPK.getStart_Event_Types();
         this.UI_ID = new SimpleIntegerProperty(ID);
         Chosen_Starter = null;
-        StringBuilder ID_Build = new StringBuilder("Event: ");
+        StringBuilder ID_Build = new StringBuilder("Activating Start-Event: ");
         ID_Build.append(ID);
         this.tag = new SimpleStringProperty(ID_Build.toString());
         UI_ID_FIELD = Field.ofIntegerType(UI_ID).label("ID").editable(false);

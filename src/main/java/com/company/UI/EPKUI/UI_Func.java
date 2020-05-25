@@ -67,17 +67,21 @@ public class UI_Func extends Function implements UI_Instantiable {
         ID_Build.append(ID);
         this.tag = new SimpleStringProperty(ID_Build.toString());
         this.nodelist = getNext_Elem();
-    }
-
-    @Override
-    public VBox Get_UI() {
-
 
         UI_ID_FIELD = Field.ofIntegerType(UI_ID).label("ID").editable(false);
         UI_TAG_FIELD = Field.ofStringType(tag).label("Knotenname:");
         UI_WORKINGTIME_HOURS_FIELD = Field.ofIntegerType(Workingtime_Hours).label("Stunden").placeholder("0").tooltip("Arbeitszeitstunden");
         UI_WORKINGTIME_MINUTES_FIELD = Field.ofIntegerType(Workingtime_Minutes).label("Minuten").placeholder("0").tooltip("Arbeitszeitminuten");
         UI_WORKINGTIME_SECONDS_FIELD = Field.ofIntegerType(Workingtime_Seconds).label("Sekunden").placeholder("60").tooltip("Arbeitszeitsekunden");
+        ID_TAG_UI = new FormRenderer(Form.of(Group.of(UI_ID_FIELD, UI_TAG_FIELD)));
+        WORKINGTIME_UI = new FormRenderer(Form.of(Group.of(UI_WORKINGTIME_HOURS_FIELD, UI_WORKINGTIME_MINUTES_FIELD, UI_WORKINGTIME_SECONDS_FIELD)));
+
+
+    }
+
+    @Override
+    public VBox Get_UI() {
+
 
         UI_NEEDED_RESOURCES_FIELD = Field.ofSingleSelectionType(Resources).label("Benötigte Ressourcen").tooltip("Benötigte Ressourcen");
         UI_RESOURCE_COUNT = Field.ofIntegerType(0).label("Count").tooltip("Choose number of selected resource to add to the function");
@@ -85,8 +89,6 @@ public class UI_Func extends Function implements UI_Instantiable {
 
         RESOURCES_UI = new FormRenderer(Form.of(Group.of(UI_NEEDED_RESOURCES_FIELD, UI_RESOURCE_COUNT)));
         WORKFORCES_UI = new FormRenderer(Form.of(Group.of(UI_NEEDED_WORKFORCES_FIELD)));
-        WORKINGTIME_UI = new FormRenderer(Form.of(Group.of(UI_WORKINGTIME_HOURS_FIELD, UI_WORKINGTIME_MINUTES_FIELD, UI_WORKINGTIME_SECONDS_FIELD)));
-        ID_TAG_UI = new FormRenderer(Form.of(Group.of(UI_ID_FIELD, UI_TAG_FIELD)));
 
 
         Box.getChildren().clear();
@@ -252,10 +254,10 @@ public class UI_Func extends Function implements UI_Instantiable {
 
     @Override
     public void save_Settings() {
-        setFunction_tag(tag.getValue());
-        setWorkingHours(Workingtime_Hours.getValue());
-        setWorkingMinutes(Workingtime_Minutes.getValue());
-        setWorkingSeconds(Workingtime_Seconds.getValue());
+        setFunction_tag(UI_TAG_FIELD.getValue());
+        setWorkingHours(UI_WORKINGTIME_HOURS_FIELD.getValue());
+        setWorkingMinutes(UI_WORKINGTIME_MINUTES_FIELD.getValue());
+        setWorkingSeconds(UI_WORKINGTIME_SECONDS_FIELD.getValue());
     }
 
     @Override

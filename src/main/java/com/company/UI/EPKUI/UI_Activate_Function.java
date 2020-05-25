@@ -71,7 +71,7 @@ public class UI_Activate_Function extends Activating_Function implements UI_Inst
     private Activating_Function self;
 
     public UI_Activate_Function(int ID, UI_EPK EPK, VBox Rightbox) {
-        super(null, null, null, ID, null, null, null);
+        super(null, null, null, null, ID, null, null, null);
         self = this;
         this.Box = new VBox();
         this.Rightbox = Rightbox;
@@ -84,7 +84,7 @@ public class UI_Activate_Function extends Activating_Function implements UI_Inst
         this.Activation_Types = EPK.getDecide_Activation_Types();
         this.UI_ID = new SimpleIntegerProperty(ID);
         Chosen_Starter = null;
-        StringBuilder ID_Build = new StringBuilder("Event: ");
+        StringBuilder ID_Build = new StringBuilder("Activating-Function: ");
         ID_Build.append(ID);
         this.tag = new SimpleStringProperty(ID_Build.toString());
         UI_ID_FIELD = Field.ofIntegerType(UI_ID).label("ID").editable(false);
@@ -107,8 +107,8 @@ public class UI_Activate_Function extends Activating_Function implements UI_Inst
         WORKINGTIME_UI = new FormRenderer(Form.of(Group.of(UI_WORKINGTIME_HOURS_FIELD, UI_WORKINGTIME_MINUTES_FIELD, UI_WORKINGTIME_SECONDS_FIELD)));
     }
 
-    public UI_Activate_Function(String function_tag, Workingtime instantiate_Time, Function_Type type, int ID, Activating_Start_Event start_Event, Event_Calendar calendar, Decide_Activation_Type decision) {
-        super(function_tag, instantiate_Time, type, ID, start_Event, calendar, decision);
+    public UI_Activate_Function(String function_tag, Workingtime workingtime, Workingtime instantiate_Time, Function_Type type, int ID, Activating_Start_Event start_Event, Event_Calendar calendar, Decide_Activation_Type decision) {
+        super(function_tag, instantiate_Time, workingtime, type, ID, start_Event, calendar, decision);
     }
 
     @Override
@@ -124,8 +124,6 @@ public class UI_Activate_Function extends Activating_Function implements UI_Inst
     @Override
     public VBox Get_UI() {
 
-        UI_ID_FIELD = Field.ofIntegerType(UI_ID).label("ID").editable(false);
-        UI_TAG_FIELD = Field.ofStringType(tag).label("Knotenname:");
 
 
         UI_NEEDED_RESOURCES_FIELD = Field.ofSingleSelectionType(Resources).label("Benötigte Ressourcen").tooltip("Benötigte Ressourcen");
@@ -134,7 +132,6 @@ public class UI_Activate_Function extends Activating_Function implements UI_Inst
 
         RESOURCES_UI = new FormRenderer(Form.of(Group.of(UI_NEEDED_RESOURCES_FIELD, UI_RESOURCE_COUNT)));
         WORKFORCES_UI = new FormRenderer(Form.of(Group.of(UI_NEEDED_WORKFORCES_FIELD)));
-        ID_TAG_UI = new FormRenderer(Form.of(Group.of(UI_ID_FIELD, UI_TAG_FIELD)));
 
         Box.getChildren().clear();
         Box.getChildren().add(ID_TAG_UI);
@@ -350,12 +347,12 @@ public class UI_Activate_Function extends Activating_Function implements UI_Inst
     @Override
     public void save_Settings() {
         setDecisionType(DECIDE_ACTIVATION_TYPE_FIELD.getSelection());
-        setFunction_tag(tag.getValue());
-        setWorkingHours(Workingtime_Hours.getValue());
-        setWorkingMinutes(Workingtime_Minutes.getValue());
-        setWorkingSeconds(Workingtime_Seconds.getValue());
-        setInstantiateHours(Order_Hours.getValue());
-        setInstantiateMinutes(Order_Minutes.getValue());
-        setInstantiateSeconds(Order_Seconds.getValue());
+        setFunction_tag(UI_TAG_FIELD.getValue());
+        setWorkingHours(UI_WORKINGTIME_HOURS_FIELD.getValue());
+        setWorkingMinutes(UI_WORKINGTIME_MINUTES_FIELD.getValue());
+        setWorkingSeconds(UI_WORKINGTIME_SECONDS_FIELD.getValue());
+        setInstantiateHours(UI_ORDERTIME_HOURS_FIELD.getValue());
+        setInstantiateMinutes(UI_ORDERTIME_MINUTES_FIELD.getValue());
+        setInstantiateSeconds(UI_ORDERTIME_SECONDS_FIELD.getValue());
     }
 }

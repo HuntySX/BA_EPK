@@ -20,7 +20,7 @@ public class Function extends EPK_Node implements Printable_Node, Is_Tagged {
     private Consumer<Process_instance> ConsumableMethod;
     private Workingtime WorkingTime;
 
-    public Function(String function_tag, Function_Type type, int ID) {
+    public Function(String function_tag, Function_Type type, int ID, Workingtime workingtime) {
         super(ID);
         if (function_tag == null) {
             String a = "Function ";
@@ -33,7 +33,11 @@ public class Function extends EPK_Node implements Printable_Node, Is_Tagged {
         this.function_type = type;
         Needed_Workforce = new ArrayList<>();
         Needed_Resources = new ArrayList<>();
-        WorkingTime = new Workingtime();
+        if (workingtime != null) {
+            WorkingTime = workingtime;
+        } else {
+            WorkingTime = new Workingtime();
+        }
     }
 
     public Function() {

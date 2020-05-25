@@ -36,6 +36,18 @@ public class EPK {
         this.discrete_start_Events = discrete_start_Events;
     }
 
+    public EPK(List<EPK_Node> Nodes, List<Start_Event> Start_Events) {
+        this.elements = Nodes;
+        this.events = new ArrayList<>();
+        this.functions = new ArrayList<>();
+        this.connector_Join = new ArrayList<>();
+        this.connector_Split = new ArrayList<>();
+        this.discrete_start_Events = Start_Events;
+        this.end_Event = new ArrayList<>();
+        this.Instances = new ArrayList<>();
+        this.start_Event = new ArrayList<>();
+    }
+
     public EPK() {
         this.elements = new ArrayList<>();
         this.events = new ArrayList<>();

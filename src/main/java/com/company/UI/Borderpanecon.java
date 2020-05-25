@@ -2,6 +2,7 @@ package com.company.UI;
 
 import com.company.EPK.*;
 import com.company.Print.EventDriven.*;
+import com.company.Run.Discrete_Event_Generator;
 import com.company.Simulation.Simulation_Base.Data.Discrete_Data.Resource;
 import com.company.Simulation.Simulation_Base.Data.Printer_Gate;
 import com.company.Simulation.Simulation_Base.Data.Printer_Queue;
@@ -24,7 +25,6 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -112,6 +112,7 @@ public class Borderpanecon implements Initializable {
         Start_Event.setTooltip(new Tooltip("Start Event"));
         End_Event.setTooltip(new Tooltip("End Event"));
 
+
     }
 
     public void setModel(Model model) {
@@ -142,7 +143,7 @@ public class Borderpanecon implements Initializable {
 
     }
 
-    public void actionPerformed(ActionEvent e) throws IOException {
+    public void actionPerformed(ActionEvent e) throws Exception {
 
         if (e.getSource() == Normal) {
             Btn_Type = NORMAL;
@@ -276,16 +277,18 @@ public class Borderpanecon implements Initializable {
             WORKFORCE_UI.generateUI();
             newWindow.show();
         } else if (e.getSource() == SimulationMan) {
-            UI_Settings Settings = EPK.getUI_Settings();
-            if (Settings == null) {
-                Settings = new UI_Settings();
-                EPK.setUI_Settings(Settings);
-            }
+
             URL url = new File("src/main/java/com/company/UI/javafxgraph/Simulation_UI.fxml").toURI().toURL();
             FXMLLoader loader = new FXMLLoader(url);
             loader.setLocation(url);
             Parent root = loader.load();
             Scene scene = new Scene(root, 1200, 800);
+
+            UI_Settings Settings = EPK.getUI_Settings();
+            if (Settings == null) {
+                Settings = new UI_Settings();
+                EPK.setUI_Settings(Settings);
+            }
 
             UI_SIMULATION_MANAGEMENT SIMULATION_UI = (UI_SIMULATION_MANAGEMENT) loader.getController();
             Stage newWindow = new Stage();
@@ -311,11 +314,13 @@ public class Borderpanecon implements Initializable {
                 if (node instanceof Activating_Function) {
                     if (((Activating_Function) node).getStart_Event() != null && ((Activating_Function) node).getStart_Event().equals(Active_Elem.getEPKNode())) {
                         ((Activating_Function) node).setStart_Event(null);
+                        EPK.getAll_Activating_Functions().remove(node);
                     }
                 } else if (node instanceof Activating_Start_Event) {
                     if (((Activating_Start_Event) node).getActivating_Function() != null &&
                             ((Activating_Start_Event) node).getActivating_Function().equals(Active_Elem.getEPKNode())) {
                         ((Activating_Start_Event) node).setFunction(null);
+                        EPK.getAll_Activating_Start_Events().remove(node);
                     }
                 } else if (node instanceof Event_Con_Join) {
                     if (((Event_Con_Join) node).getContype() == AND) {
@@ -354,7 +359,7 @@ public class Borderpanecon implements Initializable {
             List<Resource> UI_Resource = EPK.getAll_Resources();
             List<Workforce> UI_Workforces = EPK.getAll_Workforces();
             List<EPK_Node> UI_All_Nodes = EPK.getAll_Elems();
-
+            List<Start_Event> Final_Start_Events = new ArrayList<>();
             //INSTANTIATE SETTINGS
 
 
@@ -404,7 +409,7 @@ public class Borderpanecon implements Initializable {
                     //ACTIVATE FUNCTION/ NEXTELEMBINDING
                 } else if (Node instanceof Activating_Function) {
                     Activating_Function newActivatingFunction = new Activating_Function(((Function) Node).getFunction_tag(),
-                            ((Activating_Function) Node).getInstantiate_Time(), ((Function) Node).getFunction_type(), Node.getID(),
+                            ((Activating_Function) Node).getInstantiate_Time(), ((Function) Node).getWorkingTime(), ((Function) Node).getFunction_type(), Node.getID(),
                             null, null, ((Activating_Function) Node).getDecisionType());
                     newActivatingFunction.setNeeded_Resources(((Activating_Function) Node).getNeeded_Resources());
                     Final_List.add(newActivatingFunction);
@@ -422,6 +427,7 @@ public class Borderpanecon implements Initializable {
                             null, ((Start_Event) Node).getTo_Instantiate(),
                             null, ((Start_Event) Node).getEvent_Tag(), ((Start_Event) Node).is_Start_Event());
                     Final_List.add(newStart);
+                    Final_Start_Events.add(newStart);
                 }
             }
 
@@ -468,20 +474,28 @@ public class Borderpanecon implements Initializable {
                         }
                     } else if (newNode instanceof Activating_Start_Event) {
                         Activating_Function Function = ((Activating_Start_Event) UI_Node).getActivating_Function();
-                        for (EPK_Node Node : Final_List) {
-                            if (Node.getID() == Function.getID()) {
-                                ((Activating_Start_Event) newNode).setFunction(((Activating_Function) Node));
-                                break;
+                        if (Function != null) {
+                            for (EPK_Node Node : Final_List) {
+                                if (Node.getID() == Function.getID()) {
+                                    ((Activating_Start_Event) newNode).setFunction(((Activating_Function) Node));
+                                    break;
+                                }
                             }
+                        } else {
+                            ((Activating_Start_Event) newNode).setFunction(null);
                         }
                     } else if (newNode instanceof Activating_Function) {
                         Activating_Start_Event Event = ((Activating_Function) UI_Node).getStart_Event();
-                        for (EPK_Node Node : Final_List) {
-                            if (Node.getID() == Event.getID()) {
-                                ((Activating_Function) newNode).setStart_Event((Activating_Start_Event) Node);
-                                break;
-                            }
+                        if (Event != null) {
+                            for (EPK_Node Node : Final_List) {
+                                if (Node.getID() == Event.getID()) {
+                                    ((Activating_Function) newNode).setStart_Event((Activating_Start_Event) Node);
+                                    break;
+                                }
 
+                            }
+                        } else {
+                            ((Activating_Function) newNode).setStart_Event(null);
                         }
                         for (Workforce force : UI_Workforces) {
                             List<Function> Used_In = force.getUsed_in();
@@ -630,7 +644,13 @@ public class Borderpanecon implements Initializable {
                         Connected_Workforce_Print force = new Connected_Workforce_Print(needed.getW_ID(), needed.getPermission());
                         Workforce_List.add(force);
                     }
-                    Connected_Elem_Print Start_Event = new Connected_Elem_Print(((Activating_Function) Node).getStart_Event().getID(), ((Activating_Function) Node).getStart_Event().getEvent_Tag());
+                    Connected_Elem_Print Start_Event = null;
+                    if (((Activating_Function) Node).getStart_Event() != null) {
+                        Start_Event = new Connected_Elem_Print(((Activating_Function) Node).getStart_Event().getID(), ((Activating_Function) Node).getStart_Event().getEvent_Tag());
+                    } else {
+                        Start_Event = new Connected_Elem_Print(0, "");
+
+                    }
                     Print_Activating_Function Ev = new Print_Activating_Function(Node.getID(), Next_elems,
                             ((Activating_Function) Node).getTag(),
                             ((Activating_Function) Node).getFunction_type(),
@@ -642,9 +662,14 @@ public class Borderpanecon implements Initializable {
                             ((Activating_Function) Node).getDecisionType());
                     PrinterList.add(Ev);
                 } else if (Node instanceof Activating_Start_Event) {
-                    Connected_Elem_Print Activate_Function = new Connected_Elem_Print(
-                            ((Activating_Start_Event) Node).getActivating_Function().getID(),
-                            ((Activating_Start_Event) Node).getActivating_Function().getFunction_tag());
+                    Connected_Elem_Print Activate_Function = null;
+                    if (((Activating_Start_Event) Node).getActivating_Function() != null) {
+                        Activate_Function = new Connected_Elem_Print(
+                                ((Activating_Start_Event) Node).getActivating_Function().getID(),
+                                ((Activating_Start_Event) Node).getActivating_Function().getFunction_tag());
+                    } else {
+                        Activate_Function = new Connected_Elem_Print(0, "");
+                    }
                     Print_Activating_Start_Event Ev = new Print_Activating_Start_Event(Node.getID(), Next_elems, ((Activating_Start_Event) Node).getEvent_Tag(), true, false, ((Activating_Start_Event) Node).getStart_event_type(), Activate_Function);
                     PrinterList.add(Ev);
                 } else if (Node instanceof Event_Con_Join) {
@@ -694,6 +719,22 @@ public class Borderpanecon implements Initializable {
             Thread PQ = new Thread(printer_queue);
             printer_queue.setT(PQ);
             PQ.start();
+
+            Settings Final_settings = new Settings();
+            Final_settings.setBeginTime(settings.getBeginTime());
+            Final_settings.setEndTime(settings.getEndTime());
+            Final_settings.setDecide_Event_choosing(settings.getDecide_Event_choosing());
+            Final_settings.setGet_Only_Start_Finishable_Functions(settings.isGet_Only_Start_Finishable_Functions());
+            Final_settings.setMax_RuntimeDays(settings.getMax_RuntimeDays());
+            Final_settings.setOptimal_User_Layout(settings.isOptimal_User_Layout());
+            Final_settings.setPrint_Only_Function(settings.isPrint_Only_Function());
+            Final_settings.setNumber_Instances_Per_Day(settings.getNumber_Instances_Per_Day());
+            Final_settings.setStartEventType(settings.getStartEventType());
+            EPK epk = new EPK(Final_List, Final_Start_Events);
+
+            Discrete_Event_Generator Generator = new Discrete_Event_Generator(epk, Final_settings, Final_User, Final_Resource);
+            Generator.run();
+
         }
     }
 

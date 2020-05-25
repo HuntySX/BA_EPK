@@ -21,8 +21,8 @@ public class Activating_Function extends Function implements Printable_Node, Is_
     private Event_Calendar calendar;
     private Decide_Activation_Type DecisionType;
 
-    public Activating_Function(String function_tag, Workingtime instantiate_Time, Function_Type type, int ID, Activating_Start_Event start_Event, Event_Calendar calendar, Decide_Activation_Type decision) {
-        super(function_tag, type, ID);
+    public Activating_Function(String function_tag, Workingtime instantiate_Time, Workingtime working_time, Function_Type type, int ID, Activating_Start_Event start_Event, Event_Calendar calendar, Decide_Activation_Type decision) {
+        super(function_tag, type, ID, working_time);
         Start_Event = start_Event;
         if (instantiate_Time == null) {
             Instantiate_Time = new Workingtime();
@@ -32,6 +32,7 @@ public class Activating_Function extends Function implements Printable_Node, Is_
         this.Waiting_For_Activation_Instances = new ArrayList<>();
         this.calendar = calendar;
         this.DecisionType = decision;
+
         waiting_Ticket = 0;
     }
 

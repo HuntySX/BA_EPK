@@ -37,7 +37,7 @@ public class Event_Calendar {
         this.Generator = generator;
         Begin_Time = settings.getBeginTime();
         End_Time = settings.getEndTime();
-        runtime = settings.getBeginTime();
+        runtime = LocalTime.of(Begin_Time.getHour(), Begin_Time.getMinute(), Begin_Time.getSecond());
         Waiting_List = new Simulation_Waiting_List();
         Upcoming_List = new ArrayList<>();
         Activation_List = new ArrayList<>();
@@ -180,14 +180,17 @@ public class Event_Calendar {
     }
 
     public void jump() {
+        System.out.println("Second plus");
         runtime = runtime.plusSeconds(1);
         if (runtime.isAfter(getEnd_Time())) ;
         {
             act_runtimeDay++;
             if (act_runtimeDay >= getRuntimeDays()) {
                 setFinished_cycle(true);
+                System.out.println("Finished Sim");
             } else {
                 runtime = getBegin_Time();
+                System.out.println("Day Jumped");
             }
         }
     }

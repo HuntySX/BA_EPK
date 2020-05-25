@@ -2,17 +2,17 @@ package com.company.Run;
 
 import com.company.EPK.EPK;
 import com.company.Simulation.Simulation_Base.Data.Discrete_Data.Bib.Event_Decider;
+import com.company.Simulation.Simulation_Base.Data.Discrete_Data.Event_Calendar;
 import com.company.Simulation.Simulation_Base.Data.Discrete_Data.Loader.EPK_Loader;
 import com.company.Simulation.Simulation_Base.Data.Discrete_Data.Loader.Resource_Loader;
 import com.company.Simulation.Simulation_Base.Data.Discrete_Data.Loader.Settings_Loader;
 import com.company.Simulation.Simulation_Base.Data.Discrete_Data.Loader.User_Loader;
 import com.company.Simulation.Simulation_Base.Data.Discrete_Data.Resource;
+import com.company.Simulation.Simulation_Base.Data.Printer_Gate;
+import com.company.Simulation.Simulation_Base.Data.Printer_Queue;
 import com.company.Simulation.Simulation_Base.Data.Shared_Data.Settings;
 import com.company.Simulation.Simulation_Base.Data.Shared_Data.User;
 import com.company.Simulation.Simulation_Discrete_Event.Discrete_Event_Simulator;
-import com.company.Simulation.Simulation_Base.Data.Printer_Gate;
-import com.company.Simulation.Simulation_Base.Data.Printer_Queue;
-import com.company.Simulation.Simulation_Base.Data.Discrete_Data.Event_Calendar;
 
 import java.util.List;
 
@@ -49,6 +49,22 @@ public class Discrete_Event_Generator {
         printer_Queue.setT(T);
     }
 
+    public Discrete_Event_Generator(EPK epk, Settings settings, List<User> Users, List<Resource> Resources) {
+        this.EPK = epk;
+        this.Settings = settings;
+        this.Users = Users;
+        this.Resources = Resources;
+        this.event_Calendar = new Event_Calendar(Settings, EPK, this);
+        this.event_decider = new Event_Decider(Settings, Users, Resources, event_Calendar);
+        this.Simulation = new Discrete_Event_Simulator(this);
+        this.printer_Queue = new Printer_Queue();
+        this.printer_Gate = Printer_Gate.get_Printer_Gate();
+        this.case_ID = 1;
+        Thread T = new Thread();
+        printer_Queue.setT(T);
+    }
+
+
     public void generate() {
         this.EPK = EPK_loader.generate_EPK();
         this.Settings = Settings_loader.generate_Settings();
@@ -61,6 +77,7 @@ public class Discrete_Event_Generator {
 
     public void run() throws Exception {
         event_Calendar.fillCalendar();
+        System.out.println("Calendar filled");
         Simulation.run();
     }
 
