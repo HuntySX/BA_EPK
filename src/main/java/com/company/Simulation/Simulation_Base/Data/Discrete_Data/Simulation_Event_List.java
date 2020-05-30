@@ -18,13 +18,19 @@ public class Simulation_Event_List {
             Workflows.add(instance);
         } else {
             ListIterator iter = Workflows.listIterator();
+            boolean added = false;
             while (iter.hasNext()) {
                 Instance_Workflow List_Workflow = (Instance_Workflow) iter.next();
-                if (List_Workflow.getTo_Start().isAfter(instance.getTo_Start())) {
+
+                if (List_Workflow.getTo_Start().isAfter(instance.getTo_Start()) || (List_Workflow.getTo_Start() == instance.getTo_Start())) {
                     iter.previous();
                     iter.add(instance);
+                    added = true;
                     break;
                 }
+            }
+            if (!iter.hasNext() && !added) {
+                iter.add(instance);
             }
         }
     }
@@ -41,6 +47,7 @@ public class Simulation_Event_List {
                 result.add(List_Workflow);
             }
         }
+        Workflows.removeAll(result);
         return result;
     }
 

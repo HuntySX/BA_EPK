@@ -56,7 +56,7 @@ public class Discrete_Event_Simulator {
                 List<Instance_Workflow> latest_Instances = new ArrayList<>();
                 Simulation_Event_List upcoming_Events = event_Calendar.get_Single_Upcoming_List(event_Calendar.getAct_runtimeDay());
                 Simulation_Waiting_List waiting_list = event_Calendar.getWaiting_List();
-                latest_Instances = upcoming_Events.getByTime(event_Calendar.getRuntime());
+                latest_Instances.addAll(upcoming_Events.getByTime(event_Calendar.getRuntime()));
                 Instance_Workflow to_Run = event_Decider.Decide_Event(latest_Instances, waiting_list);
                 while (to_Run != null) {
 
@@ -77,12 +77,15 @@ public class Discrete_Event_Simulator {
                                 }
                             }
                         } else {
+                            System.out.println("Instance Finished: " + to_Run.getInstance().getCase_ID());
+
                             if (Settings.getPrint_Only_Function() && to_Run.getEPKNode() instanceof Function) {
                                 //TODO Print FINISHED for n;
                             } else {
                                 //TODO Print every Node FINISHED;
                             }
                         }
+
                     }
 
                     if (to_Run.getEPKNode() instanceof Event_Con_Split) {
@@ -161,13 +164,15 @@ public class Discrete_Event_Simulator {
 
                     if (to_Run.getEPKNode() instanceof Function && !(to_Run.getEPKNode() instanceof Activating_Function)) {
 
+                        boolean firstactivation = false;
                         //FALL1: To_Run Arbeitet noch nicht an Function
                         if (!to_Run.isWorking()) {
                             ActivateFunction(to_Run, event_Calendar.getAct_runtimeDay());
+                            firstactivation = true;
                         }
 
                         //FALL2: To_Run hat arbeit beendet:
-                        if (to_Run.isWorking() && (to_Run.getTo_Start() == (event_Calendar.getRuntime()) || to_Run.getTo_Start().isBefore(event_Calendar.getRuntime()))) {
+                        else if (firstactivation == false && to_Run.isWorking() && (to_Run.getTo_Start().equals(event_Calendar.getRuntime()) || to_Run.getTo_Start().isBefore(event_Calendar.getRuntime()))) {
                             DeactivateFunction(to_Run, event_Calendar.getAct_runtimeDay());
                         }
                     }
@@ -176,22 +181,22 @@ public class Discrete_Event_Simulator {
                     //Get next torun, if empty, go back to while, end it, and start event_Calendar.jump()
                     upcoming_Events = event_Calendar.get_Single_Upcoming_List(event_Calendar.getAct_runtimeDay());
                     waiting_list = event_Calendar.getWaiting_List();
-                    latest_Instances = upcoming_Events.getByTime(event_Calendar.getRuntime());
+                    latest_Instances.addAll(upcoming_Events.getByTime(event_Calendar.getRuntime()));
                     to_Run = event_Decider.Decide_Event(latest_Instances, waiting_list);
-                    if (to_Run == null) {
-                        if (!latest_Instances.isEmpty()) {
-                            for (Instance_Workflow Instance : latest_Instances) {
-                                event_Calendar.Add_To_Waiting_List(Instance);
-                                upcoming_Events.remove_from_EventList(Instance);
-                            }
-                        }
 
-                    }
 
                 }
+                if (to_Run == null) {
+                    if (!latest_Instances.isEmpty()) {
+                        for (Instance_Workflow Instance : latest_Instances) {
+                            event_Calendar.Add_To_Waiting_List(Instance);
+                            upcoming_Events.remove_from_EventList(Instance);
+                        }
+                    }
+                }
+                event_Calendar.jump();
             }
             event_Calendar.jump();
-            
         }
     }
 
@@ -218,16 +223,19 @@ public class Discrete_Event_Simulator {
                     break;
                 }
             }
+        }
+        SetUsersFree.clear();
+        SetResourceFree.clear();
 
-            //Add Function as Finished and get next Elements
-            List<EPK_Node> Next_Elem = to_Run.getEPKNode().getNext_Elem();
-            to_Run.getInstance().add_To_Finished_Work(to_Run.getEPKNode());
+        //Add Function as Finished and get next Elements
+        List<EPK_Node> Next_Elem = to_Run.getEPKNode().getNext_Elem();
+        to_Run.getInstance().add_To_Finished_Work(to_Run.getEPKNode());
 
-            //TODO Print Finished to_Run.getInstance().getNode;
+        //TODO Print Finished to_Run.getInstance().getNode;
 
-            //Instantiate new Workflow for each Element in GetNext_Elem
-            for (EPK_Node n : Next_Elem) {
-                to_Run.getInstance().add_To_Scheduled_Work(n);
+        //Instantiate new Workflow for each Element in GetNext_Elem
+        for (EPK_Node n : Next_Elem) {
+            to_Run.getInstance().add_To_Scheduled_Work(n);
                 Instance_Workflow new_Instance = new Instance_Workflow(to_Run.getInstance(), event_Calendar.getRuntime(), n);
                 event_Calendar.Add_To_Upcoming_List(new_Instance, day);
 
@@ -238,7 +246,7 @@ public class Discrete_Event_Simulator {
                 }
             }
         }
-    }
+
 
     //------------------------------------------------------------------------------------------------------------------
     //------------------------------------------------------------------------------------------------------------------
@@ -250,27 +258,27 @@ public class Discrete_Event_Simulator {
         //FALL Optimum nicht erforderlich
         if (!Settings.get_Optimal_Loadout()) {
 
-            List<Workforce> workforces = ((Function) to_Run.getEPKNode()).getNeeded_Workforce();
-            List<Resource> resources = ((Function) to_Run.getEPKNode()).getNeeded_Resources();
+            List<Workforce> needed_workforces = new ArrayList<>(((Function) to_Run.getEPKNode()).getNeeded_Workforce());
+            List<Resource> needed_Resources = new ArrayList<>(((Function) to_Run.getEPKNode()).getNeeded_Resources());
 
             //CHECK FOR USER WORKFORCE AVAILABLE
             for (User u : users) {
                 if (!u.isActive()) {
                     List<Workforce> capable = u.getWorkforces();
                     for (Workforce cap : capable) {
-                        if (workforces.contains(cap)) {
-                            if (CalculateUsers.contains(u)) {
+                        if (needed_workforces.contains(cap)) {
+                            if (!CalculateUsers.contains(u)) {
                                 CalculateUsers.add(u);
                             }
-                            workforces.remove(cap);
+                            needed_workforces.remove(cap);
                         }
                     }
-                    if (workforces.isEmpty()) {
+                    if (needed_workforces.isEmpty()) {
                         break;
                     }
                 }
             }
-            if (!workforces.isEmpty()) {
+            if (!needed_workforces.isEmpty()) {
                 System.out.println("DEBUG: Workforce not Empty but should be");
                 System.out.println("Fixing: Adding Instance back to Waiting List");
                 to_Run.setTo_Start(to_Run.getTo_Start().plusSeconds(1));
@@ -284,7 +292,7 @@ public class Discrete_Event_Simulator {
             else {
 
                 boolean not_fullfillable = false;
-                for (Resource res : ((Function) to_Run.getEPKNode()).getNeeded_Resources()) {
+                for (Resource res : needed_Resources) {
                     if (not_fullfillable) {
                         break;
                     }
@@ -324,9 +332,18 @@ public class Discrete_Event_Simulator {
             int lasting_Shifttime_in_Seconds = event_Calendar.getEnd_Time().toSecondOfDay() - event_Calendar.getRuntime().toSecondOfDay();
             int Workingtime_in_Seconds = ((Function) to_Run.getEPKNode()).getWorkingTime().get_Duration_to_Seconds();
 
+
+            Duration = Duration.plusSeconds(Workingtime_in_Seconds);
+            to_Run.setWorking(true);
+            event_Calendar.Remove_From_Upcoming_List(to_Run, day); //fraglich
+            for (User u : CalculateUsers) {
+                u.setActive(true);
+            }
+
+
             if (Workingtime_in_Seconds <= lasting_Shifttime_in_Seconds) {
 
-                Instance_Workflow Running_Instance = new Instance_Workflow(to_Run.getInstance(), Duration, to_Run.getEPKNode());
+                Instance_Workflow Running_Instance = new Instance_Workflow(to_Run.getInstance(), Duration, to_Run.getEPKNode(), to_Run.isWorking());
                 Running_Instance.Add_Active_Users(CalculateUsers);
                 Running_Instance.Add_Active_Resources(CalculateResource);
                 event_Calendar.Add_To_Upcoming_List(Running_Instance, day);

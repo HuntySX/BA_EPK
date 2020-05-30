@@ -2,7 +2,10 @@ package com.company.Simulation.Simulation_Base.Data.Discrete_Data.Bib;
 
 import com.company.EPK.Function;
 import com.company.Enums.Option_Event_Choosing;
-import com.company.Simulation.Simulation_Base.Data.Discrete_Data.*;
+import com.company.Simulation.Simulation_Base.Data.Discrete_Data.Event_Calendar;
+import com.company.Simulation.Simulation_Base.Data.Discrete_Data.Instance_Workflow;
+import com.company.Simulation.Simulation_Base.Data.Discrete_Data.Resource;
+import com.company.Simulation.Simulation_Base.Data.Discrete_Data.Simulation_Waiting_List;
 import com.company.Simulation.Simulation_Base.Data.Shared_Data.Settings;
 import com.company.Simulation.Simulation_Base.Data.Shared_Data.User;
 
@@ -24,6 +27,14 @@ public class Event_Decider {
     }
 
     public Instance_Workflow Decide_Event(List<Instance_Workflow> Upcoming, Simulation_Waiting_List Waiting) {
+        Instance_Workflow lightInstance = null;
+        for (Instance_Workflow Upcoming_Workflow : Upcoming) {
+            lightInstance = CheckForResourcefreeing(Upcoming_Workflow);
+            if (lightInstance != null) {
+                Upcoming.remove(lightInstance);
+                return lightInstance;
+            }
+        }
 
         Option_Event_Choosing Decide_Option = settings.getDecide_Event();
         if (Upcoming.isEmpty() && Waiting.getEvent_List().isEmpty()) {
@@ -61,5 +72,13 @@ public class Event_Decider {
 
         }
         return null;
+    }
+
+    private Instance_Workflow CheckForResourcefreeing(Instance_Workflow upcoming) {
+        if ((upcoming.getEPKNode() instanceof Function && !upcoming.isWorking())) {
+            return null;
+        } else {
+            return upcoming;
+        }
     }
 }

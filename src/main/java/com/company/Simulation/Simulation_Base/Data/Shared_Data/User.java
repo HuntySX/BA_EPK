@@ -19,7 +19,7 @@ public class User {
         this.first_Name = first_Name;
         this.last_Name = last_Name;
         this.p_ID = p_ID;
-        this.active = true;
+        this.active = false;
         Workforces = new ArrayList<>();
         this.efficiency = efficiency;
     }

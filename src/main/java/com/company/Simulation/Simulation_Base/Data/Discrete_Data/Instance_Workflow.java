@@ -28,6 +28,16 @@ public class Instance_Workflow {
         Working = false;
     }
 
+    public Instance_Workflow(Event_Instance instance, LocalTime to_Start, EPK_Node EPKNode, boolean working) {
+        Instance = instance;
+        this.to_Start = to_Start;
+        this.EPKNode = EPKNode;
+        this.Active_Resource = new ArrayList<>();
+        this.Active_User = new ArrayList<>();
+        Waiting = false;
+        Working = working;
+    }
+
     public boolean Is_Waiting() {
         return Waiting;
     }

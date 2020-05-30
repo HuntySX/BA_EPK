@@ -180,10 +180,8 @@ public class Event_Calendar {
     }
 
     public void jump() {
-        System.out.println("Second plus");
         runtime = runtime.plusSeconds(1);
-        if (runtime.isAfter(getEnd_Time())) ;
-        {
+        if (runtime.isAfter(getEnd_Time())) {
             act_runtimeDay++;
             if (act_runtimeDay >= getRuntimeDays()) {
                 setFinished_cycle(true);

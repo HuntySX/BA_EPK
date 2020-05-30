@@ -34,7 +34,7 @@ public class UI_Event_Ending extends Event implements UI_Instantiable {
     private FormRenderer NEXT_ELEMS_UI;
 
     public UI_Event_Ending(int ID, UI_EPK EPK, VBox Rightbox) {
-        super(null, ID, null);
+        super(null, ID, null, false, true);
         this.Box = new VBox();
         this.Rightbox = Rightbox;
         this.EPK = EPK;
