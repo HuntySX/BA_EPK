@@ -3,11 +3,13 @@ package com.company.Run;
 import com.company.EPK.EPK;
 import com.company.Simulation.Simulation_Base.Data.Discrete_Data.Bib.Event_Decider;
 import com.company.Simulation.Simulation_Base.Data.Discrete_Data.Event_Calendar;
+import com.company.Simulation.Simulation_Base.Data.Discrete_Data.Instance_Workflow;
 import com.company.Simulation.Simulation_Base.Data.Discrete_Data.Loader.EPK_Loader;
 import com.company.Simulation.Simulation_Base.Data.Discrete_Data.Loader.Resource_Loader;
 import com.company.Simulation.Simulation_Base.Data.Discrete_Data.Loader.Settings_Loader;
 import com.company.Simulation.Simulation_Base.Data.Discrete_Data.Loader.User_Loader;
 import com.company.Simulation.Simulation_Base.Data.Discrete_Data.Resource;
+import com.company.Simulation.Simulation_Base.Data.Discrete_Data.Simulation_Event_List;
 import com.company.Simulation.Simulation_Base.Data.Printer_Gate;
 import com.company.Simulation.Simulation_Base.Data.Printer_Queue;
 import com.company.Simulation.Simulation_Base.Data.Shared_Data.Settings;
@@ -78,6 +80,13 @@ public class Discrete_Event_Generator {
     public void run() throws Exception {
         event_Calendar.fillCalendar();
         System.out.println("Calendar filled");
+        List<Simulation_Event_List> Events = event_Calendar.getUpcoming_List();
+        for (Simulation_Event_List List : Events) {
+            System.out.println("List for Day: " + Events.indexOf(List) + 1);
+            for (Instance_Workflow Instance : List.getWorkflows()) {
+                System.out.println("Time to Start for Instance " + Instance.getInstance().getCase_ID() + ": " + Instance.getTo_Start());
+            }
+        }
         Simulation.run();
     }
 

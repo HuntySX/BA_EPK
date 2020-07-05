@@ -1,8 +1,5 @@
 package com.company.Simulation.Simulation_Base.Data.Discrete_Data;
 
-import com.company.EPK.Function;
-
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
@@ -24,13 +21,18 @@ public class Simulation_Waiting_List {
             Workflows.add(workflow);
         } else {
             ListIterator iter = Workflows.listIterator();
+            boolean added = false;
             while (iter.hasNext()) {
                 Instance_Workflow Instance = (Instance_Workflow) iter.next();
                 if (Instance.getTo_Start().isAfter(workflow.getTo_Start())) {
                     iter.previous();
                     iter.add(workflow);
+                    added = true;
                     break;
                 }
+            }
+            if (!added) {
+                iter.add(workflow);
             }
         }
     }

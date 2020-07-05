@@ -63,6 +63,38 @@ public class Event_Decider {
             }
 
         } else if (Decide_Option == GREEDY) {
+            List<Instance_Workflow> Event_list = Waiting.getEvent_List();
+            boolean found = false;
+            Instance_Workflow mark_for_Del = null;
+            for (Instance_Workflow w : Event_list) {
+                if (Check_Condition_For_Event.Check_For_Condition(Users, Resources, w, calendar, settings)) {
+                    mark_for_Del = w;
+                    found = true;
+                    break;
+                }
+            }
+            if (found && mark_for_Del != null) {
+                Event_list.remove(mark_for_Del);
+                return mark_for_Del;
+            } else {
+                found = false;
+                mark_for_Del = null;
+                for (Instance_Workflow w : Upcoming) {
+                    if (Check_Condition_For_Event.Check_For_Condition(Users, Resources, w, calendar, settings)) {
+                        mark_for_Del = w;
+                        found = true;
+                        break;
+                    }
+                }
+
+                if (found && mark_for_Del != null) {
+                    Upcoming.remove(mark_for_Del);
+                    return mark_for_Del;
+                } else {
+                    return null;
+                }
+            }
+
 
         } else if (Decide_Option == BY_CUSTOMER_RELATION) {
 
@@ -75,10 +107,10 @@ public class Event_Decider {
     }
 
     private Instance_Workflow CheckForResourcefreeing(Instance_Workflow upcoming) {
-        if ((upcoming.getEPKNode() instanceof Function && !upcoming.isWorking())) {
-            return null;
-        } else {
+        if (((upcoming.getEPKNode() instanceof Function) && upcoming.isWorking())) {
             return upcoming;
+        } else {
+            return null;
         }
     }
 }

@@ -69,6 +69,9 @@ public class Discrete_Event_Simulator {
                                 to_Run.getInstance().add_To_Scheduled_Work(n);
                                 Instance_Workflow new_Instance = new Instance_Workflow(to_Run.getInstance(), event_Calendar.getRuntime(), n);
                                 event_Calendar.Add_To_Upcoming_List(new_Instance, event_Calendar.getAct_runtimeDay());
+                                System.out.println("Event Finished: " + ((Event) to_Run.getEPKNode()).getEvent_Tag() + "for: " +
+                                        to_Run.getInstance().getCase_ID() +
+                                        " At: [" + event_Calendar.getRuntime().toString() + "] Should be: [" + to_Run.getTo_Start().toString() + "]");
 
                                 if (Settings.getPrint_Only_Function() && n instanceof Function) {
                                     //TODO Print Scheduled for n;
@@ -77,7 +80,9 @@ public class Discrete_Event_Simulator {
                                 }
                             }
                         } else {
-                            System.out.println("Instance Finished: " + to_Run.getInstance().getCase_ID());
+                            System.out.println("Instance finished at: " + ((Event) to_Run.getEPKNode()).getEvent_Tag() + "for: " +
+                                    to_Run.getInstance().getCase_ID() +
+                                    " At: [" + event_Calendar.getRuntime().toString() + "] Should be: [" + to_Run.getTo_Start().toString() + "]");
 
                             if (Settings.getPrint_Only_Function() && to_Run.getEPKNode() instanceof Function) {
                                 //TODO Print FINISHED for n;
@@ -168,12 +173,21 @@ public class Discrete_Event_Simulator {
                         //FALL1: To_Run Arbeitet noch nicht an Function
                         if (!to_Run.isWorking()) {
                             ActivateFunction(to_Run, event_Calendar.getAct_runtimeDay());
+                            System.out.println("Function started: " + ((Function) to_Run.getEPKNode()).getFunction_tag() + "for: " +
+                                    to_Run.getInstance().getCase_ID() +
+                                    " At: [" + event_Calendar.getRuntime().toString() + "] Should be: [" + to_Run.getTo_Start().toString() + "]");
+                            if (event_Calendar.getRuntime().toNanoOfDay() - to_Run.getTo_Start().toNanoOfDay() != 0) {
+                                System.out.println("Function is Late: " + (event_Calendar.getRuntime().toNanoOfDay() - to_Run.getTo_Start().toNanoOfDay()));
+                            }
                             firstactivation = true;
                         }
 
                         //FALL2: To_Run hat arbeit beendet:
                         else if (firstactivation == false && to_Run.isWorking() && (to_Run.getTo_Start().equals(event_Calendar.getRuntime()) || to_Run.getTo_Start().isBefore(event_Calendar.getRuntime()))) {
                             DeactivateFunction(to_Run, event_Calendar.getAct_runtimeDay());
+                            System.out.println("Function finished: " + ((Function) to_Run.getEPKNode()).getFunction_tag() + "for: " +
+                                    to_Run.getInstance().getCase_ID() +
+                                    " At: [" + event_Calendar.getRuntime().toString() + "] Should be: [" + to_Run.getTo_Start().toString() + "]");
                         }
                     }
 

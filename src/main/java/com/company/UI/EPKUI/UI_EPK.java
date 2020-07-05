@@ -257,6 +257,7 @@ public class UI_EPK {
     public List<Option_Event_Choosing> getAll_Event_Choosings() {
         List<Option_Event_Choosing> List = new ArrayList<>();
         List.add(FIFO);
+        List.add(GREEDY);
         List.add(BY_CUSTOMER_RELATION);
         List.add(BY_LARGEST_MARGIN);
         List.add(BY_LARGEST_INVEST);

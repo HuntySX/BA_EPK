@@ -13,6 +13,10 @@ public class Simulation_Event_List {
         Workflows = new ArrayList<>();
     }
 
+    public List<Instance_Workflow> getWorkflows() {
+        return Workflows;
+    }
+
     public void addTimedEvent(Instance_Workflow instance) {
         if (Workflows.isEmpty()) {
             Workflows.add(instance);
