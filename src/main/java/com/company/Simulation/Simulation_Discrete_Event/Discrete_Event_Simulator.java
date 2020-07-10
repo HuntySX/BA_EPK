@@ -129,10 +129,11 @@ public class Discrete_Event_Simulator {
                             }
                         } else {
                             //GATE NOT FULLFILLED; WAIT
-                            LocalTime Actualize = event_Calendar.getRuntime();
+                            /*LocalTime Actualize = event_Calendar.getRuntime();
                             Actualize.plusSeconds(1);
                             Instance_Workflow new_Instance = new Instance_Workflow(to_Run.getInstance(), Actualize, to_Run.getEPKNode());
-                            event_Calendar.Add_To_Upcoming_List(new_Instance, event_Calendar.getAct_runtimeDay());
+                            event_Calendar.Add_To_Upcoming_List(new_Instance, event_Calendar.getAct_runtimeDay());*/
+                            System.out.println("Clone killed Through Gate");
 
                         }
                     }
