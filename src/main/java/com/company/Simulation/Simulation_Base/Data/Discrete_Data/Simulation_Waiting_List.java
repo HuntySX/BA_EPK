@@ -40,4 +40,13 @@ public class Simulation_Waiting_List {
     public void remove_from_WaitingList(Instance_Workflow Instance) {
         Workflows.remove(Instance);
     }
+
+    public boolean containsInstance(Instance_Workflow to_run) {
+        for (Instance_Workflow Instance : Workflows) {
+            if (to_run.getInstance().equals(Instance.getInstance())) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

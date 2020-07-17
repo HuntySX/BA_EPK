@@ -160,4 +160,22 @@ public class EPK {
         }
     }
 
+    public void generateMapping() {
+        for (EPK_Node n : elements) {
+            List<EPK_Node> Reachable = new ArrayList<>();
+            List<EPK_Node> Workinglist = new ArrayList<>();
+            Workinglist.addAll(n.getNext_Elem());
+            while (!Workinglist.isEmpty()) {
+                EPK_Node to_reach = Workinglist.get(0);
+                for (EPK_Node next_Node : to_reach.getNext_Elem()) {
+                    if (!(Workinglist.contains(next_Node) || Reachable.contains(next_Node))) {
+                        Workinglist.add(next_Node);
+                    }
+                }
+                Workinglist.remove(0);
+                Reachable.add(to_reach);
+            }
+            n.setReachable_Elements(Reachable);
+        }
+    }
 }

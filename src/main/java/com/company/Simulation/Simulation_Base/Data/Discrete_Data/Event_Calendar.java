@@ -297,6 +297,30 @@ public class Event_Calendar {
             Activation_List.remove(workflow);
         }
     }
+
+    public LocalTime getNextInstanceTime(Instance_Workflow to_run) {
+        for (Simulation_Event_List Days : Upcoming_List) {
+            for (Instance_Workflow flow : Days.getWorkflows()) {
+                if (flow.getInstance().equals(to_run.getInstance())) {
+                    return flow.getTo_Start();
+                }
+            }
+        }
+        return null;
+    }
+
+    public int getNextInstanceDay(Instance_Workflow to_run) {
+        int days = 0;
+        for (Simulation_Event_List Days : Upcoming_List) {
+            for (Instance_Workflow flow : Days.getWorkflows()) {
+                if (flow.getInstance().equals(to_run.getInstance())) {
+                    return days;
+                }
+            }
+            days++;
+        }
+        return -1;
+    }
 }
 
 

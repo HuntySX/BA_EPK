@@ -160,7 +160,6 @@ public class Event_Con_Join extends Connector implements Printable_Node {
             }
             return ADVANCE;
         }
-
     }
 
     public void AddNode(EPK_Node to_wait_for) {

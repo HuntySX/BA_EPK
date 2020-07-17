@@ -8,12 +8,15 @@ import java.util.List;
 public abstract class EPK_Node implements UI_Check_Settings {
 
     private List<EPK_Node> Next_Elem;
+    private List<EPK_Node> Reachable_Elements;
     private int ID;
 
     public EPK_Node(List<EPK_Node> Next_Elem, int ID) {
         this.ID = ID;
+        this.Reachable_Elements = new ArrayList<>();
         if (Next_Elem == null) {
             this.Next_Elem = new ArrayList<>();
+
         } else {
             this.Next_Elem = Next_Elem;
         }
@@ -27,6 +30,24 @@ public abstract class EPK_Node implements UI_Check_Settings {
     public EPK_Node(int ID) {
         this.ID = ID;
         this.Next_Elem = new ArrayList<>();
+    }
+
+    public List<EPK_Node> getReachable_Elements() {
+        return Reachable_Elements;
+    }
+
+    public void setReachable_Elements(List<EPK_Node> reachable_Elements) {
+        Reachable_Elements = reachable_Elements;
+    }
+
+    public String ReachabletoString() {
+        String Result = "";
+
+        for (EPK_Node n : Reachable_Elements) {
+            String to_Add = n.toString() + "\n";
+            Result = Result.concat(to_Add);
+        }
+        return Result;
     }
 
     public List<EPK_Node> getNext_Elem() {

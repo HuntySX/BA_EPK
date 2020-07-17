@@ -1,6 +1,7 @@
 package com.company.Run;
 
 import com.company.EPK.EPK;
+import com.company.EPK.EPK_Node;
 import com.company.Simulation.Simulation_Base.Data.Discrete_Data.Bib.Event_Decider;
 import com.company.Simulation.Simulation_Base.Data.Discrete_Data.Event_Calendar;
 import com.company.Simulation.Simulation_Base.Data.Discrete_Data.Instance_Workflow;
@@ -86,6 +87,10 @@ public class Discrete_Event_Generator {
             for (Instance_Workflow Instance : List.getWorkflows()) {
                 System.out.println("Time to Start for Instance " + Instance.getInstance().getCase_ID() + ": " + Instance.getTo_Start());
             }
+        }
+        EPK.generateMapping();
+        for (EPK_Node n : EPK.getElements()) {
+            System.out.println(n.ReachabletoString());
         }
         Simulation.run();
     }
