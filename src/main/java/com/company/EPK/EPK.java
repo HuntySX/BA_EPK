@@ -178,4 +178,19 @@ public class EPK {
             n.setReachable_Elements(Reachable);
         }
     }
+
+    public void generateGateMapping() {
+        for (EPK_Node n : elements) {
+            for (EPK_Node m : n.getNext_Elem()) {
+                if (m instanceof Event_Con_Join) {
+                    ((Event_Con_Join) m).getPrevious_Elements().add(n);
+                }
+            }
+        }
+        for (EPK_Node n : elements) {
+            if (n instanceof Event_Con_Join) {
+                System.out.println(((Event_Con_Join) n).getPrevious_Elements().toString());
+            }
+        }
+    }
 }

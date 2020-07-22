@@ -89,6 +89,7 @@ public class Discrete_Event_Generator {
             }
         }
         EPK.generateMapping();
+        EPK.generateGateMapping();
         for (EPK_Node n : EPK.getElements()) {
             System.out.println(n.ReachabletoString());
         }

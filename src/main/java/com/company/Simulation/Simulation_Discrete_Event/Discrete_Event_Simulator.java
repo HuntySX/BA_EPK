@@ -91,7 +91,6 @@ public class Discrete_Event_Simulator {
                         }
 
                     }
-
                     if (to_Run.getEPKNode() instanceof Event_Con_Split) {
                         to_Run.getInstance().add_To_Finished_Work(to_Run.getEPKNode());
                         List<EPK_Node> Next_Elem = ((Event_Con_Split) to_Run.getEPKNode()).choose_Next();
@@ -126,6 +125,7 @@ public class Discrete_Event_Simulator {
                                     //TODO Print every Node Scheduled;
                                 }
                             }
+                        }
                             else if (check == DELAY) {
                                 if (waiting_list.containsInstance(to_Run)) {
                                     to_Run.getInstance().add_To_Scheduled_Work(to_Run.getEPKNode());
@@ -144,15 +144,15 @@ public class Discrete_Event_Simulator {
                                         }
                                     }
                                 }
-                            } else {
-                                //GATE NOT FULLFILLED; WAIT
+                        } else {
+                            //GATE NOT FULLFILLED; WAIT
                             /*LocalTime Actualize = event_Calendar.getRuntime();
                             Actualize.plusSeconds(1);
                             Instance_Workflow new_Instance = new Instance_Workflow(to_Run.getInstance(), Actualize, to_Run.getEPKNode());
                             event_Calendar.Add_To_Upcoming_List(new_Instance, event_Calendar.getAct_runtimeDay());*/
-                                System.out.println("Clone killed Through Gate");
+                            System.out.println("Clone killed Through Gate");
 
-                            }
+                        }
                         }
                     if (to_Run.getEPKNode() instanceof Activating_Function) {
                         if (to_Run.getInstance() instanceof Activating_Event_Instance && ((Activating_Event_Instance) to_Run.getInstance()).getEnd_Function() == to_Run.getEPKNode()) {
@@ -184,7 +184,6 @@ public class Discrete_Event_Simulator {
                             }
                         }
                     }
-
                     if (to_Run.getEPKNode() instanceof Function && !(to_Run.getEPKNode() instanceof Activating_Function)) {
 
                         boolean firstactivation = false;
@@ -226,6 +225,7 @@ public class Discrete_Event_Simulator {
                         }
                     }
                 }
+                //TODO Local Gate Weiterleitung oder Blocken
                 event_Calendar.jump();
             }
             event_Calendar.jump();

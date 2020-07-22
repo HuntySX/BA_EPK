@@ -17,6 +17,7 @@ public class Instance_Workflow {
     private boolean Working;
     private boolean Waiting;
     private int waiting_Ticket;
+    private Integer Gate_Waiting_Ticket;
 
     public Instance_Workflow(Event_Instance instance, LocalTime to_Start, EPK_Node EPKNode) {
         Instance = instance;
@@ -52,6 +53,14 @@ public class Instance_Workflow {
 
     public void setWaiting_Ticket(int waiting_Ticket) {
         this.waiting_Ticket = waiting_Ticket;
+    }
+
+    public Integer getGate_Waiting_Ticket() {
+        return Gate_Waiting_Ticket;
+    }
+
+    public void setGate_Waiting_Ticket(Integer gate_Waiting_Ticket) {
+        Gate_Waiting_Ticket = gate_Waiting_Ticket;
     }
 
     public Event_Instance getInstance() {

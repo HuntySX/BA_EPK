@@ -10,7 +10,6 @@ public class Event_Instance extends Simulation_Instance {
 
     private List<EPK_Node> Scheduled_Work;
     private List<EPK_Node> Finished_Work;
-
     public Event_Instance(int case_ID) {
         super(case_ID);
         Scheduled_Work = new ArrayList<>();

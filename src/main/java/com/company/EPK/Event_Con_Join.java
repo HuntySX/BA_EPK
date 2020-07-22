@@ -16,16 +16,28 @@ public class Event_Con_Join extends Connector implements Printable_Node {
     private List<Nodemap> Mapped_Branch_Elements;
     private List<Event_Instance> Throughput_Instances;
     private List<EPK_Node> Mapped_Branch_Elements_AND;
+    private List<EPK_Node> Previous_Elements;
+    private List<Gate_Waiting_Instance> Waiting_Instance_List;
 
     public Event_Con_Join(List<EPK_Node> Next_Elem, int ID, Contype contype) {
         super(Next_Elem, ID, contype);
         Mapped_Branch_Elements = new ArrayList<>();
         Throughput_Instances = new ArrayList<>();
         Mapped_Branch_Elements_AND = new ArrayList<>();
+        Previous_Elements = new ArrayList<>();
+        Waiting_Instance_List = new ArrayList<>();
     }
 
     public List<EPK_Node> getMapped_Branch_Elements_AND() {
         return Mapped_Branch_Elements_AND;
+    }
+
+    public List<EPK_Node> getPrevious_Elements() {
+        return Previous_Elements;
+    }
+
+    public void setPrevious_Elements(List<EPK_Node> previous_Elements) {
+        Previous_Elements = previous_Elements;
     }
 
     public void setMapped_Branch_Elements_AND(List<EPK_Node> mapped_Branch_Elements_AND) {
@@ -36,6 +48,15 @@ public class Event_Con_Join extends Connector implements Printable_Node {
 
         List<EPK_Node> finished_EPK_Nodes = instance.getInstance().getFinished_Work();
         List<EPK_Node> scheduled_EPK_Nodes = instance.getInstance().getScheduled_Work();
+        Integer Gate_Waiting_Ticket = instance.getGate_Waiting_Ticket();
+        Event_Instance Event = instance.getInstance();
+        if (Gate_Waiting_Ticket != null) {
+
+        } else {
+            Gate_Waiting_Instance gate_Waiting_Instance = new Gate_Waiting_Instance();
+            gate_Waiting_Instance.setInstance_ID(Event.getCase_ID());
+
+        }
 
         boolean Check_Single_Predecessor = false;
         boolean Check_Multiple_Predecessor = true;
