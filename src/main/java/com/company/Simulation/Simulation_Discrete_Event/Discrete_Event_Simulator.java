@@ -224,11 +224,26 @@ public class Discrete_Event_Simulator {
                             upcoming_Events.remove_from_EventList(Instance);
                         }
                     }
+                    pushLazyGateInstances();
                 }
                 //TODO Local Gate Weiterleitung oder Blocken
                 event_Calendar.jump();
             }
             event_Calendar.jump();
+        }
+    }
+
+    private void pushLazyGateInstances() {
+        for (EPK_Node Gate : EPK.getElements()) {
+            if (Gate instanceof Event_Con_Join) {
+                switch (((Event_Con_Join) Gate).getContype()) {
+                    case LAZY_OR:
+                        for (Gate_Waiting_Instance Waiting : ((Event_Con_Join) Gate).getWaiting_Instance_List() {
+
+                    }
+                    case LAZY_XOR:
+                }
+            }
         }
     }
 

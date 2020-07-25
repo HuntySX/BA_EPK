@@ -233,4 +233,30 @@ public class Event_Con_Join extends Connector implements Printable_Node {
     public Event_Con_Join returnUpperClass() {
         return this;
     }
+
+    public List<Gate_Waiting_Instance> getWaiting_Instance_List() {
+        return Waiting_Instance_List;
+    }
+
+    public void setWaiting_Instance_List(List<Gate_Waiting_Instance> waiting_Instance_List) {
+        Waiting_Instance_List = waiting_Instance_List;
+    }
+
+    public boolean isCorrectLazyState(Gate_Waiting_Instance Instance) {
+        switch (getContype()) {
+            case LAZY_OR: {
+                if (Instance.getArrived().size() >= 1) {
+                    return true;
+                }
+            }
+            case LAZY_XOR: {
+                if (Instance.getArrived().size() == 1 && getPrevious_Elements().contains(Instance.getArrived().get(0))) {
+                    return true;
+                }
+            }
+            default:
+                return false;
+        }
+    }
 }
+
