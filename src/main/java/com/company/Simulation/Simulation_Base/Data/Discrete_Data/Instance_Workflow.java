@@ -1,6 +1,7 @@
 package com.company.Simulation.Simulation_Base.Data.Discrete_Data;
 
 import com.company.EPK.EPK_Node;
+import com.company.EPK.Gate_Waiting_Instance;
 import com.company.Simulation.Simulation_Base.Data.Shared_Data.User;
 
 import java.time.LocalTime;
@@ -17,7 +18,8 @@ public class Instance_Workflow {
     private boolean Working;
     private boolean Waiting;
     private int waiting_Ticket;
-    private Integer Gate_Waiting_Ticket;
+    private EPK_Node Coming_From;
+    private List<Gate_Waiting_Instance> Waiting_At_Gate;
 
     public Instance_Workflow(Event_Instance instance, LocalTime to_Start, EPK_Node EPKNode) {
         Instance = instance;
@@ -27,6 +29,20 @@ public class Instance_Workflow {
         this.Active_User = new ArrayList<>();
         Waiting = false;
         Working = false;
+        Coming_From = null;
+        this.Waiting_At_Gate = new ArrayList<>();
+    }
+
+    public Instance_Workflow(Event_Instance instance, LocalTime to_Start, EPK_Node EPKNode, EPK_Node Coming_From) {
+        Instance = instance;
+        this.to_Start = to_Start;
+        this.EPKNode = EPKNode;
+        this.Active_Resource = new ArrayList<>();
+        this.Active_User = new ArrayList<>();
+        Waiting = false;
+        Working = false;
+        this.Coming_From = Coming_From;
+        this.Waiting_At_Gate = new ArrayList<>();
     }
 
     public Instance_Workflow(Event_Instance instance, LocalTime to_Start, EPK_Node EPKNode, boolean working) {
@@ -37,6 +53,7 @@ public class Instance_Workflow {
         this.Active_User = new ArrayList<>();
         Waiting = false;
         Working = working;
+        this.Waiting_At_Gate = new ArrayList<>();
     }
 
     public boolean Is_Waiting() {
@@ -55,12 +72,12 @@ public class Instance_Workflow {
         this.waiting_Ticket = waiting_Ticket;
     }
 
-    public Integer getGate_Waiting_Ticket() {
-        return Gate_Waiting_Ticket;
+    public List<Gate_Waiting_Instance> getWaiting_At_Gate() {
+        return Waiting_At_Gate;
     }
 
-    public void setGate_Waiting_Ticket(Integer gate_Waiting_Ticket) {
-        Gate_Waiting_Ticket = gate_Waiting_Ticket;
+    public void setWaiting_At_Gate(List<Gate_Waiting_Instance> Waiting_At_Gate) {
+        this.Waiting_At_Gate = Waiting_At_Gate;
     }
 
     public Event_Instance getInstance() {
@@ -89,6 +106,10 @@ public class Instance_Workflow {
 
     public void setTo_Start(LocalTime to_Start) {
         this.to_Start = to_Start;
+    }
+
+    public EPK_Node getComing_From() {
+        return Coming_From;
     }
 
     public void removeActiveUser(User u) {

@@ -1,6 +1,7 @@
 package com.company.Simulation.Simulation_Discrete_Event;
 
 import com.company.EPK.*;
+import com.company.Enums.Contype;
 import com.company.Enums.Gate_Check_Status;
 import com.company.Run.Discrete_Event_Generator;
 import com.company.Simulation.Simulation_Base.Data.Discrete_Data.*;
@@ -47,8 +48,8 @@ public class Discrete_Event_Simulator {
 
     }
 
-    public void run() throws Exception {
-
+    public void run() {
+        boolean pushed_new_Elements = false;
         while (!event_Calendar.isFinished_cycle()) {
             while (event_Calendar.getRuntime().isBefore(event_Calendar.getEnd_Time()) && !event_Calendar.isFinished_cycle()) {
 
@@ -60,6 +61,7 @@ public class Discrete_Event_Simulator {
                 while (to_Run != null) {
 
                     if (to_Run.getEPKNode() instanceof Event) {
+
                         to_Run.getInstance().add_To_Finished_Work(to_Run.getEPKNode());
                         if (!(((Event) to_Run.getEPKNode()).is_End_Event())) {
 
@@ -89,7 +91,6 @@ public class Discrete_Event_Simulator {
                                 //TODO Print every Node FINISHED;
                             }
                         }
-
                     }
                     if (to_Run.getEPKNode() instanceof Event_Con_Split) {
                         to_Run.getInstance().add_To_Finished_Work(to_Run.getEPKNode());
@@ -110,8 +111,7 @@ public class Discrete_Event_Simulator {
 
                         Gate_Check_Status check = ((Event_Con_Join) to_Run.getEPKNode()).check_Previous_Elem(to_Run);
                         if (check == BLOCK) {
-                            System.out.println("Instanz mit ID: " + to_Run.getInstance().getCase_ID() + "Besaß einen ungültigen" +
-                                    "Teilbereich (Uhrzeit/Gate): " + to_Run.getEPKNode().toString());
+
                         } else if (check == ADVANCE) {
                             List<EPK_Node> Next_Elem = to_Run.getEPKNode().getNext_Elem();
                             to_Run.getInstance().add_To_Finished_Work(to_Run.getEPKNode());
@@ -125,25 +125,24 @@ public class Discrete_Event_Simulator {
                                     //TODO Print every Node Scheduled;
                                 }
                             }
-                        }
-                            else if (check == DELAY) {
-                                if (waiting_list.containsInstance(to_Run)) {
-                                    to_Run.getInstance().add_To_Scheduled_Work(to_Run.getEPKNode());
-                                    Instance_Workflow new_Instance = new Instance_Workflow(to_Run.getInstance(), event_Calendar.getRuntime().plusSeconds(1), to_Run.getEPKNode());
-                                    event_Calendar.Add_To_Upcoming_List(new_Instance, event_Calendar.getAct_runtimeDay());
-                                } else {
-                                    LocalTime to_check = event_Calendar.getNextInstanceTime(to_Run);
+                        } else if (check == DELAY) {
+                            if (waiting_list.containsInstance(to_Run)) {
+                                to_Run.getInstance().add_To_Scheduled_Work(to_Run.getEPKNode());
+                                Instance_Workflow new_Instance = new Instance_Workflow(to_Run.getInstance(), event_Calendar.getRuntime().plusSeconds(1), to_Run.getEPKNode());
+                                event_Calendar.Add_To_Upcoming_List(new_Instance, event_Calendar.getAct_runtimeDay());
+                            } else {
+                                LocalTime to_check = event_Calendar.getNextInstanceTime(to_Run);
 
-                                    if (to_check != null) {
-                                        int days = event_Calendar.getNextInstanceDay(to_Run);
-                                        if (days != -1) {
-                                            to_check.plusSeconds(1);
-                                            to_Run.getInstance().add_To_Scheduled_Work(to_Run.getEPKNode());
-                                            Instance_Workflow new_Instance = new Instance_Workflow(to_Run.getInstance(), to_check, to_Run.getEPKNode());
-                                            event_Calendar.Add_To_Upcoming_List(new_Instance, days);
-                                        }
+                                if (to_check != null) {
+                                    int days = event_Calendar.getNextInstanceDay(to_Run);
+                                    if (days != -1) {
+                                        to_check.plusSeconds(1);
+                                        to_Run.getInstance().add_To_Scheduled_Work(to_Run.getEPKNode());
+                                        Instance_Workflow new_Instance = new Instance_Workflow(to_Run.getInstance(), to_check, to_Run.getEPKNode());
+                                        event_Calendar.Add_To_Upcoming_List(new_Instance, days);
                                     }
                                 }
+                            }
                         } else {
                             //GATE NOT FULLFILLED; WAIT
                             /*LocalTime Actualize = event_Calendar.getRuntime();
@@ -151,9 +150,8 @@ public class Discrete_Event_Simulator {
                             Instance_Workflow new_Instance = new Instance_Workflow(to_Run.getInstance(), Actualize, to_Run.getEPKNode());
                             event_Calendar.Add_To_Upcoming_List(new_Instance, event_Calendar.getAct_runtimeDay());*/
                             System.out.println("Clone killed Through Gate");
-
                         }
-                        }
+                    }
                     if (to_Run.getEPKNode() instanceof Activating_Function) {
                         if (to_Run.getInstance() instanceof Activating_Event_Instance && ((Activating_Event_Instance) to_Run.getInstance()).getEnd_Function() == to_Run.getEPKNode()) {
                             int for_case_ID = ((Activating_Event_Instance) to_Run.getInstance()).getFor_case_ID();
@@ -215,7 +213,16 @@ public class Discrete_Event_Simulator {
                     latest_Instances.addAll(upcoming_Events.getByTime(event_Calendar.getRuntime()));
                     to_Run = event_Decider.Decide_Event(latest_Instances, waiting_list);
 
-
+                    if (to_Run == null) {
+                        pushed_new_Elements = pushLazyGateInstances();
+                        if (pushed_new_Elements) {
+                            upcoming_Events = event_Calendar.get_Single_Upcoming_List(event_Calendar.getAct_runtimeDay());
+                            waiting_list = event_Calendar.getWaiting_List();
+                            latest_Instances.addAll(upcoming_Events.getByTime(event_Calendar.getRuntime()));
+                            to_Run = event_Decider.Decide_Event(latest_Instances, waiting_list);
+                            pushed_new_Elements = false;
+                        }
+                    }
                 }
                 if (to_Run == null) {
                     if (!latest_Instances.isEmpty()) {
@@ -224,29 +231,32 @@ public class Discrete_Event_Simulator {
                             upcoming_Events.remove_from_EventList(Instance);
                         }
                     }
-                    pushLazyGateInstances();
                 }
-                //TODO Local Gate Weiterleitung oder Blocken
                 event_Calendar.jump();
             }
             event_Calendar.jump();
         }
     }
 
-    private void pushLazyGateInstances() {
+    private boolean pushLazyGateInstances() {
+        boolean pushed = false;
         for (EPK_Node Gate : EPK.getElements()) {
-            if (Gate instanceof Event_Con_Join) {
-                switch (((Event_Con_Join) Gate).getContype()) {
-                    case LAZY_OR:
-                        for (Gate_Waiting_Instance Waiting : ((Event_Con_Join) Gate).getWaiting_Instance_List() {
-
+            if (((Event_Con_Join) Gate).getContype() == Contype.LAZY_OR || ((Event_Con_Join) Gate).getContype() == Contype.LAZY_XOR) {
+                for (Gate_Waiting_Instance Instance : ((Event_Con_Join) Gate).getWaiting_Instance_List()) {
+                    if (((Event_Con_Join) Gate).isCorrectLazyState(Instance)) {
+                        Event_Instance next_Step = Instance.getFirst_Instance();
+                        for (EPK_Node n : Gate.getNext_Elem()) {
+                            next_Step.add_To_Scheduled_Work(n);
+                            Instance_Workflow to_Run = new Instance_Workflow(next_Step, event_Calendar.getRuntime().plusSeconds(1), n);
+                            event_Calendar.Add_To_Upcoming_List(to_Run, event_Calendar.getAct_runtimeDay());
+                            pushed = true;
+                        }
                     }
-                    case LAZY_XOR:
                 }
             }
         }
+        return pushed;
     }
-
 
     //------------------------------------------------------------------------------------------------------------------
     //------------------------------------------------------------------------------------------------------------------
@@ -283,16 +293,16 @@ public class Discrete_Event_Simulator {
         //Instantiate new Workflow for each Element in GetNext_Elem
         for (EPK_Node n : Next_Elem) {
             to_Run.getInstance().add_To_Scheduled_Work(n);
-                Instance_Workflow new_Instance = new Instance_Workflow(to_Run.getInstance(), event_Calendar.getRuntime(), n);
-                event_Calendar.Add_To_Upcoming_List(new_Instance, day);
+            Instance_Workflow new_Instance = new Instance_Workflow(to_Run.getInstance(), event_Calendar.getRuntime(), n);
+            event_Calendar.Add_To_Upcoming_List(new_Instance, day);
 
-                if (Settings.getPrint_Only_Function() && n instanceof Function) {
-                    //TODO Print Function Scheduled for n
-                } else {
-                    //TODO Print Scheduled everynode for n
-                }
+            if (Settings.getPrint_Only_Function() && n instanceof Function) {
+                //TODO Print Function Scheduled for n
+            } else {
+                //TODO Print Scheduled everynode for n
             }
         }
+    }
 
 
     //------------------------------------------------------------------------------------------------------------------
@@ -443,4 +453,54 @@ public class Discrete_Event_Simulator {
     }
 }
 
+/*
 
+                    if (to_Run.getEPKNode() instanceof Event_Con_Join) {
+
+                            Gate_Check_Status check = ((Event_Con_Join) to_Run.getEPKNode()).check_Previous_Elem(to_Run);
+                            if (check == BLOCK) {
+                            System.out.println("Instanz mit ID: " + to_Run.getInstance().getCase_ID() + "Besaß einen ungültigen" +
+                            "Teilbereich (Uhrzeit/Gate): " + to_Run.getEPKNode().toString());
+                            } else if (check == ADVANCE) {
+                            List<EPK_Node> Next_Elem = to_Run.getEPKNode().getNext_Elem();
+        to_Run.getInstance().add_To_Finished_Work(to_Run.getEPKNode());
+        for (EPK_Node n : Next_Elem) {
+        to_Run.getInstance().add_To_Scheduled_Work(n);
+        Instance_Workflow new_Instance = new Instance_Workflow(to_Run.getInstance(), event_Calendar.getRuntime(), n);
+        event_Calendar.Add_To_Upcoming_List(new_Instance, event_Calendar.getAct_runtimeDay());
+        if (Settings.getPrint_Only_Function() && n instanceof Function) {
+        //TODO Print Scheduled for n;
+        } else {
+        //TODO Print every Node Scheduled;
+        }
+        }
+        }
+        else if (check == DELAY) {
+        if (waiting_list.containsInstance(to_Run)) {
+        to_Run.getInstance().add_To_Scheduled_Work(to_Run.getEPKNode());
+        Instance_Workflow new_Instance = new Instance_Workflow(to_Run.getInstance(), event_Calendar.getRuntime().plusSeconds(1), to_Run.getEPKNode());
+        event_Calendar.Add_To_Upcoming_List(new_Instance, event_Calendar.getAct_runtimeDay());
+        } else {
+        LocalTime to_check = event_Calendar.getNextInstanceTime(to_Run);
+
+        if (to_check != null) {
+        int days = event_Calendar.getNextInstanceDay(to_Run);
+        if (days != -1) {
+        to_check.plusSeconds(1);
+        to_Run.getInstance().add_To_Scheduled_Work(to_Run.getEPKNode());
+        Instance_Workflow new_Instance = new Instance_Workflow(to_Run.getInstance(), to_check, to_Run.getEPKNode());
+        event_Calendar.Add_To_Upcoming_List(new_Instance, days);
+        }
+        }
+        }
+        } else {
+        //GATE NOT FULLFILLED; WAIT
+                            /*LocalTime Actualize = event_Calendar.getRuntime();
+                            Actualize.plusSeconds(1);
+                            Instance_Workflow new_Instance = new Instance_Workflow(to_Run.getInstance(), Actualize, to_Run.getEPKNode());
+                            event_Calendar.Add_To_Upcoming_List(new_Instance, event_Calendar.getAct_runtimeDay());*/
+/*
+        System.out.println("Clone killed Through Gate");
+        }
+        }
+        */

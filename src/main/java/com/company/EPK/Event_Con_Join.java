@@ -48,13 +48,117 @@ public class Event_Con_Join extends Connector implements Printable_Node {
 
         List<EPK_Node> finished_EPK_Nodes = instance.getInstance().getFinished_Work();
         List<EPK_Node> scheduled_EPK_Nodes = instance.getInstance().getScheduled_Work();
-        Integer Gate_Waiting_Ticket = instance.getGate_Waiting_Ticket();
+        List<Gate_Waiting_Instance> Instance_Waiting_List = instance.getWaiting_At_Gate();
+        List<Gate_Waiting_Instance> Waiting_Instance_At_This_Gate = new ArrayList<>();
+
+        for (Gate_Waiting_Instance Waiting_Instance : Waiting_Instance_List) {
+            if (Waiting_Instance.getFirst_Instance().equals(instance.getInstance())) {
+                Waiting_Instance_At_This_Gate.add(Waiting_Instance);
+            }
+        }
+        if (Waiting_Instance_At_This_Gate.isEmpty()) {
+            switch (getContype()) {
+                case LAZY_OR:
+                case LAZY_XOR: {
+                    Gate_Waiting_Instance new_Wait = new Gate_Waiting_Instance(instance, instance.getComing_From(), 0, this);
+                    instance.getWaiting_At_Gate().add(new_Wait);
+                    Waiting_Instance_List.add(new_Wait);
+                    return BLOCK;
+                }
+                case EAGER_OR: {
+                    Gate_Waiting_Instance new_Wait = new Gate_Waiting_Instance(instance, instance.getComing_From(), 0, this);
+                    instance.getWaiting_At_Gate().add(new_Wait);
+                    Waiting_Instance_List.add(new_Wait);
+                    if (possiblePreCondition(new_Wait)) {
+                        return DELAY;
+                    } else {
+                        Waiting_Instance_List.remove(new_Wait);
+                        instance.getWaiting_At_Gate().remove(new_Wait);
+                        if (new_Wait.getArrived().size() >= 1) {
+                            return ADVANCE;
+                        } else {
+                            return BLOCK;
+                        }
+                    }
+                }
+                case AND: {
+                    Gate_Waiting_Instance new_Wait = new Gate_Waiting_Instance(instance, instance.getComing_From(), 0, this);
+                    instance.getWaiting_At_Gate().add(new_Wait);
+                    Waiting_Instance_List.add(new_Wait);
+                    if (possiblePreCondition(new_Wait)) {
+                        return DELAY;
+                    } else {
+                        Waiting_Instance_List.remove(new_Wait);
+                        instance.getWaiting_At_Gate().remove(new_Wait);
+                        boolean check_AND_Cond = true;
+                        for (EPK_Node Prev_Cond : Previous_Elements) {
+                            if (!new_Wait.getArrived().contains(Prev_Cond)) {
+                                check_AND_Cond = false;
+                            }
+                        }
+                        if (check_AND_Cond) {
+                            return ADVANCE;
+                        } else {
+                            return BLOCK;
+                        }
+                    }
+                }
+                case EAGER_XOR:
+                    Gate_Waiting_Instance new_Wait = new Gate_Waiting_Instance(instance, instance.getComing_From(), 0, this);
+                    instance.getWaiting_At_Gate().add(new_Wait);
+                    Waiting_Instance_List.add(new_Wait);
+                    if (possiblePreCondition(new_Wait)) {
+                        return DELAY;
+                    } else {
+                        Waiting_Instance_List.remove(new_Wait);
+                        instance.getWaiting_At_Gate().remove(new_Wait);
+                        if (new_Wait.getArrived().size() == 1 && Previous_Elements.contains(new_Wait.getArrived().get(0))) {
+                            return ADVANCE;
+                        } else {
+                            return BLOCK;
+                        }
+                    }
+            }
+        } else {
+            boolean placed = false;
+            for (Gate_Waiting_Instance Waiting_instance : Waiting_Instance_At_This_Gate) {
+                if (!Waiting_instance.getArrived().contains(instance.getComing_From())) {
+                    placed = true;
+                    Waiting_instance.getArrived().add(instance.getComing_From());
+                    break;
+                }
+            }
+            if (!placed) {
+                Gate_Waiting_Instance new_Waiting_Instance = new Gate_Waiting_Instance(instance,
+                        instance.getComing_From(), Waiting_Instance_At_This_Gate.size() + 1, this);
+                instance.getWaiting_At_Gate().add(new_Waiting_Instance);
+                Instance_Waiting_List.add(new_Waiting_Instance);
+            }
+            switch (getContype()) {
+                case LAZY_OR:
+                case LAZY_XOR: {
+                    return BLOCK;
+                }
+                case EAGER_OR: {
+                    if (instance.getWaiting_At_Gate().isEmpty() || instance.getWaiting_At_Gate() == null) {
+
+                    } else {
+
+                    }
+                }
+                case EAGER_XOR:
+                case AND:
+            }
+        }
+
+
         Event_Instance Event = instance.getInstance();
         if (Gate_Waiting_Ticket != null) {
 
         } else {
             Gate_Waiting_Instance gate_Waiting_Instance = new Gate_Waiting_Instance();
-            gate_Waiting_Instance.setInstance_ID(Event.getCase_ID());
+            gate_Waiting_Instance.setFirst_Instance(instance.getInstance());
+            gate_Waiting_Instance.set
 
         }
 
@@ -183,6 +287,21 @@ public class Event_Con_Join extends Connector implements Printable_Node {
         }
     }
 
+    private boolean possiblePreCondition(Gate_Waiting_Instance instance) {
+        List<EPK_Node> Left_Elements = new ArrayList<>(Previous_Elements);
+        for (EPK_Node arrived : instance.getArrived()) {
+            Left_Elements.remove(arrived);
+        }
+        for (EPK_Node Node : Left_Elements) {
+            for (EPK_Node Scheduled : instance.getFirst_Instance().getInstance().getScheduled_Work()) {
+                if (Scheduled.getReachable_Elements().contains(Node)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     public void AddNode(EPK_Node to_wait_for) {
         if (this.getContype() == AND && !Mapped_Branch_Elements_AND.contains(to_wait_for)) {
             Mapped_Branch_Elements_AND.add(to_wait_for);
@@ -258,5 +377,6 @@ public class Event_Con_Join extends Connector implements Printable_Node {
                 return false;
         }
     }
+
 }
 
