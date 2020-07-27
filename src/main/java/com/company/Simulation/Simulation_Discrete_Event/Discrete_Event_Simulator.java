@@ -111,7 +111,7 @@ public class Discrete_Event_Simulator {
 
                         Gate_Check_Status check = ((Event_Con_Join) to_Run.getEPKNode()).check_Previous_Elem(to_Run);
                         if (check == BLOCK) {
-
+                            //Instanz wird gelöscht und nicht weiter behandelt
                         } else if (check == ADVANCE) {
                             List<EPK_Node> Next_Elem = to_Run.getEPKNode().getNext_Elem();
                             to_Run.getInstance().add_To_Finished_Work(to_Run.getEPKNode());
@@ -129,27 +129,24 @@ public class Discrete_Event_Simulator {
                             if (waiting_list.containsInstance(to_Run)) {
                                 to_Run.getInstance().add_To_Scheduled_Work(to_Run.getEPKNode());
                                 Instance_Workflow new_Instance = new Instance_Workflow(to_Run.getInstance(), event_Calendar.getRuntime().plusSeconds(1), to_Run.getEPKNode());
+                                new_Instance.setWaiting_At_Gate(to_Run.getWaiting_At_Gate());
                                 event_Calendar.Add_To_Upcoming_List(new_Instance, event_Calendar.getAct_runtimeDay());
                             } else {
                                 LocalTime to_check = event_Calendar.getNextInstanceTime(to_Run);
-
                                 if (to_check != null) {
                                     int days = event_Calendar.getNextInstanceDay(to_Run);
                                     if (days != -1) {
-                                        to_check.plusSeconds(1);
                                         to_Run.getInstance().add_To_Scheduled_Work(to_Run.getEPKNode());
-                                        Instance_Workflow new_Instance = new Instance_Workflow(to_Run.getInstance(), to_check, to_Run.getEPKNode());
+                                        Instance_Workflow new_Instance = new Instance_Workflow(to_Run.getInstance(), to_check.plusSeconds(1), to_Run.getEPKNode());
                                         event_Calendar.Add_To_Upcoming_List(new_Instance, days);
                                     }
                                 }
+                                if (to_check == null) {
+                                    System.out.println("Error at Gate " + to_Run.getEPKNode() + ", Instance was delayed but without Copy to wait for. DROPPED");
+                                }
                             }
                         } else {
-                            //GATE NOT FULLFILLED; WAIT
-                            /*LocalTime Actualize = event_Calendar.getRuntime();
-                            Actualize.plusSeconds(1);
-                            Instance_Workflow new_Instance = new Instance_Workflow(to_Run.getInstance(), Actualize, to_Run.getEPKNode());
-                            event_Calendar.Add_To_Upcoming_List(new_Instance, event_Calendar.getAct_runtimeDay());*/
-                            System.out.println("Clone killed Through Gate");
+                            System.out.println("Instancecopy killed at Gate, Check Error");
                         }
                     }
                     if (to_Run.getEPKNode() instanceof Activating_Function) {
@@ -244,10 +241,10 @@ public class Discrete_Event_Simulator {
             if (((Event_Con_Join) Gate).getContype() == Contype.LAZY_OR || ((Event_Con_Join) Gate).getContype() == Contype.LAZY_XOR) {
                 for (Gate_Waiting_Instance Instance : ((Event_Con_Join) Gate).getWaiting_Instance_List()) {
                     if (((Event_Con_Join) Gate).isCorrectLazyState(Instance)) {
-                        Event_Instance next_Step = Instance.getFirst_Instance();
+                        Instance_Workflow next_Step = Instance.getFirst_Instance();
                         for (EPK_Node n : Gate.getNext_Elem()) {
-                            next_Step.add_To_Scheduled_Work(n);
-                            Instance_Workflow to_Run = new Instance_Workflow(next_Step, event_Calendar.getRuntime().plusSeconds(1), n);
+                            next_Step.getInstance().add_To_Scheduled_Work(n);
+                            Instance_Workflow to_Run = new Instance_Workflow(next_Step.getInstance(), event_Calendar.getRuntime(), n);
                             event_Calendar.Add_To_Upcoming_List(to_Run, event_Calendar.getAct_runtimeDay());
                             pushed = true;
                         }
