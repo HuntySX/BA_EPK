@@ -69,6 +69,9 @@ public class Discrete_Event_Simulator {
                             for (EPK_Node n : Next_Elem) {
                                 to_Run.getInstance().add_To_Scheduled_Work(n);
                                 Instance_Workflow new_Instance = new Instance_Workflow(to_Run.getInstance(), event_Calendar.getRuntime(), n);
+                                if (n instanceof Event_Con_Join) {
+                                    new_Instance.setComing_From(to_Run.getEPKNode());
+                                }
                                 event_Calendar.Add_To_Upcoming_List(new_Instance, event_Calendar.getAct_runtimeDay());
                                 System.out.println("Event Finished: " + ((Event) to_Run.getEPKNode()).getEvent_Tag() + "for: " +
                                         to_Run.getInstance().getCase_ID() +
@@ -98,6 +101,9 @@ public class Discrete_Event_Simulator {
                         for (EPK_Node n : Next_Elem) {
                             to_Run.getInstance().add_To_Scheduled_Work(n);
                             Instance_Workflow new_Instance = new Instance_Workflow(to_Run.getInstance(), event_Calendar.getRuntime(), n);
+                            if (n instanceof Event_Con_Join) {
+                                new_Instance.setComing_From(to_Run.getEPKNode());
+                            }
                             event_Calendar.Add_To_Upcoming_List(new_Instance, event_Calendar.getAct_runtimeDay());
                             if (Settings.getPrint_Only_Function() && n instanceof Function) {
                                 //TODO Print Scheduled for n;
@@ -118,6 +124,9 @@ public class Discrete_Event_Simulator {
                             for (EPK_Node n : Next_Elem) {
                                 to_Run.getInstance().add_To_Scheduled_Work(n);
                                 Instance_Workflow new_Instance = new Instance_Workflow(to_Run.getInstance(), event_Calendar.getRuntime(), n);
+                                if (n instanceof Event_Con_Join) {
+                                    new_Instance.setComing_From(to_Run.getEPKNode());
+                                }
                                 event_Calendar.Add_To_Upcoming_List(new_Instance, event_Calendar.getAct_runtimeDay());
                                 if (Settings.getPrint_Only_Function() && n instanceof Function) {
                                     //TODO Print Scheduled for n;
@@ -138,6 +147,7 @@ public class Discrete_Event_Simulator {
                                     if (days != -1) {
                                         to_Run.getInstance().add_To_Scheduled_Work(to_Run.getEPKNode());
                                         Instance_Workflow new_Instance = new Instance_Workflow(to_Run.getInstance(), to_check.plusSeconds(1), to_Run.getEPKNode());
+                                        new_Instance.setWaiting_At_Gate(to_Run.getWaiting_At_Gate());
                                         event_Calendar.Add_To_Upcoming_List(new_Instance, days);
                                     }
                                 }
@@ -158,23 +168,31 @@ public class Discrete_Event_Simulator {
                                         && workflow.getWaiting_Ticket() == to_Run.getWaiting_Ticket()) {
                                     workflow.setIs_Waiting(true);
                                     event_Calendar.Add_To_Waiting_List(workflow);
+                                    System.out.println("Reactivating Instance: " + workflow.getInstance().getCase_ID());
                                     Activation_List.remove(workflow);
                                     break;
                                 }
                             }
                             to_Run.getInstance().add_To_Finished_Work(to_Run.getEPKNode());
                         } else {
-                            if (to_Run.getInstance() instanceof Event_Instance && to_Run.Is_Waiting()) {
+                            if (to_Run.getInstance() instanceof Event_Instance && !(to_Run.getInstance() instanceof Activating_Event_Instance) && to_Run.isWorking()) {
+                                DeactivateFunction(to_Run, event_Calendar.getAct_runtimeDay());
+
+                                System.out.println("Finishing Instance: " + to_Run.getInstance().getCase_ID());
+                            } else if (to_Run.getInstance() instanceof Event_Instance && !(to_Run.getInstance() instanceof Activating_Event_Instance) && to_Run.Is_Waiting()) {
                                 to_Run.setIs_Waiting(false);
                                 ActivateFunction(to_Run, event_Calendar.getAct_runtimeDay());
-                            } else if (to_Run.getInstance() instanceof Event_Instance && !to_Run.Is_Waiting()) {
+                                System.out.println("Starting Function for Instance after Instantiation: " + to_Run.getInstance().getCase_ID());
+                            } else if (to_Run.getInstance() instanceof Event_Instance && !(to_Run.getInstance() instanceof Activating_Event_Instance) && !to_Run.Is_Waiting()) {
 
                                 boolean decide = ((Activating_Function) to_Run.getEPKNode()).Decide();
                                 if (decide == true) {
                                     ActivateFunction(to_Run, event_Calendar.getAct_runtimeDay());
+                                    System.out.println("Starting Function for Instance without Instantiation: " + to_Run.getInstance().getCase_ID());
                                 } else {
                                     to_Run.setWaiting_Ticket(event_Calendar.getUnique_Waiting_Ticket_ID());
                                     ((Activating_Function) to_Run.getEPKNode()).Instantiate_Activation(to_Run);
+                                    System.out.println("Pausing Function for Instance with Instantiation: " + to_Run.getInstance().getCase_ID());
                                 }
                             }
                         }
@@ -238,16 +256,26 @@ public class Discrete_Event_Simulator {
     private boolean pushLazyGateInstances() {
         boolean pushed = false;
         for (EPK_Node Gate : EPK.getElements()) {
-            if (((Event_Con_Join) Gate).getContype() == Contype.LAZY_OR || ((Event_Con_Join) Gate).getContype() == Contype.LAZY_XOR) {
-                for (Gate_Waiting_Instance Instance : ((Event_Con_Join) Gate).getWaiting_Instance_List()) {
-                    if (((Event_Con_Join) Gate).isCorrectLazyState(Instance)) {
-                        Instance_Workflow next_Step = Instance.getFirst_Instance();
-                        for (EPK_Node n : Gate.getNext_Elem()) {
-                            next_Step.getInstance().add_To_Scheduled_Work(n);
-                            Instance_Workflow to_Run = new Instance_Workflow(next_Step.getInstance(), event_Calendar.getRuntime(), n);
-                            event_Calendar.Add_To_Upcoming_List(to_Run, event_Calendar.getAct_runtimeDay());
-                            pushed = true;
+            if (Gate instanceof Event_Con_Join) {
+                if (((Event_Con_Join) Gate).getContype() == Contype.LAZY_OR || ((Event_Con_Join) Gate).getContype() == Contype.LAZY_XOR) {
+                    List<Gate_Waiting_Instance> to_Remove = new ArrayList<>();
+                    for (Gate_Waiting_Instance Instance : ((Event_Con_Join) Gate).getWaiting_Instance_List()) {
+                        if (((Event_Con_Join) Gate).isCorrectLazyState(Instance)) {
+                            Instance_Workflow next_Step = Instance.getFirst_Instance();
+                            for (EPK_Node n : Gate.getNext_Elem()) {
+                                next_Step.getInstance().add_To_Scheduled_Work(n);
+                                Instance_Workflow new_Instance = new Instance_Workflow(next_Step.getInstance(), event_Calendar.getRuntime(), n);
+                                if (n instanceof Event_Con_Join) {
+                                    new_Instance.setComing_From(next_Step.getEPKNode());
+                                }
+                                event_Calendar.Add_To_Upcoming_List(new_Instance, event_Calendar.getAct_runtimeDay());
+                                pushed = true;
+                            }
+                            to_Remove.add(Instance);
                         }
+                    }
+                    if (!to_Remove.isEmpty()) {
+                        ((Event_Con_Join) Gate).getWaiting_Instance_List().removeAll(to_Remove);
                     }
                 }
             }
@@ -290,7 +318,11 @@ public class Discrete_Event_Simulator {
         //Instantiate new Workflow for each Element in GetNext_Elem
         for (EPK_Node n : Next_Elem) {
             to_Run.getInstance().add_To_Scheduled_Work(n);
+
             Instance_Workflow new_Instance = new Instance_Workflow(to_Run.getInstance(), event_Calendar.getRuntime(), n);
+            if (n instanceof Event_Con_Join) {
+                new_Instance.setComing_From(to_Run.getEPKNode());
+            }
             event_Calendar.Add_To_Upcoming_List(new_Instance, day);
 
             if (Settings.getPrint_Only_Function() && n instanceof Function) {

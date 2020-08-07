@@ -60,6 +60,7 @@ public class Instance_Workflow {
         return Waiting;
     }
 
+
     public void setIs_Waiting(boolean is_Waiting) {
         this.Waiting = is_Waiting;
     }
@@ -110,6 +111,10 @@ public class Instance_Workflow {
 
     public EPK_Node getComing_From() {
         return Coming_From;
+    }
+
+    public void setComing_From(EPK_Node coming_From) {
+        this.Coming_From = coming_From;
     }
 
     public void removeActiveUser(User u) {

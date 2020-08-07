@@ -30,7 +30,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
-import static com.company.Enums.Contype.AND;
 import static com.company.UI.UI_Button_Active_Type.*;
 
 
@@ -323,18 +322,8 @@ public class Borderpanecon implements Initializable {
                         EPK.getAll_Activating_Start_Events().remove(node);
                     }
                 } else if (node instanceof Event_Con_Join) {
-                    if (((Event_Con_Join) node).getContype() == AND) {
-                        ((Event_Con_Join) node).getMapped_Branch_Elements_AND().remove(Active_Elem.getEPKNode());
-                    } else {
-                        List<Nodemap> Mapped_Elems = ((Event_Con_Join) node).getMapped_Branch_Elements();
-                        List<Nodemap> Mark_For_deletion = new ArrayList<>();
-                        for (Nodemap map : Mapped_Elems) {
-                            if (map.contains(Active_Elem.getEPKNode())) {
-                                Mark_For_deletion.add(map);
-                            }
-                        }
-                        Mapped_Elems.removeAll(Mark_For_deletion);
-                    }
+                    ((Event_Con_Join) node).getPrevious_Elements().remove(Active_Elem.getEPKNode());
+
                 }
             }
 
@@ -515,43 +504,18 @@ public class Borderpanecon implements Initializable {
 
                     } else if (newNode instanceof Event_Con_Join) {
 
-                        if (((Event_Con_Join) newNode).getContype().equals(AND)) {
-                            List<EPK_Node> MappedElemsAND = ((Event_Con_Join) UI_Node).getMapped_Branch_Elements_AND();
-                            List<EPK_Node> newMap = new ArrayList<>();
-                            for (EPK_Node mapnode : MappedElemsAND) {
-                                for (EPK_Node Node : Final_List) {
-                                    if (Node.getID() == mapnode.getID()) {
-                                        newMap.add(Node);
-                                    }
+                        List<EPK_Node> MappedElems = ((Event_Con_Join) UI_Node).getPrevious_Elements();
+                        List<EPK_Node> newMap = new ArrayList<>();
+                        for (EPK_Node mapnode : MappedElems) {
+                            for (EPK_Node Node : Final_List) {
+                                if (Node.getID() == mapnode.getID()) {
+                                    newMap.add(Node);
                                 }
                             }
-                            if (!newMap.isEmpty()) {
-                                ((Event_Con_Join) newNode).setMapped_Branch_Elements_AND(newMap);
-                            }
-                        } else {
-                            List<Nodemap> MappedElems = ((Event_Con_Join) UI_Node).getMapped_Branch_Elements();
-                            List<Nodemap> newMaps = new ArrayList<>();
-                            for (Nodemap map : MappedElems) {
-                                EPK_Node End = map.getFinished_Elem();
-                                EPK_Node Start = map.getStarted_Elem();
-                                EPK_Node newEnd = null;
-                                EPK_Node newStart = null;
-                                for (EPK_Node Node : Final_List) {
-                                    if (End.getID() == Node.getID()) {
-                                        newEnd = Node;
-                                    } else if (Start.getID() == Node.getID()) {
-
-                                        newStart = Node;
-                                    }
-                                }
-                                if (newEnd != null && newStart != null) {
-                                    Nodemap newMap = new Nodemap(newStart, newEnd);
-                                    newMaps.add(newMap);
-                                }
-                            }
-                            ((Event_Con_Join) newNode).setMapped_Branch_Elements(newMaps);
                         }
-
+                            if (!newMap.isEmpty()) {
+                                ((Event_Con_Join) newNode).setPrevious_Elements(newMap);
+                            }
                     }
                 }
             }
@@ -673,36 +637,19 @@ public class Borderpanecon implements Initializable {
                     Print_Activating_Start_Event Ev = new Print_Activating_Start_Event(Node.getID(), Next_elems, ((Activating_Start_Event) Node).getEvent_Tag(), true, false, ((Activating_Start_Event) Node).getStart_event_type(), Activate_Function);
                     PrinterList.add(Ev);
                 } else if (Node instanceof Event_Con_Join) {
-                    List<Connected_Elem_Print> Mapped_Branched_Elements_AND = new ArrayList<>();
+                    List<Connected_Elem_Print> Previous_Elems = new ArrayList<>();
                     List<Connected_Node_Map_Print> Mapped_Branched_Elements = new ArrayList<>();
-                    for (Nodemap Map : ((Event_Con_Join) Node).getMapped_Branch_Elements()) {
-                        Connected_Elem_Print Start = null;
-                        Connected_Elem_Print End = null;
-                        Connected_Node_Map_Print Nodemap = null;
-                        if (Map.getStarted_Elem() instanceof Is_Tagged) {
-                            Start = new Connected_Elem_Print(Map.getStarted_Elem().getID(), ((Is_Tagged) Map.getStarted_Elem()).getTag());
-                        } else {
-                            Start = new Connected_Elem_Print(Map.getStarted_Elem().getID(), "Gate: " + Map.getStarted_Elem().getID());
-                        }
-                        if (Map.getFinished_Elem() instanceof Is_Tagged) {
-                            End = new Connected_Elem_Print(Map.getFinished_Elem().getID(), ((Is_Tagged) Map.getFinished_Elem()).getTag());
-                        } else {
-                            End = new Connected_Elem_Print(Map.getFinished_Elem().getID(), "Gate: " + Map.getFinished_Elem().getID());
-                        }
-                        Nodemap = new Connected_Node_Map_Print(Start, End);
-                        Mapped_Branched_Elements.add(Nodemap);
-                    }
-                    for (EPK_Node Mapped : ((Event_Con_Join) Node).getMapped_Branch_Elements_AND()) {
+                    for (EPK_Node Mapped : ((Event_Con_Join) Node).getPrevious_Elements()) {
                         Connected_Elem_Print mappedNode = null;
                         if (Mapped instanceof Is_Tagged) {
                             mappedNode = new Connected_Elem_Print(Mapped.getID(), ((Is_Tagged) Mapped).getTag());
                         } else {
                             mappedNode = new Connected_Elem_Print(Mapped.getID(), "Gate: " + Mapped.getID());
                         }
-                        Mapped_Branched_Elements_AND.add(mappedNode);
+                        Previous_Elems.add(mappedNode);
                     }
 
-                    Print_Event_Con_Join Ev = new Print_Event_Con_Join(Node.getID(), Next_elems, Mapped_Branched_Elements, Mapped_Branched_Elements_AND, ((Event_Con_Join) Node).getContype());
+                    Print_Event_Con_Join Ev = new Print_Event_Con_Join(Node.getID(), Next_elems, Mapped_Branched_Elements, Previous_Elems, ((Event_Con_Join) Node).getContype());
                     PrinterList.add(Ev);
                 } else if (Node instanceof Event_Con_Split) {
                     Print_Event_Con_Split Ev = new Print_Event_Con_Split(Node.getID(), Next_elems, ((Event_Con_Split) Node).getDecide_Type(), ((Event_Con_Split) Node).isIs_Event_Driven(), ((Event_Con_Split) Node).getContype());

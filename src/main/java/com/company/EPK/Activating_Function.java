@@ -165,4 +165,11 @@ public class Activating_Function extends Function implements Printable_Node, Is_
         return this;
     }
 
+    public Event_Calendar getCalendar() {
+        return calendar;
+    }
+
+    public void setCalendar(Event_Calendar calendar) {
+        this.calendar = calendar;
+    }
 }

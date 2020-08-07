@@ -34,16 +34,16 @@ public class Event_Con_Split extends Connector implements Printable_Node {
                 int count_Elem_Quantity = Next_Elem.size();
                 Random rand = new Random();
                 count_Elem_Quantity = rand.nextInt(count_Elem_Quantity);
-                if (count_Elem_Quantity == 0) {
+                //if (count_Elem_Quantity == 0) {
                     count_Elem_Quantity++;
-                }
+                //}
                 List<EPK_Node> working_On_EPK_Nodes = new ArrayList<>();
                 working_On_EPK_Nodes.addAll(getNext_Elem());
                 for (int i = count_Elem_Quantity; i > 0; i--) {
                     int count_Elem = working_On_EPK_Nodes.size();
                     count_Elem = rand.nextInt(count_Elem);
                     Result.add(working_On_EPK_Nodes.get(count_Elem));
-                    working_On_EPK_Nodes.remove(i);
+                    working_On_EPK_Nodes.remove(count_Elem);
                 }
             }
         } else if (Decide_Type == Split_Decide_Type.FULL) {

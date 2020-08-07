@@ -7,30 +7,17 @@ import com.company.Simulation.Simulation_Base.Data.Discrete_Data.Instance_Workfl
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.company.Enums.Contype.AND;
 import static com.company.Enums.Gate_Check_Status.*;
 
 public class Event_Con_Join extends Connector implements Printable_Node {
 
-    private List<Nodemap> Mapped_Branch_Elements;
-    private List<EPK_Node> Mapped_Branch_Elements_AND;
     private List<EPK_Node> Previous_Elements;
     private List<Gate_Waiting_Instance> Waiting_Instance_List;
 
     public Event_Con_Join(List<EPK_Node> Next_Elem, int ID, Contype contype) {
         super(Next_Elem, ID, contype);
-        Mapped_Branch_Elements = new ArrayList<>();
-        Mapped_Branch_Elements_AND = new ArrayList<>();
         Previous_Elements = new ArrayList<>();
         Waiting_Instance_List = new ArrayList<>();
-    }
-
-    public List<EPK_Node> getMapped_Branch_Elements_AND() {
-        return Mapped_Branch_Elements_AND;
-    }
-
-    public void setMapped_Branch_Elements_AND(List<EPK_Node> mapped_Branch_Elements_AND) {
-        Mapped_Branch_Elements_AND = mapped_Branch_Elements_AND;
     }
 
     public List<EPK_Node> getPrevious_Elements() {
@@ -48,7 +35,7 @@ public class Event_Con_Join extends Connector implements Printable_Node {
         List<Gate_Waiting_Instance> Waiting_Instance_At_This_Gate = new ArrayList<>();
 
         for (Gate_Waiting_Instance Waiting_Instance : Waiting_Instance_List) {
-            if (Waiting_Instance.getFirst_Instance().equals(instance.getInstance())) {
+            if (Waiting_Instance.getFirst_Instance().getInstance().equals(instance.getInstance())) {
                 Waiting_Instance_At_This_Gate.add(Waiting_Instance);
             }
         }
@@ -356,43 +343,14 @@ public class Event_Con_Join extends Connector implements Printable_Node {
         }
         for (EPK_Node Node : Left_Elements) {
             for (EPK_Node Scheduled : instance.getFirst_Instance().getInstance().getScheduled_Work()) {
-                if (Scheduled.getReachable_Elements().contains(Node)) {
+                if (Scheduled.getReachable_Elements().contains(Node) || Scheduled.equals(Node)) {
                     return true;
                 }
             }
+
         }
         return false;
     }
-
-    public void AddNode(EPK_Node to_wait_for) {
-        if (this.getContype() == AND && !Mapped_Branch_Elements_AND.contains(to_wait_for)) {
-            Mapped_Branch_Elements_AND.add(to_wait_for);
-        }
-    }
-
-    public void AddMap(EPK_Node start, EPK_Node end) {
-        boolean mapped = false;
-        for (Nodemap added_Node : Mapped_Branch_Elements) {
-            if (added_Node.containsboth(start, end)) {
-                mapped = true;
-                break;
-            }
-        }
-        if (!mapped) {
-            Nodemap to_Map = new Nodemap(start, end);
-            Mapped_Branch_Elements.add(to_Map);
-        }
-    }
-
-    public List<Nodemap> getMapped_Branch_Elements() {
-        return Mapped_Branch_Elements;
-    }
-
-    public void setMapped_Branch_Elements(List<Nodemap> mapped_Branch_Elements) {
-        Mapped_Branch_Elements = mapped_Branch_Elements;
-    }
-
-
 
     @Override
     public boolean CheckSettings() {

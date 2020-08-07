@@ -41,7 +41,7 @@ public class UI_AND_Join extends Event_Con_Join implements UI_Instantiable {
         this.EPK = EPK;
         this.UI_ID = new SimpleIntegerProperty(ID);
         this.prev_nodelist = EPK.getAll_Elems();
-        this.Chosen_Previous_List = getMapped_Branch_Elements_AND();
+        this.Chosen_Previous_List = getPrevious_Elements();
         UI_ID_FIELD = Field.ofIntegerType(UI_ID).label("ID").editable(false);
         this.nodelist = getNext_Elem();
         ID_TAG_UI = new FormRenderer(

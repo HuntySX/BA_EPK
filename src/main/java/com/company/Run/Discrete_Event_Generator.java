@@ -1,5 +1,6 @@
 package com.company.Run;
 
+import com.company.EPK.Activating_Function;
 import com.company.EPK.EPK;
 import com.company.EPK.EPK_Node;
 import com.company.Simulation.Simulation_Base.Data.Discrete_Data.Bib.Event_Decider;
@@ -93,7 +94,16 @@ public class Discrete_Event_Generator {
         for (EPK_Node n : EPK.getElements()) {
             System.out.println(n.ReachabletoString());
         }
+        giveCalToActivatings();
         Simulation.run();
+    }
+
+    private void giveCalToActivatings() {
+        for (EPK_Node Node : EPK.getElements()) {
+            if (Node instanceof Activating_Function) {
+                ((Activating_Function) Node).setCalendar(event_Calendar);
+            }
+        }
     }
 
     public EPK getEPK() {
