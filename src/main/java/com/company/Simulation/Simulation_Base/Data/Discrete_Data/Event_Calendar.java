@@ -26,6 +26,7 @@ public class Event_Calendar {
     private Discrete_Event_Generator Generator;
     private List<Instance_Workflow> Activation_List;
     private int Unique_Waiting_Ticket_ID;
+    private List<External_Event> External_Events;
 
     public Event_Calendar(Settings settings, EPK epk, Discrete_Event_Generator generator) {
 
@@ -42,6 +43,7 @@ public class Event_Calendar {
         Upcoming_List = new ArrayList<>();
         Activation_List = new ArrayList<>();
         Unique_Waiting_Ticket_ID = 0;
+        External_Events = new ArrayList<>();
         for (int i = 0; i < RuntimeDays; i++) {
             Simulation_Event_List Day_Upcoming_List = new Simulation_Event_List();
             Upcoming_List.add(Day_Upcoming_List);
@@ -201,8 +203,8 @@ public class Event_Calendar {
         this.finished_cycle = finished_cycle;
     }
 
-    public void instantiate_new_Activation_Event(Activating_Start_Event start, Activating_Function Func, int for_case_ID, int waiting_Ticket, Workingtime to_Start) {
-        Activating_Event_Instance activating_instance = new Activating_Event_Instance(Generator.get_Unique_case_ID(), Func, for_case_ID, waiting_Ticket);
+    public void instantiate_new_Activation_Event(Activating_Start_Event start, Activating_Function Func, Instance_Workflow for_Workflow, Workingtime to_Start) {
+        Activating_Event_Instance activating_instance = new Activating_Event_Instance(Generator.get_Unique_case_ID(), Func, for_Workflow);
         LocalTime StartTime = getRuntime();
 
         int lasting_Shifttime_in_Seconds = getEnd_Time().toSecondOfDay() - getRuntime().toSecondOfDay();
@@ -320,6 +322,14 @@ public class Event_Calendar {
             days++;
         }
         return -1;
+    }
+
+    public List<External_Event> getExternal_Events() {
+        return External_Events;
+    }
+
+    public void setExternal_Events(List<External_Event> external_Events) {
+        External_Events = external_Events;
     }
 }
 

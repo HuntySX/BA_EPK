@@ -5,12 +5,12 @@ import com.company.EPK.Activating_Function;
 public class Activating_Event_Instance extends Event_Instance {
 
     private Activating_Function End_Function;
-    private int for_case_ID;
+    private Instance_Workflow for_Workflow;
 
-    public Activating_Event_Instance(int case_ID, Activating_Function end_Function, int for_case_ID, int waiting_Ticket) {
+    public Activating_Event_Instance(int case_ID, Activating_Function end_Function, Instance_Workflow for_Workflow) {
         super(case_ID);
         End_Function = end_Function;
-        this.for_case_ID = for_case_ID;
+        this.for_Workflow = for_Workflow;
     }
 
     public Activating_Function getEnd_Function() {
@@ -21,11 +21,11 @@ public class Activating_Event_Instance extends Event_Instance {
         End_Function = end_Function;
     }
 
-    public int getFor_case_ID() {
-        return for_case_ID;
+    public Instance_Workflow getFor_case_ID() {
+        return for_Workflow;
     }
 
-    public void setFor_case_ID(int for_case_ID) {
-        this.for_case_ID = for_case_ID;
+    public void setFor_case_ID(Instance_Workflow for_Workflow) {
+        this.for_Workflow = for_Workflow;
     }
 }

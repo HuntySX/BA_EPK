@@ -45,4 +45,12 @@ public class Workingtime {
     public int get_Duration_to_Seconds() {
         return (this.Hours * 3600) + (this.Minutes * 60) + (this.Seconds);
     }
+
+    @Override
+    public String toString() {
+        return "[" + Hours +
+                ":" + Minutes +
+                ":" + Seconds +
+                ']';
+    }
 }

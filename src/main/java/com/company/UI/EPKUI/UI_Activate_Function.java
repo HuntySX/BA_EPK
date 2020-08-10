@@ -41,6 +41,7 @@ public class UI_Activate_Function extends Activating_Function implements UI_Inst
     private IntegerProperty Workingtime_Minutes = new SimpleIntegerProperty();
     private IntegerProperty Workingtime_Seconds = new SimpleIntegerProperty();
     private IntegerProperty UI_ID;
+    private IntegerProperty Chance;
     private IntegerProperty Order_Hours = new SimpleIntegerProperty();
     private IntegerProperty Order_Minutes = new SimpleIntegerProperty();
     private IntegerProperty Order_Seconds = new SimpleIntegerProperty();
@@ -54,12 +55,14 @@ public class UI_Activate_Function extends Activating_Function implements UI_Inst
     private IntegerField UI_ORDERTIME_MINUTES_FIELD;
     private IntegerField UI_ORDERTIME_SECONDS_FIELD;
     private IntegerField UI_RESOURCE_COUNT;
+    private IntegerField UI_CHANCE;
     private SingleSelectionField<Resource> UI_NEEDED_RESOURCES_FIELD;
     private SingleSelectionField<Workforce> UI_NEEDED_WORKFORCES_FIELD;
     private SingleSelectionField<EPK_Node> UI_NEXT_ELEMENTS;
     private FormRenderer RESOURCES_UI;
     private FormRenderer WORKFORCES_UI;
     private FormRenderer WORKINGTIME_UI;
+    private FormRenderer CHANCE_UI;
     private FormRenderer ID_TAG_UI;
     private FormRenderer NEXT_ELEMS_UI;
     private FormRenderer UI_DECIDE_ACTIVATION_TYPE;
@@ -71,7 +74,7 @@ public class UI_Activate_Function extends Activating_Function implements UI_Inst
     private Activating_Function self;
 
     public UI_Activate_Function(int ID, UI_EPK EPK, VBox Rightbox) {
-        super(null, null, null, null, ID, null, null, null);
+        super(null, null, 0, null, null, ID, null, null, null);
         self = this;
         this.Box = new VBox();
         this.Rightbox = Rightbox;
@@ -89,6 +92,8 @@ public class UI_Activate_Function extends Activating_Function implements UI_Inst
         this.tag = new SimpleStringProperty(ID_Build.toString());
         UI_ID_FIELD = Field.ofIntegerType(UI_ID).label("ID").editable(false);
         UI_TAG_FIELD = Field.ofStringType(tag).label("Knotenname:");
+        this.Chance = new SimpleIntegerProperty(getChance_for_instantiation());
+        UI_CHANCE = Field.ofIntegerType(Chance).label("Chance for Instantiation");
         this.nodelist = getNext_Elem();
 
         DECIDE_ACTIVATION_TYPE_FIELD = Field.ofSingleSelectionType(Activation_Types, 0).label("Entscheidungstyp")
@@ -103,12 +108,13 @@ public class UI_Activate_Function extends Activating_Function implements UI_Inst
         UI_WORKINGTIME_SECONDS_FIELD = Field.ofIntegerType(Workingtime_Seconds).label("Sekunden").placeholder("60").tooltip("Arbeitszeitsekunden");
         ID_TAG_UI = new FormRenderer(Form.of(Group.of(UI_ID_FIELD, UI_TAG_FIELD)));
         UI_DECIDE_ACTIVATION_TYPE = new FormRenderer(Form.of(Group.of(DECIDE_ACTIVATION_TYPE_FIELD)));
+        CHANCE_UI = new FormRenderer(Form.of(Group.of(UI_CHANCE)));
         ORDER_TIME_UI = new FormRenderer(Form.of(Group.of(UI_ORDERTIME_HOURS_FIELD, UI_ORDERTIME_MINUTES_FIELD, UI_ORDERTIME_SECONDS_FIELD)));
         WORKINGTIME_UI = new FormRenderer(Form.of(Group.of(UI_WORKINGTIME_HOURS_FIELD, UI_WORKINGTIME_MINUTES_FIELD, UI_WORKINGTIME_SECONDS_FIELD)));
     }
 
-    public UI_Activate_Function(String function_tag, Workingtime workingtime, Workingtime instantiate_Time, Function_Type type, int ID, Activating_Start_Event start_Event, Event_Calendar calendar, Decide_Activation_Type decision) {
-        super(function_tag, instantiate_Time, workingtime, type, ID, start_Event, calendar, decision);
+    public UI_Activate_Function(String function_tag, Workingtime workingtime, int chance_for_instantiation, Workingtime instantiate_Time, Function_Type type, int ID, Activating_Start_Event start_Event, Event_Calendar calendar, Decide_Activation_Type decision) {
+        super(function_tag, instantiate_Time, chance_for_instantiation, workingtime, type, ID, start_Event, calendar, decision);
     }
 
     @Override
@@ -163,9 +169,11 @@ public class UI_Activate_Function extends Activating_Function implements UI_Inst
             @Override
             public void handle(ActionEvent actionEvent) {
                 Chosen_Starter = ACTIVATING_EVENT_FIELD.getSelection();
-                if (Chosen_Starter != null) {
+
+                if (Chosen_Starter != null && UI_CHANCE.getValue() != getChance_for_instantiation()) {
                     Activating_Event_Label.setText("Ausgewähltes Start Event: " + Chosen_Starter.toString());
                     setStart_Event(Chosen_Starter);
+                    setChance_for_instantiation(UI_CHANCE.getValue());
                 }
             }
         });
@@ -312,6 +320,7 @@ public class UI_Activate_Function extends Activating_Function implements UI_Inst
         Box.getChildren().add(new Separator());
         Box.getChildren().add(Activating_Event_Label);
         Box.getChildren().add(UI_ACTIVATING_EVENT);
+        Box.getChildren().add(CHANCE_UI);
         Box.getChildren().add(Selection);
         Box.getChildren().add(new Separator());
         Box.getChildren().add(ORDER_TIME_UI);

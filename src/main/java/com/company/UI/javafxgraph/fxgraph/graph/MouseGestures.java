@@ -1,6 +1,7 @@
 package com.company.UI.javafxgraph.fxgraph.graph;
 
 import com.company.EPK.EPK_Node;
+import com.company.EPK.Event_Con_Split;
 import com.company.UI.Borderpanecon;
 import com.company.UI.EPKUI.UI_Instantiable;
 import com.company.UI.UI_Button_Active_Type;
@@ -41,8 +42,12 @@ public class MouseGestures {
                     if (model.getEPK().getActive_Elem() != null) {
                         model.getEPK().getActive_Elem().getEPKNode().add_Next_Elem(((UI_View_Gen) node).getEPKNode());
                         model.addEdge(model.getEPK().getActive_Elem().getCellId(), ((UI_View_Gen) node).getCellId());
+                        if (model.getEPK().getActive_Elem().getNodeView() instanceof Event_Con_Split) {
+                            ((Event_Con_Split) model.getEPK().getActive_Elem().getNodeView()).generateChance(((UI_View_Gen) node).getEPKNode());
+                        }
                         graph.endUpdate();
                         model.getEPK().setActive_Elem_For_Connection(null);
+
                         controller.setBtn_Type(NORMAL);
                     } else {
                         model.getEPK().setActive_Elem_For_Connection((UI_View_Gen) node);

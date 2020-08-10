@@ -10,18 +10,20 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import static com.company.Enums.Decide_Activation_Type.*;
+import static com.company.Enums.Decide_Activation_Type.CUSTOM;
+import static com.company.Enums.Decide_Activation_Type.RANDOM;
 
 public class Activating_Function extends Function implements Printable_Node, Is_Tagged {
 
     private Activating_Start_Event Start_Event;
     private Workingtime Instantiate_Time;
+    private int chance_for_instantiation;
     private int waiting_Ticket;
     private List<Instance_Workflow> Waiting_For_Activation_Instances;
     private Event_Calendar calendar;
     private Decide_Activation_Type DecisionType;
 
-    public Activating_Function(String function_tag, Workingtime instantiate_Time, Workingtime working_time, Function_Type type, int ID, Activating_Start_Event start_Event, Event_Calendar calendar, Decide_Activation_Type decision) {
+    public Activating_Function(String function_tag, Workingtime instantiate_Time, int chance_for_instantiation, Workingtime working_time, Function_Type type, int ID, Activating_Start_Event start_Event, Event_Calendar calendar, Decide_Activation_Type decision) {
         super(function_tag, type, ID, working_time);
         Start_Event = start_Event;
         if (instantiate_Time == null) {
@@ -29,6 +31,7 @@ public class Activating_Function extends Function implements Printable_Node, Is_
         } else {
             Instantiate_Time = instantiate_Time;
         }
+        this.chance_for_instantiation = chance_for_instantiation;
         this.Waiting_For_Activation_Instances = new ArrayList<>();
         this.calendar = calendar;
         this.DecisionType = decision;
@@ -38,8 +41,7 @@ public class Activating_Function extends Function implements Printable_Node, Is_
 
     public void Instantiate_Activation(Instance_Workflow instance) {
 
-        calendar.instantiate_new_Activation_Event(Start_Event, this, instance.getInstance().getCase_ID(),
-                instance.getWaiting_Ticket(), Instantiate_Time);
+        calendar.instantiate_new_Activation_Event(Start_Event, this, instance, Instantiate_Time);
         add_to_Waiting_For_Activation(instance);
     }
 
@@ -112,12 +114,12 @@ public class Activating_Function extends Function implements Printable_Node, Is_
             } else {
                 return false;
             }
-        } else if (DecisionType == NORMAL) {
-            return true;
-            //TODO NORMAL ACTIVATION DISTRIBUTION
-        } else if (DecisionType == EXPONENTIAL) {
-            return false;
-            //TODO NORMAL ACTIVATION DISTRIBUTION
+        } else if (DecisionType == CUSTOM) {
+            System.out.println("Chance: " + chance_for_instantiation);
+            Random rand = new Random();
+            int randomcheck = rand.nextInt(100);
+            randomcheck++;
+            return randomcheck <= chance_for_instantiation;
         }
         return false; //TODO Delete;
     }
@@ -171,5 +173,13 @@ public class Activating_Function extends Function implements Printable_Node, Is_
 
     public void setCalendar(Event_Calendar calendar) {
         this.calendar = calendar;
+    }
+
+    public int getChance_for_instantiation() {
+        return chance_for_instantiation;
+    }
+
+    public void setChance_for_instantiation(int chance_for_instantiation) {
+        this.chance_for_instantiation = chance_for_instantiation;
     }
 }

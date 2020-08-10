@@ -4,14 +4,11 @@ import com.company.EPK.Activating_Function;
 import com.company.EPK.EPK;
 import com.company.EPK.EPK_Node;
 import com.company.Simulation.Simulation_Base.Data.Discrete_Data.Bib.Event_Decider;
-import com.company.Simulation.Simulation_Base.Data.Discrete_Data.Event_Calendar;
-import com.company.Simulation.Simulation_Base.Data.Discrete_Data.Instance_Workflow;
+import com.company.Simulation.Simulation_Base.Data.Discrete_Data.*;
 import com.company.Simulation.Simulation_Base.Data.Discrete_Data.Loader.EPK_Loader;
 import com.company.Simulation.Simulation_Base.Data.Discrete_Data.Loader.Resource_Loader;
 import com.company.Simulation.Simulation_Base.Data.Discrete_Data.Loader.Settings_Loader;
 import com.company.Simulation.Simulation_Base.Data.Discrete_Data.Loader.User_Loader;
-import com.company.Simulation.Simulation_Base.Data.Discrete_Data.Resource;
-import com.company.Simulation.Simulation_Base.Data.Discrete_Data.Simulation_Event_List;
 import com.company.Simulation.Simulation_Base.Data.Printer_Gate;
 import com.company.Simulation.Simulation_Base.Data.Printer_Queue;
 import com.company.Simulation.Simulation_Base.Data.Shared_Data.Settings;
@@ -53,12 +50,13 @@ public class Discrete_Event_Generator {
         printer_Queue.setT(T);
     }
 
-    public Discrete_Event_Generator(EPK epk, Settings settings, List<User> Users, List<Resource> Resources) {
+    public Discrete_Event_Generator(EPK epk, Settings settings, List<User> Users, List<Resource> Resources, List<External_Event> external_events) {
         this.EPK = epk;
         this.Settings = settings;
         this.Users = Users;
         this.Resources = Resources;
         this.event_Calendar = new Event_Calendar(Settings, EPK, this);
+        this.event_Calendar.setExternal_Events(external_events);
         this.event_decider = new Event_Decider(Settings, Users, Resources, event_Calendar);
         this.Simulation = new Discrete_Event_Simulator(this);
         this.printer_Queue = new Printer_Queue();

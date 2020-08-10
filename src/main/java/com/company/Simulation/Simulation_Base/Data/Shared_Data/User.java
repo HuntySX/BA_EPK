@@ -12,6 +12,7 @@ public class User {
     private int p_ID;
     private List<Function> allowed_Processes;
     private boolean active;
+    private boolean disabled;
     private float efficiency;
     private List<Workforce> Workforces;
 
@@ -22,6 +23,7 @@ public class User {
         this.active = false;
         Workforces = new ArrayList<>();
         this.efficiency = efficiency;
+        disabled = false;
     }
 
     public User(String first_Name, String last_Name, int p_ID, List<Function> allowed_Processes) {
@@ -30,6 +32,7 @@ public class User {
         this.allowed_Processes = allowed_Processes;
         this.p_ID = p_ID;
         this.active = false;
+        disabled = false;
     }
 
     //TODO Set Get Workforce ( Add, Construct bla)
@@ -104,5 +107,13 @@ public class User {
         if (!to_Delete.isEmpty()) {
             Workforces.removeAll(to_Delete);
         }
+    }
+
+    public boolean isDisabled() {
+        return disabled;
+    }
+
+    public void setDisabled(boolean disabled) {
+        this.disabled = disabled;
     }
 }

@@ -52,7 +52,7 @@ public class Discrete_Event_Simulator {
         boolean pushed_new_Elements = false;
         while (!event_Calendar.isFinished_cycle()) {
             while (event_Calendar.getRuntime().isBefore(event_Calendar.getEnd_Time()) && !event_Calendar.isFinished_cycle()) {
-
+                event_Decider.updateWithExternalEvents();
                 List<Instance_Workflow> latest_Instances = new ArrayList<>();
                 Simulation_Event_List upcoming_Events = event_Calendar.get_Single_Upcoming_List(event_Calendar.getAct_runtimeDay());
                 Simulation_Waiting_List waiting_list = event_Calendar.getWaiting_List();
@@ -161,11 +161,10 @@ public class Discrete_Event_Simulator {
                     }
                     if (to_Run.getEPKNode() instanceof Activating_Function) {
                         if (to_Run.getInstance() instanceof Activating_Event_Instance && ((Activating_Event_Instance) to_Run.getInstance()).getEnd_Function() == to_Run.getEPKNode()) {
-                            int for_case_ID = ((Activating_Event_Instance) to_Run.getInstance()).getFor_case_ID();
+                            Instance_Workflow for_Workflow = ((Activating_Event_Instance) to_Run.getInstance()).getFor_case_ID();
                             List<Instance_Workflow> Activation_List = ((Activating_Function) to_Run.getEPKNode()).getWaiting_For_Activation_Instances();
                             for (Instance_Workflow workflow : Activation_List) {
-                                if (workflow.getInstance().getCase_ID() == for_case_ID
-                                        && workflow.getWaiting_Ticket() == to_Run.getWaiting_Ticket()) {
+                                if (workflow.equals(for_Workflow)) {
                                     workflow.setIs_Waiting(true);
                                     event_Calendar.Add_To_Waiting_List(workflow);
                                     System.out.println("Reactivating Instance: " + workflow.getInstance().getCase_ID());
@@ -186,11 +185,10 @@ public class Discrete_Event_Simulator {
                             } else if (to_Run.getInstance() instanceof Event_Instance && !(to_Run.getInstance() instanceof Activating_Event_Instance) && !to_Run.Is_Waiting()) {
 
                                 boolean decide = ((Activating_Function) to_Run.getEPKNode()).Decide();
-                                if (decide == true) {
+                                if (decide == false) {
                                     ActivateFunction(to_Run, event_Calendar.getAct_runtimeDay());
                                     System.out.println("Starting Function for Instance without Instantiation: " + to_Run.getInstance().getCase_ID());
                                 } else {
-                                    to_Run.setWaiting_Ticket(event_Calendar.getUnique_Waiting_Ticket_ID());
                                     ((Activating_Function) to_Run.getEPKNode()).Instantiate_Activation(to_Run);
                                     System.out.println("Pausing Function for Instance with Instantiation: " + to_Run.getInstance().getCase_ID());
                                 }

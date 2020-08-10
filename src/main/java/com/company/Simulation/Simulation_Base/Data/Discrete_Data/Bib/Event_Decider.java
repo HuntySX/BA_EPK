@@ -2,13 +2,12 @@ package com.company.Simulation.Simulation_Base.Data.Discrete_Data.Bib;
 
 import com.company.EPK.Function;
 import com.company.Enums.Option_Event_Choosing;
-import com.company.Simulation.Simulation_Base.Data.Discrete_Data.Event_Calendar;
-import com.company.Simulation.Simulation_Base.Data.Discrete_Data.Instance_Workflow;
-import com.company.Simulation.Simulation_Base.Data.Discrete_Data.Resource;
-import com.company.Simulation.Simulation_Base.Data.Discrete_Data.Simulation_Waiting_List;
+import com.company.Simulation.Simulation_Base.Data.Discrete_Data.*;
 import com.company.Simulation.Simulation_Base.Data.Shared_Data.Settings;
 import com.company.Simulation.Simulation_Base.Data.Shared_Data.User;
 
+import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.company.Enums.Option_Event_Choosing.*;
@@ -111,6 +110,58 @@ public class Event_Decider {
             return upcoming;
         } else {
             return null;
+        }
+    }
+
+    public void updateWithExternalEvents() {
+        LocalTime Runtime = calendar.getRuntime();
+        List<External_Event> External_Events = calendar.getExternal_Events();
+        {
+            List<External_Event> Mark_For_Deletion = new ArrayList<>();
+            for (External_Event external_event : External_Events) {
+                if (external_event.getTime().get_Duration_to_Seconds() <= Runtime.toSecondOfDay()) {
+                    handleExternalEvent(external_event);
+                    Mark_For_Deletion.add(external_event);
+                } else {
+                    break;
+                }
+            }
+            External_Events.removeAll(Mark_For_Deletion);
+
+        }
+    }
+
+    private void handleExternalEvent(External_Event external_event) {
+        if (external_event instanceof Resource_Activating_External_Event) {
+            for (Resource res : Resources) {
+                if (res.getID() == ((Resource_Activating_External_Event) external_event).getResource().getID()) {
+                    res.setCount(res.getCount() - ((Resource_Activating_External_Event) external_event).getResource().getCount());
+                    break;
+                }
+            }
+        } else if (external_event instanceof Resource_Deactivating_External_Event) {
+            for (Resource res : Resources) {
+                if (res.getID() == ((Resource_Activating_External_Event) external_event).getResource().getID()) {
+                    res.setCount(res.getCount() + ((Resource_Activating_External_Event) external_event).getResource().getCount());
+                    break;
+                }
+            }
+
+        } else if (external_event instanceof User_Activating_External_Event) {
+            for (User user : Users) {
+                if (user.getP_ID() == ((User_Activating_External_Event) external_event).getUser().getP_ID()) {
+                    user.setDisabled(true);
+                    break;
+                }
+            }
+        } else if (external_event instanceof User_Deactivating_External_Event) {
+
+            for (User user : Users) {
+                if (user.getP_ID() == ((User_Activating_External_Event) external_event).getUser().getP_ID()) {
+                    user.setDisabled(false);
+                    break;
+                }
+            }
         }
     }
 }

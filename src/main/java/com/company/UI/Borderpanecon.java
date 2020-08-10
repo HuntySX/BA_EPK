@@ -3,6 +3,7 @@ package com.company.UI;
 import com.company.EPK.*;
 import com.company.Print.EventDriven.*;
 import com.company.Run.Discrete_Event_Generator;
+import com.company.Simulation.Simulation_Base.Data.Discrete_Data.External_Event;
 import com.company.Simulation.Simulation_Base.Data.Discrete_Data.Resource;
 import com.company.Simulation.Simulation_Base.Data.Printer_Gate;
 import com.company.Simulation.Simulation_Base.Data.Printer_Queue;
@@ -362,6 +363,10 @@ public class Borderpanecon implements Initializable {
             settings.setPrint_Only_Function(UISettings.isPrint_Only_Function());
             settings.setGet_Only_Start_Finishable_Functions(UISettings.isOnly_Start_Finishable_Functions());
 
+            List<External_Event> external_events = new ArrayList<>();
+            UI_External_Event UI_External_Events = EPK.getUI_External_Events();
+            external_events.addAll(UI_External_Events.getList());
+
             //INSTANTIATE ALL UNITS
             for (Resource Res : UI_Resource) {
                 Resource newRes = new Resource(Res.getName(), Res.getCount(), Res.getID());
@@ -398,7 +403,7 @@ public class Borderpanecon implements Initializable {
                     //ACTIVATE FUNCTION/ NEXTELEMBINDING
                 } else if (Node instanceof Activating_Function) {
                     Activating_Function newActivatingFunction = new Activating_Function(((Function) Node).getFunction_tag(),
-                            ((Activating_Function) Node).getInstantiate_Time(), ((Function) Node).getWorkingTime(), ((Function) Node).getFunction_type(), Node.getID(),
+                            ((Activating_Function) Node).getInstantiate_Time(), ((Activating_Function) Node).getChance_for_instantiation(), ((Function) Node).getWorkingTime(), ((Function) Node).getFunction_type(), Node.getID(),
                             null, null, ((Activating_Function) Node).getDecisionType());
                     newActivatingFunction.setNeeded_Resources(((Activating_Function) Node).getNeeded_Resources());
                     Final_List.add(newActivatingFunction);
@@ -409,7 +414,7 @@ public class Borderpanecon implements Initializable {
                     //MAPPEDBRANCHEDELEMENTS Binding
                 } else if (Node instanceof Event_Con_Split) {
                     Event_Con_Split newCon_Split = new Event_Con_Split(null, Node.getID(),
-                            ((Event_Con_Split) Node).getContype(), ((Event_Con_Split) Node).getDecide_Type());
+                            ((Event_Con_Split) Node).getContype(), ((Event_Con_Split) Node).getDecide_Type(), ((Event_Con_Split) Node).getChances_List());
                     Final_List.add(newCon_Split);
                 } else if (Node instanceof Start_Event) {
                     Start_Event newStart = new Start_Event(((Start_Event) Node).getStart_event_type(), Node.getID(),
@@ -679,7 +684,7 @@ public class Borderpanecon implements Initializable {
             Final_settings.setStartEventType(settings.getStartEventType());
             EPK epk = new EPK(Final_List, Final_Start_Events);
 
-            Discrete_Event_Generator Generator = new Discrete_Event_Generator(epk, Final_settings, Final_User, Final_Resource);
+            Discrete_Event_Generator Generator = new Discrete_Event_Generator(epk, Final_settings, Final_User, Final_Resource, external_Events);
             Generator.run();
 
         }

@@ -2,18 +2,21 @@ package com.company.UI.EPKUI;
 
 import com.company.EPK.EPK_Node;
 import com.company.EPK.Event_Con_Split;
+import com.company.EPK.Split_Node_Chances;
 import com.company.Enums.Contype;
 import com.company.Enums.Split_Decide_Type;
 import com.dlsc.formsfx.model.structure.*;
 import com.dlsc.formsfx.view.renderer.FormRenderer;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Button;
 import javafx.scene.control.Separator;
 import javafx.scene.layout.VBox;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.company.Enums.Split_Decide_Type.SINGLE_RANDOM;
@@ -32,6 +35,7 @@ public class UI_XOR_Split extends Event_Con_Split implements UI_Instantiable {
     private FormRenderer ID_UI;
     private FormRenderer NEXT_ELEMS_UI;
     private FormRenderer DECIDE_UI;
+    private List<UI_Split_Node_Chances> UI_Chance_List;
 
     public UI_XOR_Split(int ID, UI_EPK EPK, VBox Rightbox) {
 
@@ -90,7 +94,44 @@ public class UI_XOR_Split extends Event_Con_Split implements UI_Instantiable {
         });
         Box.getChildren().add(btn);
         Box.getChildren().add(new Separator());
+        UI_Chance_List = new ArrayList<>();
+        CleanupChances();
+        if (!getChances_List().isEmpty()) {
+            for (EPK_Node n : nodelist) {
+
+                boolean found = false;
+                for (Split_Node_Chances Chance : getChances_List()) {
+                    if (Chance.getNode().equals(n)) {
+                        SimpleStringProperty Node_Name = new SimpleStringProperty(n.toString());
+                        StringField Node_Name_Field = Field.ofStringType(Node_Name).label("Node").editable(false);
+                        IntegerProperty Chanceproperty = new SimpleIntegerProperty(Chance.getChance());
+                        IntegerField Chancefield = Field.ofIntegerType(Chanceproperty).label("Chance").editable(true);
+                        UI_Chance_List.add(new UI_Split_Node_Chances(Chance, Chanceproperty, Chancefield, Node_Name, Node_Name_Field));
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    Split_Node_Chances new_Chance = new Split_Node_Chances(n, 0);
+                    SimpleStringProperty Node_Name = new SimpleStringProperty(n.toString());
+                    StringField Node_Name_Field = Field.ofStringType(Node_Name).label("Node").editable(false);
+                    IntegerProperty Chanceproperty = new SimpleIntegerProperty(new_Chance.getChance());
+                    IntegerField Chancefield = Field.ofIntegerType(Chanceproperty).label("Chance").editable(true);
+                    UI_Chance_List.add(new UI_Split_Node_Chances(new_Chance, Chanceproperty, Chancefield, Node_Name, Node_Name_Field));
+
+                }
+            }
+        }
+
+        Box.getChildren().add(new Separator());
         Box.getChildren().add(DECIDE_UI);
+
+        for (UI_Split_Node_Chances to_Render_Chance : UI_Chance_List) {
+            FormRenderer to_Render = new FormRenderer(Form.of(Group.of(to_Render_Chance.getNamefield(), to_Render_Chance.getChancefield())));
+            Box.getChildren().add(to_Render);
+        }
+
+        Box.getChildren().add(new Separator());
         return Box;
     }
 

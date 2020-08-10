@@ -47,6 +47,7 @@ public class UI_EPK {
     private int UniqueResourceID;
     private int UniqueWorkforceID;
     private UI_Settings UI_Settings;
+    private UI_External_Event UI_External_Event;
 
     public UI_EPK(Model model, Graph graph) {
         this.model = model;
@@ -137,9 +138,8 @@ public class UI_EPK {
 
     public List<Decide_Activation_Type> getDecide_Activation_Types() {
         List<Decide_Activation_Type> List = new ArrayList<>();
-        List.addAll(Arrays.asList(com.company.Enums.Decide_Activation_Type.NORMAL,
-                com.company.Enums.Decide_Activation_Type.RANDOM,
-                com.company.Enums.Decide_Activation_Type.EXPONENTIAL));
+        List.addAll(Arrays.asList(com.company.Enums.Decide_Activation_Type.CUSTOM,
+                com.company.Enums.Decide_Activation_Type.RANDOM));
         return List;
     }
 
@@ -222,8 +222,7 @@ public class UI_EPK {
         List<Split_Decide_Type> List = new ArrayList<>();
         List.add(Split_Decide_Type.SINGLE_RANDOM);
         List.add(Split_Decide_Type.FULL_RANDOM);
-        List.add(Split_Decide_Type.NORMAL);
-        List.add(Split_Decide_Type.EXPONENTIAL);
+        List.add(Split_Decide_Type.CUSTOM);
         List.add(Split_Decide_Type.FULL);
         return List;
     }
@@ -268,5 +267,9 @@ public class UI_EPK {
     public void activate() {
         Box.getChildren().clear();
         Box = (((UI_Instantiable) getActive_Elem().getEPKNode()).Get_UI());
+    }
+
+    public UI_External_Event getUI_External_Events() {
+        return UI_External_Event;
     }
 }

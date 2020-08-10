@@ -74,6 +74,7 @@ public class UI_OR_Join extends Event_Con_Join implements UI_Instantiable {
 
     @Override
     public VBox Get_UI() {
+        prev_nodelist = EPK.getAll_Elems();
         Box.getChildren().clear();
         Box.getChildren().add(ID_TAG_UI);
         Box.getChildren().add(new Separator());
