@@ -2,11 +2,12 @@ package com.company.UI.EPKUI;
 
 import com.company.EPK.Workforce;
 import com.company.Enums.Option_Event_Choosing;
-import com.company.Simulation.Simulation_Base.Data.Discrete_Data.External_Event;
-import com.company.Simulation.Simulation_Base.Data.Discrete_Data.Resource;
+import com.company.Simulation.Simulation_Base.Data.Discrete_Data.*;
 import com.company.Simulation.Simulation_Base.Data.Shared_Data.User;
 import com.dlsc.formsfx.model.structure.*;
 import com.dlsc.formsfx.view.renderer.FormRenderer;
+import javafx.beans.property.ListProperty;
+import javafx.beans.property.SimpleListProperty;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -32,8 +33,9 @@ public class UI_EXTERNAL_EVENT_MANAGER implements Initializable {
     @FXML
     VBox Choosebox;
     @FXML
-    VBox Editbox;
-
+    VBox EditResourceBox;
+    @FXML
+    VBox EditUserBox;
 
     private UI_EPK EPK;
     private Stage Mainstage;
@@ -55,10 +57,14 @@ public class UI_EXTERNAL_EVENT_MANAGER implements Initializable {
     private FormRenderer Endingtime;
     private FormRenderer RunningDays;
     private FormRenderer Choose_UI;
+    private Integer chosenDay;
+    private External_Event EditableExternalEvent;
+    private UI_External_Event_Manager_Status UI_Status;
 
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        chosenDay = 0;
     }
 
     public void setEPK(UI_EPK EPK) {
@@ -73,13 +79,18 @@ public class UI_EXTERNAL_EVENT_MANAGER implements Initializable {
         this_stage = stage;
     }
 
+    public UI_External_Event_Manager_Status getUI_Status() {
+        return UI_Status;
+    }
+
+    public void setUI_Status(UI_External_Event_Manager_Status UI_Status) {
+        this.UI_Status = UI_Status;
+    }
+
     public void generateUI() {
 
         Choosebox.getChildren().clear();
-        External_Events_by_Day = EPK.getExternal_Events_by_Day();
-        Users = EPK.getAll_Users();
-        Workforces = EPK.getAll_Workforces();
-        Resources = EPK.getAll_Resources();
+        InstantiateStandartUI();
         generateShowUI();
         Label label = new Label("Choose User: ");
         SingleSelectionField<User> UI_USERS = Field.ofSingleSelectionType(Users).label("User");
@@ -103,6 +114,106 @@ public class UI_EXTERNAL_EVENT_MANAGER implements Initializable {
         bar.getButtons().add(button1);
         bar.getButtons().add(button2);
         Choosebox.getChildren().add(bar);
+    }
+
+    private void InstantiateStandartUI() {
+        Choosebox.getChildren().clear();
+        EditResourceBox.getChildren().clear();
+        EditUserBox.getChildren().clear();
+        Integer countday = EPK.getExternal_Events_by_Day().size() - 1;
+        External_Events_by_Day = EPK.getExternal_Events_by_Day();
+        Users = EPK.getAll_Users();
+        Resources = EPK.getAll_Resources();
+
+        List<External_Event_Activation_Property> User_Activation_Status = new ArrayList<>();
+        User_Activation_Status.add(External_Event_Activation_Property.Activate);
+        User_Activation_Status.add(External_Event_Activation_Property.Deactivate);
+
+        SingleSelectionField UserActivation = Field.ofSingleSelectionType(User_Activation_Status);
+
+        SingleSelectionField Userslist = Field.ofSingleSelectionType(Users).editable(false);
+        IntegerField UserHour = Field.ofIntegerType(0).editable(false);
+        IntegerField UserMinute = Field.ofIntegerType(0).editable(false);
+        IntegerField UserSecond = Field.ofIntegerType(0).editable(false);
+
+
+        List<External_Event_Activation_Property> Resource_Activation_Status = new ArrayList<>();
+        Resource_Activation_Status.add(External_Event_Activation_Property.Increase);
+        Resource_Activation_Status.add(External_Event_Activation_Property.Decrease);
+        SingleSelectionField ResourceActivation = Field.ofSingleSelectionType(Resource_Activation_Status).editable(false);
+
+        SingleSelectionField Resourcelist = Field.ofSingleSelectionType(Resources).editable(false);
+        IntegerField ResHour = Field.ofIntegerType(0);
+        IntegerField ResMinute = Field.ofIntegerType(0);
+        IntegerField ResSecond = Field.ofIntegerType(0);
+
+        ListProperty<Integer> ChooseDayProperty = new SimpleListProperty<>();
+        for (int i = 0; i <= countday; i++) {
+            ChooseDayProperty.add(i);
+        }
+
+        SingleSelectionField<Integer> DayField = Field.ofSingleSelectionType(ChooseDayProperty, chosenDay);
+        ButtonBar ChooseDayBar = new ButtonBar();
+        Button ChooseDayBtn = new Button();
+        ChooseDayBtn.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                if (!chosenDay.equals(DayField.getSelection())) {
+                    chosenDay = DayField.getSelection();
+                    InstantiateStandartUI();
+                }
+            }
+        });
+        ChooseDayBar.getButtons().add(ChooseDayBtn);
+        SingleSelectionField<External_Event> Chosefield = Field.ofSingleSelectionType(External_Events_by_Day.get(chosenDay));
+        Button EditChosenExternalEventBtn = new Button();
+        EditChosenExternalEventBtn.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                External_Event Chosen = Chosefield.getSelection();
+                if (Chosen instanceof Resource_Activating_External_Event || Chosen instanceof Resource_Deactivating_External_Event) {
+                    UI_Status = UI_External_Event_Manager_Status.EditResource;
+                    EditableExternalEvent = Chosen;
+                } else if (Chosen instanceof User_Activating_External_Event || Chosen instanceof User_Deactivating_External_Event) {
+                    UI_Status = UI_External_Event_Manager_Status.EditUser;
+                    EditableExternalEvent = Chosen;
+                }
+                if (Chosen != null) {
+                    InstantiateStandartUI();
+                }
+            }
+        });
+        Button NewResourceEvent = new Button();
+        NewResourceEvent.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                UI_Status = UI_External_Event_Manager_Status.NewResource;
+                EditableExternalEvent = null;
+                InstantiateStandartUI();
+            }
+        });
+        Button NewUserEvent = new Button();
+        NewUserEvent.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                UI_Status = UI_External_Event_Manager_Status.NewUser;
+                EditableExternalEvent = null;
+                InstantiateStandartUI();
+            }
+        });
+        ButtonBar ActionBar = new ButtonBar();
+
+        if (UI_Status == UI_External_Event_Manager_Status.Standard) {
+
+        } else if (UI_Status == UI_External_Event_Manager_Status.NewUser) {
+
+        } else if (UI_Status == UI_External_Event_Manager_Status.NewResource) {
+
+        } else if (UI_Status == UI_External_Event_Manager_Status.EditUser) {
+
+        } else if (UI_Status == UI_External_Event_Manager_Status.EditResource) {
+
+        }
     }
 
     private void showNewUserUI() {
