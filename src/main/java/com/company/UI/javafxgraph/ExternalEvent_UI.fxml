@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+<BorderPane xmlns:fx="http://javafx.com/fxml/1" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
+            minWidth="-Infinity" prefHeight="500.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.111"
+            fx:controller="com.company.UI.EPKUI.UI_EXTERNAL_EVENT_MANAGER">
+    <top>
+        <VBox maxHeight="65.0" maxWidth="800.0" minHeight="65.0" minWidth="800.0" prefHeight="65.0" prefWidth="800.0"
+              BorderPane.alignment="CENTER">
+            <children>
+                <TextArea editable="false" maxHeight="55.0" maxWidth="790.0" minHeight="55.0" minWidth="790.0"
+                          prefHeight="55.0" prefWidth="790.0"
+                          text="This window provides a management tool for Users participating in the EPC Simulation.&#10;Please remember, you first need to instantiate new permissions. After that, new users can be instantiated and&#10;receive afformentioned permissions to work on the EPC functions."
+                          wrapText="true">
+                    <VBox.margin>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                    </VBox.margin>
+                    <font>
+                        <Font name="Arial" size="12.0"/>
+                    </font>
+                </TextArea>
+            </children>
+        </VBox>
+    </top>
+    <left>
+        <VBox maxHeight="380.0" maxWidth="290.0" minHeight="380.0" minWidth="290.0" prefHeight="380.0" prefWidth="290.0"
+              BorderPane.alignment="CENTER">
+            <children>
+                <VBox fx:id="Choosebox" maxHeight="150.0" maxWidth="290.0" minHeight="150.0" minWidth="290.0"
+                      prefHeight="150.0" prefWidth="290.0">
+                    <VBox.margin>
+                        <Insets/>
+                    </VBox.margin>
+                </VBox>
+                <Separator maxWidth="290.0" minWidth="290.0" prefWidth="290.0"/>
+                <VBox fx:id="Showbox" maxHeight="230.0" maxWidth="290.0" minHeight="230.0" minWidth="290.0"
+                      prefHeight="230.0" prefWidth="290.0"/>
+            </children>
+            <BorderPane.margin>
+                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+            </BorderPane.margin>
+        </VBox>
+    </left>
+    <right>
+        <VBox fx:id="Editbox" maxWidth="490.0" minWidth="490.0" prefHeight="200.0" prefWidth="490.0"
+              BorderPane.alignment="CENTER">
+            <BorderPane.margin>
+                <Insets top="5.0"/>
+            </BorderPane.margin>
+        </VBox>
+    </right>
+    <center>
+        <Separator orientation="VERTICAL" prefHeight="200.0" BorderPane.alignment="CENTER"/>
+    </center>
+    <bottom>
+        <VBox maxHeight="35.0" maxWidth="790.0" minHeight="35.0" minWidth="790.0" prefHeight="35.0" prefWidth="790.0"
+              BorderPane.alignment="CENTER">
+            <children>
+                <Separator prefWidth="200.0"/>
+                <ButtonBar maxHeight="35.0" maxWidth="790.0" minHeight="35.0" minWidth="790.0" prefHeight="35.0"
+                           prefWidth="790.0">
+                    <buttons>
+                        <Button fx:id="OK_Button" mnemonicParsing="false" onAction="#actionPerformed" text="OK"/>
+                    </buttons>
+                </ButtonBar>
+            </children>
+            <BorderPane.margin>
+                <Insets right="5.0" top="5.0"/>
+            </BorderPane.margin>
+        </VBox>
+    </bottom>
+</BorderPane>

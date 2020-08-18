@@ -6,8 +6,8 @@ public class User_Activating_External_Event extends External_Event {
 
     private User user;
 
-    public User_Activating_External_Event(Workingtime time, User user) {
-        super(time);
+    public User_Activating_External_Event(Workingtime time, int day, User user, int EEV_ID) {
+        super(time, day, EEV_ID);
         this.user = user;
     }
 

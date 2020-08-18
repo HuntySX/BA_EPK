@@ -51,7 +51,10 @@
                                         <Button fx:id="WorkforcesMan" mnemonicParsing="false"
                                                 onAction="#actionPerformed" text="Workforces"/>
                                         <Button fx:id="SimulationMan" mnemonicParsing="false"
-                                                onAction="#actionPerformed" text="Simulation settings"/>
+                                                onAction="#actionPerformed" text="Simulation Settings"/>
+                                        <Button fx:id="ExternalMan" layoutX="406.0" layoutY="10.0"
+                                                mnemonicParsing="false" onAction="#actionPerformed"
+                                                text="External Events"/>
                                     </buttons>
                                 </ButtonBar>
                             </items>

@@ -6,6 +6,7 @@ import com.company.Enums.Decide_Activation_Type;
 import com.company.Enums.Option_Event_Choosing;
 import com.company.Enums.Split_Decide_Type;
 import com.company.Enums.Start_Event_Type;
+import com.company.Simulation.Simulation_Base.Data.Discrete_Data.External_Event;
 import com.company.Simulation.Simulation_Base.Data.Discrete_Data.Resource;
 import com.company.Simulation.Simulation_Base.Data.Shared_Data.User;
 import com.company.UI.javafxgraph.fxgraph.cells.UI_View_Gen;
@@ -40,14 +41,16 @@ public class UI_EPK {
     private List<Resource> All_Resources;
     private List<Workforce> All_Workforces;
     private List<User> All_Users;
+    private List<List<External_Event>> External_Events_by_Day;
     private Model model;
     private VBox Box;
     private Graph graph;
     private int UniqueUserID;
     private int UniqueResourceID;
     private int UniqueWorkforceID;
+    private int UniqueExternalEventID;
     private UI_Settings UI_Settings;
-    private UI_External_Event UI_External_Event;
+    private UI_EXTERNAL_EVENT_MANAGER UI_EXTERNAL_EVENT_MANAGER;
 
     public UI_EPK(Model model, Graph graph) {
         this.model = model;
@@ -59,6 +62,9 @@ public class UI_EPK {
         Activating_Start_Events = new ArrayList<>();
         Activate_Functions = new ArrayList<>();
         Functions = new ArrayList<>();
+        External_Events_by_Day = new ArrayList<>();
+        List<External_Event> Events_Day_0 = new ArrayList<>();
+        External_Events_by_Day.add(Events_Day_0);
         this.XOR_Splits = new ArrayList<>();
         this.OR_Splits = new ArrayList<>();
         this.AND_Splits = new ArrayList<>();
@@ -77,6 +83,7 @@ public class UI_EPK {
         this.UniqueUserID = 1;
         this.UniqueResourceID = 1;
         this.UniqueWorkforceID = 1;
+        this.UniqueExternalEventID = 1;
         this.UI_Settings = new UI_Settings();
     }
 
@@ -211,6 +218,14 @@ public class UI_EPK {
         return graph;
     }
 
+    public List<List<External_Event>> getExternal_Events_by_Day() {
+        return External_Events_by_Day;
+    }
+
+    public void setExternal_Events_by_Day(List<List<External_Event>> external_Events_by_Day) {
+        External_Events_by_Day = external_Events_by_Day;
+    }
+
     public List<UI_Con_Type> get_UI_Con_Type() {
         List<UI_Con_Type> List = new ArrayList<>();
         List.add(UI_Con_Type.EAGER);
@@ -245,6 +260,12 @@ public class UI_EPK {
         return id;
     }
 
+    public int getUniqueExternalEventID() {
+        int id = UniqueExternalEventID;
+        UniqueExternalEventID++;
+        return id;
+    }
+
     public com.company.UI.EPKUI.UI_Settings getUI_Settings() {
         return UI_Settings;
     }
@@ -269,7 +290,27 @@ public class UI_EPK {
         Box = (((UI_Instantiable) getActive_Elem().getEPKNode()).Get_UI());
     }
 
-    public UI_External_Event getUI_External_Events() {
-        return UI_External_Event;
+    public UI_EXTERNAL_EVENT_MANAGER getUI_External_Events() {
+        return UI_EXTERNAL_EVENT_MANAGER;
+    }
+
+    public void deleteEE_List_for_days(Integer value) {
+        while (value > 0) {
+            if (External_Events_by_Day.isEmpty()) {
+                break;
+            }
+            List<External_Event> pointer = null;
+            for (List<External_Event> to_Point : External_Events_by_Day) {
+                pointer = to_Point;
+            }
+            if (pointer != null) {
+                External_Events_by_Day.remove(pointer);
+            }
+            value--;
+        }
+    }
+
+    public void addNewDayForExternalEvent(List<External_Event> new_event_list) {
+        External_Events_by_Day.add((new_event_list));
     }
 }

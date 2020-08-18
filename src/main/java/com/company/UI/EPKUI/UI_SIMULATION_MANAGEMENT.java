@@ -1,18 +1,24 @@
 package com.company.UI.EPKUI;
 
 import com.company.Enums.Option_Event_Choosing;
+import com.company.Simulation.Simulation_Base.Data.Discrete_Data.External_Event;
 import com.dlsc.formsfx.model.structure.*;
 import com.dlsc.formsfx.view.renderer.FormRenderer;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.net.URL;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 import static com.company.Enums.Option_Event_Choosing.*;
@@ -154,16 +160,38 @@ public class UI_SIMULATION_MANAGEMENT implements Initializable {
 
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == OK_Button) {
-            settings.setOnly_Start_Finishable_Functions(Only_Start_Finishable_Functions.getValue());
-            settings.setBeginTime(LocalTime.of
-                    (BeginTimeHour.getValue(), BeginTimeMinute.getValue(), BeginTimeSecond.getValue()));
-            settings.setEndTime(LocalTime.of
-                    (EndTimeHour.getValue(), EndTimeMinute.getValue(), EndTimeSecond.getValue()));
-            settings.setDecide_Event_choosing(Event_Choosing.getSelection());
-            settings.setMax_RuntimeDays(RuntimeDays.getValue());
-            settings.setPrint_Only_Function(Print_Only_Functions.getValue());
-            settings.setOptimal_User_Layout(Optimal_User_Layout.getValue());
-            this_stage.close();
+            if (RuntimeDays.getValue() <= 0) {
+                Alert alert = new Alert(AlertType.WARNING);
+                alert.setTitle("Warning");
+                alert.setHeaderText("Wrong number of runtimedays selected");
+                alert.setContentText("You need to choose a higher number of runtimedays.");
+                alert.showAndWait();
+            } else {
+                if (RuntimeDays.getValue() < settings.getMax_RuntimeDays()) {
+                    Alert alert = new Alert(AlertType.CONFIRMATION);
+                    alert.setTitle("Warning");
+                    alert.setHeaderText("External Event Deletion Message");
+                    alert.setContentText("Decremting the count of Runtimedays will Result in deleting possible added External Events for those Days." +
+                            "Are you Sure to go on?");
+
+                    Optional<ButtonType> result = alert.showAndWait();
+                    if (result.get() == ButtonType.OK) {
+                        EPK.deleteEE_List_for_days(settings.getMax_RuntimeDays() - RuntimeDays.getValue());
+                        Save_Settings();
+
+                    } else {
+                        //do nothing, simply cancel;
+                    }
+                } else {
+                    if (RuntimeDays.getValue() > settings.getMax_RuntimeDays()) {
+                        List<External_Event> new_Event_list = new ArrayList<>();
+                        for (int i = settings.getMax_RuntimeDays(); i < RuntimeDays.getValue(); i++) {
+                            EPK.addNewDayForExternalEvent(new_Event_list);
+                        }
+                    }
+                    Save_Settings();
+                }
+            }
         } else if (e.getSource() == CANCEL_Button) {
             settings.setEndTime(saveForCancel.getEndTime());
             settings.setBeginTime(saveForCancel.getBeginTime());
@@ -174,6 +202,20 @@ public class UI_SIMULATION_MANAGEMENT implements Initializable {
             settings.setOptimal_User_Layout(saveForCancel.isOptimal_User_Layout());
             this_stage.close();
         }
+    }
+
+    private void Save_Settings() {
+        settings.setOnly_Start_Finishable_Functions(Only_Start_Finishable_Functions.getValue());
+        settings.setBeginTime(LocalTime.of
+                (BeginTimeHour.getValue(), BeginTimeMinute.getValue(), BeginTimeSecond.getValue()));
+        settings.setEndTime(LocalTime.of
+                (EndTimeHour.getValue(), EndTimeMinute.getValue(), EndTimeSecond.getValue()));
+        settings.setDecide_Event_choosing(Event_Choosing.getSelection());
+
+        settings.setMax_RuntimeDays(RuntimeDays.getValue());
+        settings.setPrint_Only_Function(Print_Only_Functions.getValue());
+        settings.setOptimal_User_Layout(Optimal_User_Layout.getValue());
+        this_stage.close();
     }
 
 }

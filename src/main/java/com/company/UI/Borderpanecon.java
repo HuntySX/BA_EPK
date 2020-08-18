@@ -43,6 +43,8 @@ public class Borderpanecon implements Initializable {
     Stage ThisStage;
 
     @FXML
+    Button ExternalMan;
+    @FXML
     Button SimulationMan;
     @FXML
     Button WorkforcesMan;
@@ -305,6 +307,29 @@ public class Borderpanecon implements Initializable {
             newWindow.setY(primarystage.getY() + 100);
             SIMULATION_UI.generateUI();
             newWindow.show();
+        } else if (e.getSource() == ExternalMan) {
+            URL url = new File("src/main/java/com/company/UI/javafxgraph/User_UI.fxml").toURI().toURL();
+            FXMLLoader loader = new FXMLLoader(url);
+            loader.setLocation(url);
+            Parent root = loader.load();
+            Scene scene = new Scene(root, 800, 500);
+
+            UI_USER_MANAGEMENT USER_UI = (UI_USER_MANAGEMENT) loader.getController();
+
+
+            Stage newWindow = new Stage();
+            USER_UI.setEPK(EPK);
+            USER_UI.setMainStage(ThisStage);
+            USER_UI.setThisstage(newWindow);
+            newWindow.setTitle("EPCSim User-Management");
+            newWindow.setScene(scene);
+            newWindow.setResizable(false);
+            newWindow.initOwner(primarystage);
+            newWindow.initModality(Modality.WINDOW_MODAL);
+            newWindow.setX(primarystage.getX() + 200);
+            newWindow.setY(primarystage.getY() + 100);
+            USER_UI.generateUI();
+            newWindow.show();
         } else if (e.getSource() == Delete) {
             UI_View_Gen Active_Elem = EPK.getActive_Elem();
             EPK.getAll_Elems().remove(Active_Elem.getNodeView());
@@ -363,9 +388,11 @@ public class Borderpanecon implements Initializable {
             settings.setPrint_Only_Function(UISettings.isPrint_Only_Function());
             settings.setGet_Only_Start_Finishable_Functions(UISettings.isOnly_Start_Finishable_Functions());
 
-            List<External_Event> external_events = new ArrayList<>();
-            UI_External_Event UI_External_Events = EPK.getUI_External_Events();
-            external_events.addAll(UI_External_Events.getList());
+            //TODO
+
+            /*List<External_Event> external_events = new ArrayList<>();
+            UI_EXTERNAL_EVENT_MANAGER UI_External_Events = EPK.getUI_External_Events();
+            external_events.addAll(UI_External_Events.getList());*/
 
             //INSTANTIATE ALL UNITS
             for (Resource Res : UI_Resource) {
@@ -683,6 +710,8 @@ public class Borderpanecon implements Initializable {
             Final_settings.setNumber_Instances_Per_Day(settings.getNumber_Instances_Per_Day());
             Final_settings.setStartEventType(settings.getStartEventType());
             EPK epk = new EPK(Final_List, Final_Start_Events);
+
+            List<External_Event> external_Events = new ArrayList<>();
 
             Discrete_Event_Generator Generator = new Discrete_Event_Generator(epk, Final_settings, Final_User, Final_Resource, external_Events);
             Generator.run();

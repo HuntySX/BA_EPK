@@ -1,0 +1,410 @@
+package com.company.UI.EPKUI;
+
+import com.company.EPK.Workforce;
+import com.company.Enums.Option_Event_Choosing;
+import com.company.Simulation.Simulation_Base.Data.Discrete_Data.External_Event;
+import com.company.Simulation.Simulation_Base.Data.Discrete_Data.Resource;
+import com.company.Simulation.Simulation_Base.Data.Shared_Data.User;
+import com.dlsc.formsfx.model.structure.*;
+import com.dlsc.formsfx.view.renderer.FormRenderer;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.Label;
+import javafx.scene.control.Separator;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
+
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ResourceBundle;
+
+
+public class UI_EXTERNAL_EVENT_MANAGER implements Initializable {
+    @FXML
+    Button OK_Button;
+    @FXML
+    VBox EDIT_Event_Button;
+    @FXML
+    VBox Choosebox;
+    @FXML
+    VBox Editbox;
+
+
+    private UI_EPK EPK;
+    private Stage Mainstage;
+    private Stage this_stage;
+    private List<List<External_Event>> External_Events_by_Day;
+    private List<User> Users;
+    private List<Resource> Resources;
+    private List<Workforce> Workforces;
+    private SingleSelectionField<External_Event> Choose_Event;
+    private SingleSelectionField<Option_Event_Choosing> Event_Choosing;
+    private SingleSelectionField<Integer> Choose_Day;
+    private SingleSelectionField<Integer> Show_Day;
+    private IntegerField Event_Time_Second;
+    private IntegerField Event_Time_Minute;
+    private IntegerField Event_Time_Hour;
+    private IntegerField RuntimeDays;
+    private FormRenderer BooleanSettings;
+    private FormRenderer Begintime;
+    private FormRenderer Endingtime;
+    private FormRenderer RunningDays;
+    private FormRenderer Choose_UI;
+
+
+    @Override
+    public void initialize(URL url, ResourceBundle resourceBundle) {
+    }
+
+    public void setEPK(UI_EPK EPK) {
+        this.EPK = EPK;
+    }
+
+    public void setMainStage(Stage stage) {
+        this.Mainstage = stage;
+    }
+
+    public void setThisstage(Stage stage) {
+        this_stage = stage;
+    }
+
+    public void generateUI() {
+
+        Choosebox.getChildren().clear();
+        External_Events_by_Day = EPK.getExternal_Events_by_Day();
+        Users = EPK.getAll_Users();
+        Workforces = EPK.getAll_Workforces();
+        Resources = EPK.getAll_Resources();
+        generateShowUI();
+        Label label = new Label("Choose User: ");
+        SingleSelectionField<User> UI_USERS = Field.ofSingleSelectionType(Users).label("User");
+        FormRenderer USERS_UI = new FormRenderer(Form.of(Group.of(UI_USERS)));
+        Choosebox.getChildren().add(USERS_UI);
+        Button button1 = new Button("Edit selected User");
+        button1.setOnAction(actionEvent -> {
+            User user = UI_USERS.getSelection();
+            if (user != null) {
+                showEditUserUI(user);
+            }
+        });
+        Button button2 = new Button("New User");
+        button2.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                showNewUserUI();
+            }
+        });
+        ButtonBar bar = new ButtonBar();
+        bar.getButtons().add(button1);
+        bar.getButtons().add(button2);
+        Choosebox.getChildren().add(bar);
+    }
+
+    private void showNewUserUI() {
+        Editbox.getChildren().clear();
+        User user = new User("", "", EPK.getUniqueUserID(), 1);
+        IntegerField P_ID = Field.ofIntegerType(user.getP_ID()).label("ID: ").editable(false);
+        List<Workforce> Workforces_to_Add = new ArrayList<>();
+        StringField FirstName = Field.ofStringType(user.getFirst_Name()).label("Firstname:");
+        StringField LastName = Field.ofStringType(user.getLast_Name()).label("Lastname: ");
+        DoubleField Efficiency = Field.ofDoubleType(user.getEfficiency()).label("Efficiency: ");
+
+        ButtonBar Save = new ButtonBar();
+        Button Save_Button = new Button("Save User");
+        Save_Button.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                user.setEfficiency(Efficiency.getValue().floatValue());
+                user.setFirst_Name(FirstName.getValue());
+                user.setLast_Name(LastName.getValue());
+                for (Workforce w : Workforces_to_Add) {
+                    if (!user.getWorkforces().contains(w)) {
+                        user.getWorkforces().add(w);
+                    }
+                    if (!w.getGranted_to().contains(user)) {
+                        w.getGranted_to().add(user);
+                    }
+                }
+                EPK.AddUser(user);
+                generateUI();
+            }
+        });
+
+        Button Remove_Button = new Button("Remove user");
+        Remove_Button.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+
+                List<Workforce> User_Workforce_List = user.getWorkforces();
+                for (Workforce w : Workforces) {
+                    if (w.getGranted_to().contains(user)) {
+                        w.getGranted_to().remove(user);
+                    }
+                }
+                user.getWorkforces().clear();
+                EPK.getAll_Users().remove(user);
+                generateUI();
+            }
+        });
+        Remove_Button.setDisable(true);
+        Save.getButtons().add(Remove_Button);
+        Save.getButtons().add(Save_Button);
+
+        Label AddedWorkforces = new Label();
+        String Workforcelabel = new String("Added Workforces: [");
+        for (Workforce added_force : user.getWorkforces()) {
+            Workforcelabel = Workforcelabel.concat("; " + added_force.toString());
+        }
+        Workforcelabel = Workforcelabel.concat("]");
+        AddedWorkforces.setText(Workforcelabel);
+
+        SingleSelectionField<Workforce> Workforcelist = Field.ofSingleSelectionType(Workforces).label("Workforces: ");
+        Button Add_Workforce = new Button("Add Workforce");
+        Add_Workforce.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                Workforce force = Workforcelist.getSelection();
+                if (force != null) {
+                    if (!Workforces_to_Add.contains(force)) {
+                        Workforces_to_Add.add(force);
+                        String Workforcelabel = "Added Workforces: [";
+                        for (Workforce added_force : Workforces_to_Add) {
+                            Workforcelabel = Workforcelabel.concat("; " + added_force.toString());
+                        }
+                        Workforcelabel = Workforcelabel.concat("]");
+                        AddedWorkforces.setText(Workforcelabel);
+                    }
+                }
+            }
+        });
+        Button Remove_Workforce = new Button("Remove Workforce");
+        Remove_Workforce.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                Workforce force = Workforcelist.getSelection();
+                if (force != null) {
+                    if (Workforces_to_Add.contains(force)) {
+                        Workforces_to_Add.remove(force);
+                        String Workforcelabel = new String("Added Workforces: [ ");
+                        for (Workforce added_force : Workforces_to_Add) {
+                            Workforcelabel = Workforcelabel.concat("; " + added_force.toString());
+                        }
+                        Workforcelabel = Workforcelabel.concat(" ]");
+                        AddedWorkforces.setText(Workforcelabel);
+                    }
+                }
+            }
+        });
+        ButtonBar WorkforcesBar = new ButtonBar();
+        WorkforcesBar.getButtons().add(Add_Workforce);
+        WorkforcesBar.getButtons().add(Remove_Workforce);
+
+        FormRenderer EDIT_UI = new FormRenderer(Form.of(Group.of(P_ID, FirstName, LastName, Efficiency)));
+        FormRenderer WORKFORCE_SELECTION_UI = new FormRenderer(Form.of(Group.of(Workforcelist)));
+        Editbox.getChildren().add(EDIT_UI);
+        Editbox.getChildren().add(AddedWorkforces);
+        Editbox.getChildren().add(WORKFORCE_SELECTION_UI);
+        Editbox.getChildren().add(WorkforcesBar);
+        Editbox.getChildren().add(new Separator());
+        Editbox.getChildren().add(Save);
+    }
+
+    private void showEditUserUI(User user) {
+
+        Editbox.getChildren().clear();
+        IntegerField P_ID = Field.ofIntegerType(user.getP_ID()).label("ID: ").editable(false);
+        StringField FirstName = Field.ofStringType(user.getFirst_Name()).label("Firstname:");
+        StringField LastName = Field.ofStringType(user.getLast_Name()).label("Lastname: ");
+        DoubleField Efficiency = Field.ofDoubleType(user.getEfficiency()).label("Efficiency: ");
+        List<Workforce> Workforces_to_Add = new ArrayList<>();
+        List<Workforce> Workforces_to_Remove = new ArrayList<>();
+        ButtonBar Save = new ButtonBar();
+        Button Save_Button = new Button("Save User");
+        Save_Button.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                user.setEfficiency(Efficiency.getValue().floatValue());
+                user.setFirst_Name(FirstName.getValue());
+                user.setLast_Name(LastName.getValue());
+                for (Workforce w : Workforces_to_Add) {
+                    if (!user.getWorkforces().contains(w)) {
+                        user.getWorkforces().add(w);
+                    }
+                    if (!w.getGranted_to().contains(user)) {
+                        w.getGranted_to().add(user);
+                    }
+                }
+                for (Workforce w : Workforces_to_Remove) {
+                    user.getWorkforces().remove(w);
+                    w.getGranted_to().remove(user);
+                }
+                generateUI();
+            }
+        });
+
+        Button Remove_Button = new Button("Remove user");
+        Remove_Button.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+
+                List<Workforce> User_Workforce_List = user.getWorkforces();
+                for (Workforce w : Workforces) {
+                    if (w.getGranted_to().contains(user)) {
+                        w.getGranted_to().remove(user);
+                    }
+                }
+                user.getWorkforces().clear();
+                EPK.getAll_Users().remove(user);
+                generateUI();
+            }
+        });
+        Remove_Button.setDisable(false);
+        Save.getButtons().add(Remove_Button);
+        Save.getButtons().add(Save_Button);
+
+        Label AddedWorkforces = new Label();
+        String Workforcelabel = new String("Added Workforces: [");
+        for (Workforce added_force : user.getWorkforces()) {
+            Workforcelabel = Workforcelabel.concat("; " + added_force.toString());
+        }
+        Workforcelabel = Workforcelabel.concat("]");
+        AddedWorkforces.setText(Workforcelabel);
+
+        SingleSelectionField<Workforce> Workforcelist = Field.ofSingleSelectionType(Workforces).label("Workforces: ");
+        Button Add_Workforce = new Button("Add Workforce");
+        Add_Workforce.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                Workforce force = Workforcelist.getSelection();
+                if (force != null) {
+                    if (!user.getWorkforces().contains(force) && !Workforces_to_Add.contains(force)) {
+                        Workforces_to_Add.add(force);
+                        String Workforcelabel = "Added Workforces: [";
+                        for (Workforce added_force : user.getWorkforces()) {
+                            Workforcelabel = Workforcelabel.concat("; " + added_force.toString());
+                        }
+                        for (Workforce added_force : Workforces_to_Add) {
+                            Workforcelabel = Workforcelabel.concat("; " + added_force.toString());
+                        }
+                        Workforcelabel = Workforcelabel.concat("]");
+                        AddedWorkforces.setText(Workforcelabel);
+                    }
+                }
+            }
+        });
+
+        Button Remove_Workforce = new Button("Remove Workforce");
+        Remove_Workforce.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                Workforce force = Workforcelist.getSelection();
+                if (force != null) {
+                    if (user.getWorkforces().contains(force) || Workforces_to_Add.contains(force)) {
+                        Workforces_to_Remove.add(force);
+                    }
+
+                    String Workforcelabel = new String("Added Workforces: [ ");
+                    for (Workforce added_force : user.getWorkforces()) {
+                        if (!Workforces_to_Remove.contains(added_force)) {
+                            Workforcelabel = Workforcelabel.concat("; " + added_force.toString());
+                        }
+                    }
+                    Workforcelabel = Workforcelabel.concat(" ]");
+                    AddedWorkforces.setText(Workforcelabel);
+                }
+            }
+        });
+        ButtonBar WorkforcesBar = new ButtonBar();
+        WorkforcesBar.getButtons().add(Add_Workforce);
+        WorkforcesBar.getButtons().add(Remove_Workforce);
+
+        FormRenderer EDIT_UI = new FormRenderer(Form.of(Group.of(P_ID, FirstName, LastName, Efficiency)));
+        FormRenderer WORKFORCE_SELECTION_UI = new FormRenderer(Form.of(Group.of(Workforcelist)));
+        Editbox.getChildren().add(EDIT_UI);
+        Editbox.getChildren().add(AddedWorkforces);
+        Editbox.getChildren().add(WORKFORCE_SELECTION_UI);
+        Editbox.getChildren().add(WorkforcesBar);
+        Editbox.getChildren().add(new Separator());
+        Editbox.getChildren().add(Save);
+    }
+
+    private void generateShowUI() {
+        Editbox.getChildren().clear();
+        StringField P_ID = Field.ofStringType("").label("ID: ").editable(false);
+        StringField FirstName = Field.ofStringType((String) "").label("Firstname: ");
+        StringField LastName = Field.ofStringType((String) "").label("Lastname: ");
+        StringField Efficiency = Field.ofStringType("").label("Efficiency: ");
+
+        ButtonBar Save = new ButtonBar();
+        Button Save_Button = new Button("Save User");
+        Save_Button.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+            }
+        });
+
+        Button Remove_Button = new Button("Remove user");
+        Remove_Button.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+            }
+        });
+        Remove_Button.setDisable(true);
+        Save.getButtons().add(Remove_Button);
+        Save.getButtons().add(Save_Button);
+        List<Workforce> emptyList = new ArrayList<>();
+        Label AddedWorkforces = new Label(" ");
+        SingleSelectionField<Workforce> Workforcelist = Field.ofSingleSelectionType(emptyList).label("Workforces: ");
+        Button Add_Workforce = new Button("Add Workforce");
+        Add_Workforce.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+            }
+        });
+
+        Button Remove_Workforce = new Button("Remove Workforce");
+        Remove_Workforce.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+            }
+        });
+
+        ButtonBar WorkforcesBar = new ButtonBar();
+        WorkforcesBar.getButtons().add(Add_Workforce);
+        WorkforcesBar.getButtons().add(Remove_Workforce);
+
+        P_ID.editable(false);
+        FirstName.editable(false);
+        LastName.editable(false);
+        Efficiency.editable(false);
+        Workforcelist.editable(true);
+        Add_Workforce.setDisable(true);
+        Remove_Workforce.setDisable(true);
+        Save_Button.setDisable(true);
+        FormRenderer EDIT_UI = new FormRenderer(Form.of(Group.of(P_ID, FirstName, LastName, Efficiency)));
+        FormRenderer WORKFORCE_SELECTION_UI = new FormRenderer(Form.of(Group.of(Workforcelist)));
+        Editbox.getChildren().add(EDIT_UI);
+        Editbox.getChildren().add(AddedWorkforces);
+        Editbox.getChildren().add(WORKFORCE_SELECTION_UI);
+        Editbox.getChildren().add(WorkforcesBar);
+        Editbox.getChildren().add(new Separator());
+        Editbox.getChildren().add(Save);
+    }
+
+
+    public void actionPerformed(ActionEvent e) {
+        if (e.getSource() == OK_Button) {
+            this_stage.close();
+        }
+    }
+
+    public void setExternal_Events_by_Day(List<List<External_Event>> external_Events_by_Day) {
+        External_Events_by_Day = external_Events_by_Day;
+    }
+}
+

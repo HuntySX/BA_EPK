@@ -2,9 +2,13 @@ package com.company.Simulation.Simulation_Base.Data.Discrete_Data;
 
 public abstract class External_Event {
     public Workingtime Time;
+    public int day;
+    public int EEV_ID;
 
-    public External_Event(Workingtime time) {
+    public External_Event(Workingtime time, int day, int ID) {
         Time = time;
+        this.day = day;
+        EEV_ID = ID;
     }
 
     public Workingtime getTime() {
@@ -15,10 +19,17 @@ public abstract class External_Event {
         Time = time;
     }
 
+    public int getDay() {
+        return day;
+    }
+
+    public void setDay(int day) {
+        this.day = day;
+    }
+
     @Override
     public String toString() {
-        return "External_Event{" +
-                "Time=" + Time +
-                '}';
+        return Time +
+                "//Day: " + day;
     }
 }
