@@ -50,7 +50,7 @@ public class Discrete_Event_Generator {
         printer_Queue.setT(T);
     }
 
-    public Discrete_Event_Generator(EPK epk, Settings settings, List<User> Users, List<Resource> Resources, List<External_Event> external_events) {
+    public Discrete_Event_Generator(EPK epk, Settings settings, List<User> Users, List<Resource> Resources, List<List<External_Event>> external_events) {
         this.EPK = epk;
         this.Settings = settings;
         this.Users = Users;

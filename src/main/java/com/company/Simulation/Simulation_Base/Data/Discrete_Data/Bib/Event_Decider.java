@@ -7,7 +7,6 @@ import com.company.Simulation.Simulation_Base.Data.Shared_Data.Settings;
 import com.company.Simulation.Simulation_Base.Data.Shared_Data.User;
 
 import java.time.LocalTime;
-import java.util.ArrayList;
 import java.util.List;
 
 import static com.company.Enums.Option_Event_Choosing.*;
@@ -115,19 +114,17 @@ public class Event_Decider {
 
     public void updateWithExternalEvents() {
         LocalTime Runtime = calendar.getRuntime();
-        List<External_Event> External_Events = calendar.getExternal_Events();
-        {
-            List<External_Event> Mark_For_Deletion = new ArrayList<>();
-            for (External_Event external_event : External_Events) {
-                if (external_event.getTime().get_Duration_to_Seconds() <= Runtime.toSecondOfDay()) {
-                    handleExternalEvent(external_event);
-                    Mark_For_Deletion.add(external_event);
-                } else {
-                    break;
+        int Day = calendar.getAct_runtimeDay();
+        if (Day <= calendar.getRuntimeDays() - 1) {
+            List<External_Event> External_Events = calendar.getExternal_Events().get(Day);
+            {
+                for (External_Event external_event : External_Events) {
+                    if (external_event.getTime().get_Duration_to_Seconds() == Runtime.toSecondOfDay()) {
+                        handleExternalEvent(external_event);
+                    }
                 }
-            }
-            External_Events.removeAll(Mark_For_Deletion);
 
+            }
         }
     }
 
@@ -141,8 +138,8 @@ public class Event_Decider {
             }
         } else if (external_event instanceof Resource_Deactivating_External_Event) {
             for (Resource res : Resources) {
-                if (res.getID() == ((Resource_Activating_External_Event) external_event).getResource().getID()) {
-                    res.setCount(res.getCount() + ((Resource_Activating_External_Event) external_event).getResource().getCount());
+                if (res.getID() == ((Resource_Deactivating_External_Event) external_event).getResource().getID()) {
+                    res.setCount(res.getCount() + ((Resource_Deactivating_External_Event) external_event).getResource().getCount());
                     break;
                 }
             }
@@ -157,7 +154,7 @@ public class Event_Decider {
         } else if (external_event instanceof User_Deactivating_External_Event) {
 
             for (User user : Users) {
-                if (user.getP_ID() == ((User_Activating_External_Event) external_event).getUser().getP_ID()) {
+                if (user.getP_ID() == ((User_Deactivating_External_Event) external_event).getUser().getP_ID()) {
                     user.setDisabled(false);
                     break;
                 }

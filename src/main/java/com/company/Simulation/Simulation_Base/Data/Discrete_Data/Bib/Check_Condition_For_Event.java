@@ -51,7 +51,7 @@ public class Check_Condition_For_Event {
                 for (Workforce workforce : ((Function) Instance.getEPKNode()).getNeeded_Workforce()) {
                     boolean workforcefound = false;
                     for (User user : Users) {
-                        if (!user.isActive()) {
+                        if (!user.isActive() && !user.isDisabled()) {
                             for (Workforce work : user.getWorkforces()) {
                                 if (work.getW_ID() == workforce.getW_ID()) {
                                     workforcefound = true;

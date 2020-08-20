@@ -26,7 +26,7 @@ public class Event_Calendar {
     private Discrete_Event_Generator Generator;
     private List<Instance_Workflow> Activation_List;
     private int Unique_Waiting_Ticket_ID;
-    private List<External_Event> External_Events;
+    private List<List<External_Event>> External_Events;
 
     public Event_Calendar(Settings settings, EPK epk, Discrete_Event_Generator generator) {
 
@@ -324,11 +324,11 @@ public class Event_Calendar {
         return -1;
     }
 
-    public List<External_Event> getExternal_Events() {
+    public List<List<External_Event>> getExternal_Events() {
         return External_Events;
     }
 
-    public void setExternal_Events(List<External_Event> external_Events) {
+    public void setExternal_Events(List<List<External_Event>> external_Events) {
         External_Events = external_Events;
     }
 }

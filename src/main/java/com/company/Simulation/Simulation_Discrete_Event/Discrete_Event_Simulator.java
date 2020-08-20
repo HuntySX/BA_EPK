@@ -52,7 +52,7 @@ public class Discrete_Event_Simulator {
         boolean pushed_new_Elements = false;
         while (!event_Calendar.isFinished_cycle()) {
             while (event_Calendar.getRuntime().isBefore(event_Calendar.getEnd_Time()) && !event_Calendar.isFinished_cycle()) {
-                event_Decider.updateWithExternalEvents();
+
                 List<Instance_Workflow> latest_Instances = new ArrayList<>();
                 Simulation_Event_List upcoming_Events = event_Calendar.get_Single_Upcoming_List(event_Calendar.getAct_runtimeDay());
                 Simulation_Waiting_List waiting_list = event_Calendar.getWaiting_List();
@@ -246,8 +246,10 @@ public class Discrete_Event_Simulator {
                     }
                 }
                 event_Calendar.jump();
+                event_Decider.updateWithExternalEvents();
             }
             event_Calendar.jump();
+            event_Decider.updateWithExternalEvents();
         }
     }
 
@@ -347,7 +349,7 @@ public class Discrete_Event_Simulator {
 
             //CHECK FOR USER WORKFORCE AVAILABLE
             for (User u : users) {
-                if (!u.isActive()) {
+                if (!u.isActive() && !u.isDisabled()) {
                     List<Workforce> capable = u.getWorkforces();
                     for (Workforce cap : capable) {
                         if (needed_workforces.contains(cap)) {

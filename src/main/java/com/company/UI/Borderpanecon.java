@@ -308,28 +308,28 @@ public class Borderpanecon implements Initializable {
             SIMULATION_UI.generateUI();
             newWindow.show();
         } else if (e.getSource() == ExternalMan) {
-            URL url = new File("src/main/java/com/company/UI/javafxgraph/User_UI.fxml").toURI().toURL();
+            URL url = new File("src/main/java/com/company/UI/javafxgraph/ExternalEvent_UI.fxml").toURI().toURL();
             FXMLLoader loader = new FXMLLoader(url);
             loader.setLocation(url);
             Parent root = loader.load();
-            Scene scene = new Scene(root, 800, 500);
+            Scene scene = new Scene(root, 1200, 900);
 
-            UI_USER_MANAGEMENT USER_UI = (UI_USER_MANAGEMENT) loader.getController();
+            UI_EXTERNAL_EVENT_MANAGER Manager_UI = (UI_EXTERNAL_EVENT_MANAGER) loader.getController();
 
 
             Stage newWindow = new Stage();
-            USER_UI.setEPK(EPK);
-            USER_UI.setMainStage(ThisStage);
-            USER_UI.setThisstage(newWindow);
-            newWindow.setTitle("EPCSim User-Management");
+            Manager_UI.setEPK(EPK);
+            Manager_UI.setMainStage(ThisStage);
+            Manager_UI.setThisstage(newWindow);
+            newWindow.setTitle("EPCSim External-Event-Management");
             newWindow.setScene(scene);
             newWindow.setResizable(false);
             newWindow.initOwner(primarystage);
-            newWindow.initModality(Modality.WINDOW_MODAL);
             newWindow.setX(primarystage.getX() + 200);
             newWindow.setY(primarystage.getY() + 100);
-            USER_UI.generateUI();
+            Manager_UI.generateUI();
             newWindow.show();
+
         } else if (e.getSource() == Delete) {
             UI_View_Gen Active_Elem = EPK.getActive_Elem();
             EPK.getAll_Elems().remove(Active_Elem.getNodeView());
@@ -711,7 +711,7 @@ public class Borderpanecon implements Initializable {
             Final_settings.setStartEventType(settings.getStartEventType());
             EPK epk = new EPK(Final_List, Final_Start_Events);
 
-            List<External_Event> external_Events = new ArrayList<>();
+            List<List<External_Event>> external_Events = EPK.getExternal_Events_by_Day();
 
             Discrete_Event_Generator Generator = new Discrete_Event_Generator(epk, Final_settings, Final_User, Final_Resource, external_Events);
             Generator.run();
