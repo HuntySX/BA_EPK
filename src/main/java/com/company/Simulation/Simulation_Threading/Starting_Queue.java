@@ -1,14 +1,16 @@
 package com.company.Simulation.Simulation_Threading;
 
 import com.company.EPK.EPK;
-import com.company.Simulation.Simulation_Base.Data.Threading_Data.Item;
+import com.company.Simulation.Simulation_Base.Data.Shared_Data.Simulation_Instance;
 import com.company.Simulation.Simulation_Base.Data.Threading_Data.Buy_Instance;
+import com.company.Simulation.Simulation_Base.Data.Threading_Data.Item;
 import com.company.Simulation.Simulation_Base.Data.Threading_Data.Order_Instance;
 import com.company.Simulation.Simulation_Base.Data.Threading_Data.Rep_Instance;
-import com.company.Simulation.Simulation_Base.Data.Shared_Data.Simulation_Instance;
 
 import java.time.LocalTime;
-import java.util.*;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Random;
 
 import static com.company.Enums.Process_Status.Pending;
 
@@ -76,8 +78,6 @@ public class Starting_Queue implements Runnable {
                     //}
                 }
 
-                //TODO Timing vom Instance chooser.
-                //TODO IF Else Auflösen.
                 try {
                     wait(2);
                 } catch (InterruptedException e) {

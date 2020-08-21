@@ -1,12 +1,12 @@
 package com.company.Simulation.Simulation_Threading;
 
 import com.company.EPK.EPK;
-import com.company.EPK.Function;
 import com.company.EPK.EPK_Node;
+import com.company.EPK.Function;
+import com.company.Simulation.Simulation_Base.Data.Shared_Data.Simulation_Instance;
 import com.company.Simulation.Simulation_Base.Data.Shared_Data.User;
 import com.company.Simulation.Simulation_Base.Data.Threading_Data.Buy_Instance;
 import com.company.Simulation.Simulation_Base.Data.Threading_Data.Process_instance;
-import com.company.Simulation.Simulation_Base.Data.Shared_Data.Simulation_Instance;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,8 +42,6 @@ public class Process_Queue implements Runnable {
     public void setNot_killed(boolean not_killed) {
         this.not_killed = not_killed;
     }
-
-    //TODO Event Listener Wenn Bestellung eingeht. Welche Reihenfolge? Siehe Notepad ++ Bzgl Fifo
 
     public synchronized void run() {
         while (not_killed) {

@@ -35,7 +35,7 @@ public class Threading_Generator {
         Con_Split cs3 = new Con_Split(null, 14, Contype.XOR, Split_Status.General, null, null);
         Event e7 = new Event(null, 15, "Reparatur möglich");
         Event e8 = new Event(null, 16, "Reparatur unmöglich");
-        Function f5 = new Function("Reparatur durchführen", Function_Type.Waiting, 17); //TODO
+        Function f5 = new Function("Reparatur durchführen", Function_Type.Waiting, 17);
         Event e9 = new Event(null, 18, "Reparatur durchgeführt");
         Function f6 = new Function("Kunde Kontaktieren", Function_Type.Waiting, 19);
         Event e10 = new Event(null, 20, "Kunde Kontaktiert");

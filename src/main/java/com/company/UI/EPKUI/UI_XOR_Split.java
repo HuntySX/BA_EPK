@@ -57,7 +57,6 @@ public class UI_XOR_Split extends Event_Con_Split implements UI_Instantiable {
                 "Instanzen an die nachfolgenden Elemente");
         DECIDE_UI = new FormRenderer(Form.of(Group.of(Decide_Type)));
 
-        //TODO Wahrschienlichkeitsoptionen in Decide Type Box einfügen und bei Update Instanzieren.
     }
 
 

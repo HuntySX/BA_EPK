@@ -3,9 +3,11 @@ package com.company.Simulation.Simulation_Discrete_Event;
 import com.company.EPK.*;
 import com.company.Enums.Contype;
 import com.company.Enums.Gate_Check_Status;
+import com.company.Print.EventDriven.*;
 import com.company.Run.Discrete_Event_Generator;
 import com.company.Simulation.Simulation_Base.Data.Discrete_Data.*;
 import com.company.Simulation.Simulation_Base.Data.Discrete_Data.Bib.Event_Decider;
+import com.company.Simulation.Simulation_Base.Data.Instance_Printer_Gate;
 import com.company.Simulation.Simulation_Base.Data.Printer_Gate;
 import com.company.Simulation.Simulation_Base.Data.Printer_Queue;
 import com.company.Simulation.Simulation_Base.Data.Shared_Data.Settings;
@@ -22,6 +24,7 @@ public class Discrete_Event_Simulator {
     private Settings Settings;
     private Printer_Gate printer_gate;
     private Printer_Queue printer_queue;
+    private Instance_Printer_Gate instance_printer_gate;
     private Event_Calendar event_Calendar;
     private Event_Decider event_Decider;
     private List<Resource> resources;
@@ -30,8 +33,8 @@ public class Discrete_Event_Simulator {
 
     public Discrete_Event_Simulator(Discrete_Event_Generator Generator) {
 
-        //TODO Erhalte relevante Settings aus Generator. speicher diese hier.
         this.EPK = Generator.getEPK();
+        this.instance_printer_gate = Instance_Printer_Gate.getInstance_Printer_Gate();
         this.resources = Generator.getResources();
         this.users = Generator.getUsers();
         this.event_Calendar = Generator.getEvent_Calendar();
@@ -44,7 +47,6 @@ public class Discrete_Event_Simulator {
         LocalTime end = Settings.getEndTime();
 
         //TODO Instantiate EPK,Users;Resources,Settings from File;
-        //TODO Events generieren, EPK aufnehmen, Run starten, Alle Settings verteilen,
 
     }
 
@@ -66,6 +68,19 @@ public class Discrete_Event_Simulator {
                         if (!(((Event) to_Run.getEPKNode()).is_End_Event())) {
 
                             List<EPK_Node> Next_Elem = to_Run.getEPKNode().getNext_Elem();
+                            System.out.println("Event Finished: " + ((Event) to_Run.getEPKNode()).getEvent_Tag() + "for: " +
+                                    to_Run.getInstance().getCase_ID() +
+                                    " At: [" + event_Calendar.getRuntime().toString() + "] Should be: [" + to_Run.getTo_Start().toString() + "]");
+
+                            if (!Settings.getPrint_Only_Function()) {
+                                Instance_Print_File print_this = new Instance_Print_File(to_Run.getInstance().getCase_ID(), event_Calendar.getRuntime(), event_Calendar.getAct_runtimeDay(),
+                                        Workflow_Status.Finished, Node_Type.Event, to_Run.getEPKNode().getID(), ((Event) to_Run.getEPKNode()).getEvent_Tag(), null, null);
+
+                                synchronized (instance_printer_gate.getI_printer_Lock()) {
+                                    instance_printer_gate.getInstancePrintList().add(print_this);
+                                }
+                            }
+
                             for (EPK_Node n : Next_Elem) {
                                 to_Run.getInstance().add_To_Scheduled_Work(n);
                                 Instance_Workflow new_Instance = new Instance_Workflow(to_Run.getInstance(), event_Calendar.getRuntime(), n);
@@ -73,14 +88,42 @@ public class Discrete_Event_Simulator {
                                     new_Instance.setComing_From(to_Run.getEPKNode());
                                 }
                                 event_Calendar.Add_To_Upcoming_List(new_Instance, event_Calendar.getAct_runtimeDay());
-                                System.out.println("Event Finished: " + ((Event) to_Run.getEPKNode()).getEvent_Tag() + "for: " +
-                                        to_Run.getInstance().getCase_ID() +
-                                        " At: [" + event_Calendar.getRuntime().toString() + "] Should be: [" + to_Run.getTo_Start().toString() + "]");
 
                                 if (Settings.getPrint_Only_Function() && n instanceof Function) {
-                                    //TODO Print Scheduled for n;
-                                } else {
-                                    //TODO Print every Node Scheduled;
+                                    Instance_Print_File next_print = new Instance_Print_File(to_Run.getInstance().getCase_ID(), event_Calendar.getRuntime(), event_Calendar.getAct_runtimeDay(),
+                                            Workflow_Status.Scheduled, Node_Type.Function, n.getID(), ((Function) n).getFunction_tag(), null, null);
+
+                                    synchronized (instance_printer_gate.getI_printer_Lock()) {
+                                        instance_printer_gate.getInstancePrintList().add(next_print);
+                                    }
+                                } else if (!Settings.getPrint_Only_Function()) {
+
+                                    Instance_Print_File next_print = null;
+                                    if (n instanceof Function && !(n instanceof Activating_Function)) {
+                                        next_print = new Instance_Print_File(to_Run.getInstance().getCase_ID(), event_Calendar.getRuntime(), event_Calendar.getAct_runtimeDay(),
+                                                Workflow_Status.Scheduled, Node_Type.Function, n.getID(), ((Function) n).getFunction_tag(), null, null);
+                                    } else if (n instanceof Event && !(n instanceof Activating_Start_Event)) {
+                                        next_print = new Instance_Print_File(to_Run.getInstance().getCase_ID(), event_Calendar.getRuntime(), event_Calendar.getAct_runtimeDay(),
+                                                Workflow_Status.Scheduled, Node_Type.Event, n.getID(), ((Event) n).getEvent_Tag(), null, null);
+                                    } else if (n instanceof Event_Con_Split) {
+                                        next_print = new Instance_Print_File(to_Run.getInstance().getCase_ID(), event_Calendar.getRuntime(), event_Calendar.getAct_runtimeDay(),
+                                                Workflow_Status.Scheduled, Node_Type.E_Con_Split, n.getID(), ((Event_Con_Split) n).getContype() + "-Split-Gate" + n.getID(), null, null);
+                                    } else if (n instanceof Event_Con_Join) {
+                                        next_print = new Instance_Print_File(to_Run.getInstance().getCase_ID(), event_Calendar.getRuntime(), event_Calendar.getAct_runtimeDay(),
+                                                Workflow_Status.Scheduled, Node_Type.E_Con_Join, n.getID(), ((Event_Con_Join) n).getContype() + "-Join-Gate" + n.getID(), null, null);
+
+                                    } else if (n instanceof Activating_Function) {
+                                        next_print = new Instance_Print_File(to_Run.getInstance().getCase_ID(), event_Calendar.getRuntime(), event_Calendar.getAct_runtimeDay(),
+                                                Workflow_Status.Scheduled, Node_Type.Activating_Function, n.getID(), ((Activating_Function) n).getFunction_tag(), null, null);
+
+                                    } else if (n instanceof Activating_Start_Event) {
+                                        next_print = new Instance_Print_File(to_Run.getInstance().getCase_ID(), event_Calendar.getRuntime(), event_Calendar.getAct_runtimeDay(),
+                                                Workflow_Status.Scheduled, Node_Type.Activating_Start_Event, n.getID(), ((Activating_Start_Event) n).getEvent_Tag(), null, null);
+                                    }
+
+                                    synchronized (instance_printer_gate.getI_printer_Lock()) {
+                                        instance_printer_gate.getInstancePrintList().add(next_print);
+                                    }
                                 }
                             }
                         } else {
@@ -88,10 +131,23 @@ public class Discrete_Event_Simulator {
                                     to_Run.getInstance().getCase_ID() +
                                     " At: [" + event_Calendar.getRuntime().toString() + "] Should be: [" + to_Run.getTo_Start().toString() + "]");
 
-                            if (Settings.getPrint_Only_Function() && to_Run.getEPKNode() instanceof Function) {
-                                //TODO Print FINISHED for n;
-                            } else {
-                                //TODO Print every Node FINISHED;
+                            if (to_Run.getEPKNode() instanceof Function) {
+                                Instance_Print_File next_print = new Instance_Print_File(to_Run.getInstance().getCase_ID(), event_Calendar.getRuntime(), event_Calendar.getAct_runtimeDay(),
+                                        Workflow_Status.Complete, Node_Type.Function, to_Run.getEPKNode().getID(),
+                                        ((Function) to_Run.getEPKNode()).getFunction_tag(), null, null);
+
+                                synchronized (instance_printer_gate.getI_printer_Lock()) {
+                                    instance_printer_gate.getInstancePrintList().add(next_print);
+                                }
+                            } else if (!Settings.getPrint_Only_Function()) { //TODO PRINT COMPLETE
+                                Instance_Print_File next_print = new Instance_Print_File(to_Run.getInstance().getCase_ID(), event_Calendar.getRuntime(), event_Calendar.getAct_runtimeDay(),
+                                        Workflow_Status.Complete, Node_Type.Event, to_Run.getEPKNode().getID(),
+                                        ((Event) to_Run.getEPKNode()).getEvent_Tag(), null, null);
+
+                                synchronized (instance_printer_gate.getI_printer_Lock()) {
+                                    instance_printer_gate.getInstancePrintList().add(next_print);
+
+                                }
                             }
                         }
                     }
@@ -105,10 +161,41 @@ public class Discrete_Event_Simulator {
                                 new_Instance.setComing_From(to_Run.getEPKNode());
                             }
                             event_Calendar.Add_To_Upcoming_List(new_Instance, event_Calendar.getAct_runtimeDay());
+
                             if (Settings.getPrint_Only_Function() && n instanceof Function) {
-                                //TODO Print Scheduled for n;
-                            } else {
-                                //TODO Print every Node Scheduled;
+                                Instance_Print_File next_print = new Instance_Print_File(to_Run.getInstance().getCase_ID(), event_Calendar.getRuntime(), event_Calendar.getAct_runtimeDay(),
+                                        Workflow_Status.Scheduled, Node_Type.Function, n.getID(), ((Function) n).getFunction_tag(), null, null);
+
+                                synchronized (instance_printer_gate.getI_printer_Lock()) {
+                                    instance_printer_gate.getInstancePrintList().add(next_print);
+                                }
+                            } else if (!Settings.getPrint_Only_Function()) {
+
+                                Instance_Print_File next_print = null;
+                                if (n instanceof Function && !(n instanceof Activating_Function)) {
+                                    next_print = new Instance_Print_File(to_Run.getInstance().getCase_ID(), event_Calendar.getRuntime(), event_Calendar.getAct_runtimeDay(),
+                                            Workflow_Status.Scheduled, Node_Type.Function, n.getID(), ((Function) n).getFunction_tag(), null, null);
+                                } else if (n instanceof Event && !(n instanceof Activating_Start_Event)) {
+                                    next_print = new Instance_Print_File(to_Run.getInstance().getCase_ID(), event_Calendar.getRuntime(), event_Calendar.getAct_runtimeDay(),
+                                            Workflow_Status.Scheduled, Node_Type.Event, n.getID(), ((Event) n).getEvent_Tag(), null, null);
+                                } else if (n instanceof Event_Con_Split) {
+                                    next_print = new Instance_Print_File(to_Run.getInstance().getCase_ID(), event_Calendar.getRuntime(), event_Calendar.getAct_runtimeDay(),
+                                            Workflow_Status.Scheduled, Node_Type.E_Con_Split, n.getID(), ((Event_Con_Split) n).getContype() + "-Split-Gate" + n.getID(), null, null);
+                                } else if (n instanceof Event_Con_Join) {
+                                    next_print = new Instance_Print_File(to_Run.getInstance().getCase_ID(), event_Calendar.getRuntime(), event_Calendar.getAct_runtimeDay(),
+                                            Workflow_Status.Scheduled, Node_Type.E_Con_Join, n.getID(), ((Event_Con_Join) n).getContype() + "-Join-Gate" + n.getID(), null, null);
+
+                                } else if (n instanceof Activating_Function) {
+                                    next_print = new Instance_Print_File(to_Run.getInstance().getCase_ID(), event_Calendar.getRuntime(), event_Calendar.getAct_runtimeDay(),
+                                            Workflow_Status.Scheduled, Node_Type.Activating_Function, n.getID(), ((Activating_Function) n).getFunction_tag(), null, null);
+
+                                } else if (n instanceof Activating_Start_Event) {
+                                    next_print = new Instance_Print_File(to_Run.getInstance().getCase_ID(), event_Calendar.getRuntime(), event_Calendar.getAct_runtimeDay(),
+                                            Workflow_Status.Scheduled, Node_Type.Activating_Start_Event, n.getID(), ((Activating_Start_Event) n).getEvent_Tag(), null, null);
+                                }
+                                synchronized (instance_printer_gate.getI_printer_Lock()) {
+                                    instance_printer_gate.getInstancePrintList().add(next_print);
+                                }
                             }
                         }
 
@@ -129,9 +216,39 @@ public class Discrete_Event_Simulator {
                                 }
                                 event_Calendar.Add_To_Upcoming_List(new_Instance, event_Calendar.getAct_runtimeDay());
                                 if (Settings.getPrint_Only_Function() && n instanceof Function) {
-                                    //TODO Print Scheduled for n;
-                                } else {
-                                    //TODO Print every Node Scheduled;
+                                    Instance_Print_File next_print = new Instance_Print_File(to_Run.getInstance().getCase_ID(), event_Calendar.getRuntime(), event_Calendar.getAct_runtimeDay(),
+                                            Workflow_Status.Scheduled, Node_Type.Function, n.getID(), ((Function) n).getFunction_tag(), null, null);
+
+                                    synchronized (instance_printer_gate.getI_printer_Lock()) {
+                                        instance_printer_gate.getInstancePrintList().add(next_print);
+                                    }
+                                } else if (!Settings.getPrint_Only_Function()) {
+
+                                    Instance_Print_File next_print = null;
+                                    if (n instanceof Function && !(n instanceof Activating_Function)) {
+                                        next_print = new Instance_Print_File(to_Run.getInstance().getCase_ID(), event_Calendar.getRuntime(), event_Calendar.getAct_runtimeDay(),
+                                                Workflow_Status.Scheduled, Node_Type.Function, n.getID(), ((Function) n).getFunction_tag(), null, null);
+                                    } else if (n instanceof Event && !(n instanceof Activating_Start_Event)) {
+                                        next_print = new Instance_Print_File(to_Run.getInstance().getCase_ID(), event_Calendar.getRuntime(), event_Calendar.getAct_runtimeDay(),
+                                                Workflow_Status.Scheduled, Node_Type.Event, n.getID(), ((Event) n).getEvent_Tag(), null, null);
+                                    } else if (n instanceof Event_Con_Split) {
+                                        next_print = new Instance_Print_File(to_Run.getInstance().getCase_ID(), event_Calendar.getRuntime(), event_Calendar.getAct_runtimeDay(),
+                                                Workflow_Status.Scheduled, Node_Type.E_Con_Split, n.getID(), ((Event_Con_Split) n).getContype() + "-Split-Gate" + n.getID(), null, null);
+                                    } else if (n instanceof Event_Con_Join) {
+                                        next_print = new Instance_Print_File(to_Run.getInstance().getCase_ID(), event_Calendar.getRuntime(), event_Calendar.getAct_runtimeDay(),
+                                                Workflow_Status.Scheduled, Node_Type.E_Con_Join, n.getID(), ((Event_Con_Join) n).getContype() + "-Join-Gate" + n.getID(), null, null);
+
+                                    } else if (n instanceof Activating_Function) {
+                                        next_print = new Instance_Print_File(to_Run.getInstance().getCase_ID(), event_Calendar.getRuntime(), event_Calendar.getAct_runtimeDay(),
+                                                Workflow_Status.Scheduled, Node_Type.Activating_Function, n.getID(), ((Activating_Function) n).getFunction_tag(), null, null);
+
+                                    } else if (n instanceof Activating_Start_Event) {
+                                        next_print = new Instance_Print_File(to_Run.getInstance().getCase_ID(), event_Calendar.getRuntime(), event_Calendar.getAct_runtimeDay(),
+                                                Workflow_Status.Scheduled, Node_Type.Activating_Start_Event, n.getID(), ((Activating_Start_Event) n).getEvent_Tag(), null, null);
+                                    }
+                                    synchronized (instance_printer_gate.getI_printer_Lock()) {
+                                        instance_printer_gate.getInstancePrintList().add(next_print);
+                                    }
                                 }
                             }
                         } else if (check == DELAY) {
@@ -174,15 +291,14 @@ public class Discrete_Event_Simulator {
                             }
                             to_Run.getInstance().add_To_Finished_Work(to_Run.getEPKNode());
                         } else {
-                            if (to_Run.getInstance() instanceof Event_Instance && !(to_Run.getInstance() instanceof Activating_Event_Instance) && to_Run.isWorking()) {
+                            if ((to_Run.getInstance() instanceof Event_Instance && !(to_Run.getInstance() instanceof Activating_Event_Instance)) && !(to_Run.getInstance() instanceof Activating_Event_Instance) && to_Run.isWorking()) {
                                 DeactivateFunction(to_Run, event_Calendar.getAct_runtimeDay());
-
                                 System.out.println("Finishing Instance: " + to_Run.getInstance().getCase_ID());
-                            } else if (to_Run.getInstance() instanceof Event_Instance && !(to_Run.getInstance() instanceof Activating_Event_Instance) && to_Run.Is_Waiting()) {
+                            } else if ((to_Run.getInstance() instanceof Event_Instance && !(to_Run.getInstance() instanceof Activating_Event_Instance)) && !(to_Run.getInstance() instanceof Activating_Event_Instance) && to_Run.Is_Waiting()) {
                                 to_Run.setIs_Waiting(false);
                                 ActivateFunction(to_Run, event_Calendar.getAct_runtimeDay());
                                 System.out.println("Starting Function for Instance after Instantiation: " + to_Run.getInstance().getCase_ID());
-                            } else if (to_Run.getInstance() instanceof Event_Instance && !(to_Run.getInstance() instanceof Activating_Event_Instance) && !to_Run.Is_Waiting()) {
+                            } else if ((to_Run.getInstance() instanceof Event_Instance && !(to_Run.getInstance() instanceof Activating_Event_Instance)) && !(to_Run.getInstance() instanceof Activating_Event_Instance) && !to_Run.Is_Waiting()) {
 
                                 boolean decide = ((Activating_Function) to_Run.getEPKNode()).Decide();
                                 if (decide == false) {
@@ -191,6 +307,17 @@ public class Discrete_Event_Simulator {
                                 } else {
                                     ((Activating_Function) to_Run.getEPKNode()).Instantiate_Activation(to_Run);
                                     System.out.println("Pausing Function for Instance with Instantiation: " + to_Run.getInstance().getCase_ID());
+
+                                    if (to_Run.getEPKNode() instanceof Activating_Function) {
+                                        Instance_Print_File activate_print = new Instance_Print_File(to_Run.getInstance().getCase_ID(),
+                                                event_Calendar.getRuntime(), event_Calendar.getAct_runtimeDay(), Workflow_Status.Waiting, Node_Type.Activating_Function, to_Run.getEPKNode().getID(),
+                                                ((Activating_Function) to_Run.getEPKNode()).getFunction_tag(), null, null);
+
+                                        synchronized (instance_printer_gate.getI_printer_Lock()) {
+                                            instance_printer_gate.getInstancePrintList().add(activate_print);
+                                        }
+                                    }
+
                                 }
                             }
                         }
@@ -306,14 +433,45 @@ public class Discrete_Event_Simulator {
                 }
             }
         }
-        SetUsersFree.clear();
-        SetResourceFree.clear();
 
         //Add Function as Finished and get next Elements
         List<EPK_Node> Next_Elem = to_Run.getEPKNode().getNext_Elem();
         to_Run.getInstance().add_To_Finished_Work(to_Run.getEPKNode());
 
-        //TODO Print Finished to_Run.getInstance().getNode;
+
+        List<Print_User> Print_User_List = new ArrayList<>();
+        List<Print_Resources> Print_Resource_list = new ArrayList<>();
+
+        for (User to_print_user : SetUsersFree) {
+            Print_User print_used_user = new Print_User(to_print_user.getP_ID(), to_print_user.getFirst_Name(), to_print_user.getLast_Name());
+            Print_User_List.add(print_used_user);
+        }
+        for (Resource to_print_resource : SetResourceFree) {
+            Print_Resources print_used_resource = new Print_Resources(to_print_resource.getID(), to_print_resource.getName(), to_print_resource.getCount());
+            Print_Resource_list.add(print_used_resource);
+        }
+
+        if (to_Run.getEPKNode() instanceof Function &&
+                !(to_Run.getEPKNode() instanceof Activating_Function)) {
+            Instance_Print_File activate_print = new Instance_Print_File(to_Run.getInstance().getCase_ID(),
+                    event_Calendar.getRuntime(), event_Calendar.getAct_runtimeDay(), Workflow_Status.Finished, Node_Type.Function, to_Run.getEPKNode().getID(),
+                    ((Function) to_Run.getEPKNode()).getFunction_tag(), Print_User_List, Print_Resource_list);
+
+            synchronized (instance_printer_gate.getI_printer_Lock()) {
+                instance_printer_gate.getInstancePrintList().add(activate_print);
+            }
+        } else if (to_Run.getEPKNode() instanceof Activating_Function) {
+            Instance_Print_File activate_print = new Instance_Print_File(to_Run.getInstance().getCase_ID(),
+                    event_Calendar.getRuntime(), event_Calendar.getAct_runtimeDay(), Workflow_Status.Finished, Node_Type.Activating_Function, to_Run.getEPKNode().getID(),
+                    ((Activating_Function) to_Run.getEPKNode()).getFunction_tag(), Print_User_List, Print_Resource_list);
+
+            synchronized (instance_printer_gate.getI_printer_Lock()) {
+                instance_printer_gate.getInstancePrintList().add(activate_print);
+            }
+        }
+
+        SetUsersFree.clear();
+        SetResourceFree.clear();
 
         //Instantiate new Workflow for each Element in GetNext_Elem
         for (EPK_Node n : Next_Elem) {
@@ -326,9 +484,40 @@ public class Discrete_Event_Simulator {
             event_Calendar.Add_To_Upcoming_List(new_Instance, day);
 
             if (Settings.getPrint_Only_Function() && n instanceof Function) {
-                //TODO Print Function Scheduled for n
-            } else {
-                //TODO Print Scheduled everynode for n
+                Instance_Print_File next_print = new Instance_Print_File(to_Run.getInstance().getCase_ID(), event_Calendar.getRuntime(), event_Calendar.getAct_runtimeDay(),
+                        Workflow_Status.Scheduled, Node_Type.Function, n.getID(), ((Function) n).getFunction_tag(), null, null);
+
+                synchronized (instance_printer_gate.getI_printer_Lock()) {
+                    instance_printer_gate.getInstancePrintList().add(next_print);
+                }
+            } else if (!Settings.getPrint_Only_Function()) {
+
+                Instance_Print_File next_print = null;
+                if (n instanceof Function && !(n instanceof Activating_Function)) {
+                    next_print = new Instance_Print_File(to_Run.getInstance().getCase_ID(), event_Calendar.getRuntime(), event_Calendar.getAct_runtimeDay(),
+                            Workflow_Status.Scheduled, Node_Type.Function, n.getID(), ((Function) n).getFunction_tag(), null, null);
+                } else if (n instanceof Event && !(n instanceof Activating_Start_Event)) {
+                    next_print = new Instance_Print_File(to_Run.getInstance().getCase_ID(), event_Calendar.getRuntime(), event_Calendar.getAct_runtimeDay(),
+                            Workflow_Status.Scheduled, Node_Type.Event, n.getID(), ((Event) n).getEvent_Tag(), null, null);
+                } else if (n instanceof Event_Con_Split) {
+                    next_print = new Instance_Print_File(to_Run.getInstance().getCase_ID(), event_Calendar.getRuntime(), event_Calendar.getAct_runtimeDay(),
+                            Workflow_Status.Scheduled, Node_Type.E_Con_Split, n.getID(), ((Event_Con_Split) n).getContype() + "-Split-Gate" + n.getID(), null, null);
+                } else if (n instanceof Event_Con_Join) {
+                    next_print = new Instance_Print_File(to_Run.getInstance().getCase_ID(), event_Calendar.getRuntime(), event_Calendar.getAct_runtimeDay(),
+                            Workflow_Status.Scheduled, Node_Type.E_Con_Join, n.getID(), ((Event_Con_Join) n).getContype() + "-Join-Gate" + n.getID(), null, null);
+
+                } else if (n instanceof Activating_Function) {
+                    next_print = new Instance_Print_File(to_Run.getInstance().getCase_ID(), event_Calendar.getRuntime(), event_Calendar.getAct_runtimeDay(),
+                            Workflow_Status.Scheduled, Node_Type.Activating_Function, n.getID(), ((Activating_Function) n).getFunction_tag(), null, null);
+
+                } else if (n instanceof Activating_Start_Event) {
+                    next_print = new Instance_Print_File(to_Run.getInstance().getCase_ID(), event_Calendar.getRuntime(), event_Calendar.getAct_runtimeDay(),
+                            Workflow_Status.Scheduled, Node_Type.Activating_Start_Event, n.getID(), ((Activating_Start_Event) n).getEvent_Tag(), null, null);
+                }
+
+                synchronized (instance_printer_gate.getI_printer_Lock()) {
+                    instance_printer_gate.getInstancePrintList().add(next_print);
+                }
             }
         }
     }
@@ -433,10 +622,36 @@ public class Discrete_Event_Simulator {
                 Running_Instance.Add_Active_Users(CalculateUsers);
                 Running_Instance.Add_Active_Resources(CalculateResource);
                 event_Calendar.Add_To_Upcoming_List(Running_Instance, day);
-                if (Settings.getPrint_Only_Function() && to_Run.getEPKNode() instanceof Function) {
-                    //TODO Print Function Activated for n
-                } else {
-                    //TODO Print Activated everynode for n
+
+                List<Print_User> Print_User_List = new ArrayList<>();
+                List<Print_Resources> Print_Resource_list = new ArrayList<>();
+
+                for (User to_print_user : CalculateUsers) {
+                    Print_User print_used_user = new Print_User(to_print_user.getP_ID(), to_print_user.getFirst_Name(), to_print_user.getLast_Name());
+                    Print_User_List.add(print_used_user);
+                }
+                for (Resource to_print_resource : CalculateResource) {
+                    Print_Resources print_used_resource = new Print_Resources(to_print_resource.getID(), to_print_resource.getName(), to_print_resource.getCount());
+                    Print_Resource_list.add(print_used_resource);
+                }
+
+                if (to_Run.getEPKNode() instanceof Function &&
+                        !(to_Run.getEPKNode() instanceof Activating_Function)) {
+                    Instance_Print_File activate_print = new Instance_Print_File(to_Run.getInstance().getCase_ID(),
+                            event_Calendar.getRuntime(), event_Calendar.getAct_runtimeDay(), Workflow_Status.Working, Node_Type.Function, to_Run.getEPKNode().getID(),
+                            ((Function) to_Run.getEPKNode()).getFunction_tag(), Print_User_List, Print_Resource_list);
+
+                    synchronized (instance_printer_gate.getI_printer_Lock()) {
+                        instance_printer_gate.getInstancePrintList().add(activate_print);
+                    }
+                } else if (to_Run.getEPKNode() instanceof Activating_Function) {
+                    Instance_Print_File activate_print = new Instance_Print_File(to_Run.getInstance().getCase_ID(),
+                            event_Calendar.getRuntime(), event_Calendar.getAct_runtimeDay(), Workflow_Status.Working, Node_Type.Activating_Function, to_Run.getEPKNode().getID(),
+                            ((Activating_Function) to_Run.getEPKNode()).getFunction_tag(), Print_User_List, Print_Resource_list);
+
+                    synchronized (instance_printer_gate.getI_printer_Lock()) {
+                        instance_printer_gate.getInstancePrintList().add(activate_print);
+                    }
                 }
             } else {
                 Workingtime_in_Seconds = Workingtime_in_Seconds - lasting_Shifttime_in_Seconds;
@@ -471,10 +686,34 @@ public class Discrete_Event_Simulator {
                     event_Calendar.Add_To_Upcoming_List(Running_Instance, day + advanceday);
                 }
 
-                if (Settings.getPrint_Only_Function() && to_Run.getEPKNode() instanceof Function) {
-                    //TODO Print Function Activated for n
-                } else {
-                    //TODO Print Activated everynode for n
+                List<Print_User> Print_User_List = new ArrayList<>();
+                List<Print_Resources> Print_Resource_list = new ArrayList<>();
+                for (User to_print_user : CalculateUsers) {
+                    Print_User print_used_user = new Print_User(to_print_user.getP_ID(), to_print_user.getFirst_Name(), to_print_user.getLast_Name());
+                    Print_User_List.add(print_used_user);
+                }
+                for (Resource to_print_resource : CalculateResource) {
+                    Print_Resources print_used_resource = new Print_Resources(to_print_resource.getID(), to_print_resource.getName(), to_print_resource.getCount());
+                    Print_Resource_list.add(print_used_resource);
+                }
+
+                if (to_Run.getEPKNode() instanceof Function &&
+                        !(to_Run.getEPKNode() instanceof Activating_Function)) {
+                    Instance_Print_File activate_print = new Instance_Print_File(to_Run.getInstance().getCase_ID(),
+                            event_Calendar.getRuntime(), day + advanceday, Workflow_Status.Working, Node_Type.Function, to_Run.getEPKNode().getID(),
+                            ((Function) to_Run.getEPKNode()).getFunction_tag(), Print_User_List, Print_Resource_list);
+
+                    synchronized (instance_printer_gate.getI_printer_Lock()) {
+                        instance_printer_gate.getInstancePrintList().add(activate_print);
+                    }
+                } else if (to_Run.getEPKNode() instanceof Activating_Function) {
+                    Instance_Print_File activate_print = new Instance_Print_File(to_Run.getInstance().getCase_ID(),
+                            event_Calendar.getRuntime(), day + advanceday, Workflow_Status.Working, Node_Type.Activating_Function, to_Run.getEPKNode().getID(),
+                            ((Activating_Function) to_Run.getEPKNode()).getFunction_tag(), Print_User_List, Print_Resource_list);
+
+                    synchronized (instance_printer_gate.getI_printer_Lock()) {
+                        instance_printer_gate.getInstancePrintList().add(activate_print);
+                    }
                 }
             }
 

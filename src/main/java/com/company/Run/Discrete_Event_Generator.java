@@ -38,7 +38,6 @@ public class Discrete_Event_Generator {
         this.EPK_loader = new EPK_Loader(EPK_file);
         this.Settings_loader = new Settings_Loader(Setting_file);
         this.User_loader = new User_Loader(User_file);
-        //TODO Workforce hier an Functionen / User Binden?
         this.Resource_loader = new Resource_Loader(Resource_file);
         this.EPK = null;
         this.Simulation = null;
@@ -137,12 +136,6 @@ public class Discrete_Event_Generator {
         case_ID = case_ID + 1;
         return id;
     }
-    //TODO Erstelle hier EPK Objekt und füttere dieses mit dem Graphen
-    //TODO Erstelle hier das Simulation Discrete Event Simulator Object welches Settings erhällt, sowie die Liste an Events.
-    //TODO starte ein Run Objekt das Evtl Loggt, den Printer erhällt und die EPK und Simulator Objekte.
-    //TODO Über Simulator Objekt zugang zu den Instanzen,
-    //TODO Über EPK Objekt zugang zur steuerung.
-
     //TODO 2.0 EPK Instanzierung evtl Auslagern auf extra Klasse um das Einlesen zu vereinfachen
     //TODO Settingsdatei kann hier ausgelesen werden (auch besser so), EPK generierung in eigener Datei (.epk) auslagern.
     //TODO Graphische Visualisierung mit Graphviz

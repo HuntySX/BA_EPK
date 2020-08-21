@@ -5,6 +5,8 @@ import com.company.Print.EventDriven.*;
 import com.company.Run.Discrete_Event_Generator;
 import com.company.Simulation.Simulation_Base.Data.Discrete_Data.External_Event;
 import com.company.Simulation.Simulation_Base.Data.Discrete_Data.Resource;
+import com.company.Simulation.Simulation_Base.Data.Instance_Printer_Gate;
+import com.company.Simulation.Simulation_Base.Data.Instance_Printer_Queue;
 import com.company.Simulation.Simulation_Base.Data.Printer_Gate;
 import com.company.Simulation.Simulation_Base.Data.Printer_Queue;
 import com.company.Simulation.Simulation_Base.Data.Shared_Data.Settings;
@@ -388,7 +390,6 @@ public class Borderpanecon implements Initializable {
             settings.setPrint_Only_Function(UISettings.isPrint_Only_Function());
             settings.setGet_Only_Start_Finishable_Functions(UISettings.isOnly_Start_Finishable_Functions());
 
-            //TODO
 
             /*List<External_Event> external_events = new ArrayList<>();
             UI_EXTERNAL_EVENT_MANAGER UI_External_Events = EPK.getUI_External_Events();
@@ -688,8 +689,6 @@ public class Borderpanecon implements Initializable {
                     PrinterList.add(Ev);
                 }
 
-                //TODO GIVE LIST TO RIGHT PRINTER, INSTANTIATE FULL LIST BEFORE. THEN START QUEUE
-                //CHANGE PRINTFILE PRINTER TO SOMETHING ELSE? :D
 
             }
             Printer_Gate pg = Printer_Gate.get_Printer_Gate();
@@ -698,6 +697,12 @@ public class Borderpanecon implements Initializable {
             Thread PQ = new Thread(printer_queue);
             printer_queue.setT(PQ);
             PQ.start();
+
+            Instance_Printer_Gate instance_printer_gate = Instance_Printer_Gate.getInstance_Printer_Gate();
+            Instance_Printer_Queue I_PQ = new Instance_Printer_Queue();
+            Thread I_Pq_T = new Thread(I_PQ);
+            I_PQ.setT(I_Pq_T);
+            I_Pq_T.start();
 
             Settings Final_settings = new Settings();
             Final_settings.setBeginTime(settings.getBeginTime());

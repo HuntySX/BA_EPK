@@ -106,14 +106,6 @@ public class Event_Con_Split extends Connector implements Printable_Node {
                 return working_On_EPK_Nodes;
             }
         }
-
-            /*else if (Decide_Type == Split_Decide_Type.EXPONENTIAL) {
-            //TODO EXPONENTIAL
-        }
-        } else if (Decide_Type == Split_Decide_Type.NORMAL) {
-            //TODO Gaussian
-        } else
-        */
         return Result;
     }
 

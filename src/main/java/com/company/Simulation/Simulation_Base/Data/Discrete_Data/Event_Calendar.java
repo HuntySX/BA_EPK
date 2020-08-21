@@ -3,6 +3,7 @@ package com.company.Simulation.Simulation_Base.Data.Discrete_Data;
 import com.company.EPK.*;
 import com.company.Run.Discrete_Event_Generator;
 import com.company.Simulation.Simulation_Base.Data.Shared_Data.Settings;
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -146,7 +147,7 @@ public class Event_Calendar {
         for (Start_Event sv : Start_Events) {
             int counter_to_Instantiate = sv.getTo_Instantiate();
             if (sv.getStart_event_type() == NORMAL) {
-                //DescriptiveStatistics descriptiveStatistics = new DescriptiveStatistics();
+                DescriptiveStatistics descriptiveStatistics = new DescriptiveStatistics();
             } else if (sv.getStart_event_type() == RANDOM) {
                 //TODO TAGE werden pro SV gefüllt, sorgt für unsortierte Case-ID´s
                 for (int i = 0; i < RuntimeDays; i++) {

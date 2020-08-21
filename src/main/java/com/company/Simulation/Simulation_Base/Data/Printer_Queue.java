@@ -95,7 +95,7 @@ public class Printer_Queue implements Runnable {
 
                     BufferedWriter writer = null;
                     try {
-                        writer = new BufferedWriter(new FileWriter("./Nodelist/Dirty.json"));
+                        writer = new BufferedWriter(new FileWriter("./NodelistLog/Line.json"));
                         writer.write(JSONObject);
                         writer.close();
                     } catch (IOException e) {
@@ -106,7 +106,7 @@ public class Printer_Queue implements Runnable {
 
                     BufferedWriter prettyWriter = null;
                     try {
-                        prettyWriter = new BufferedWriter(new FileWriter("./Nodelist/Pretty.json"));
+                        prettyWriter = new BufferedWriter(new FileWriter("./NodelistLog/Formatted.json"));
                         prettyWriter.write(prettyJson);
                         prettyWriter.close();
                     } catch (IOException e) {

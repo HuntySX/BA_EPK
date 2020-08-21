@@ -1,7 +1,7 @@
 package com.company.Simulation.Simulation_Threading;
 
-import com.company.Simulation.Simulation_Base.Data.Threading_Data.Warehouse;
 import com.company.Simulation.Simulation_Base.Data.Threading_Data.Process_instance;
+import com.company.Simulation.Simulation_Base.Data.Threading_Data.Warehouse;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,8 +28,7 @@ public class Warehouse_Gate {
 
     public synchronized void setWarehouse(Warehouse warehouse) {
         Warehouse_Gate.warehouse = warehouse;
-    } //TODO Unsicher ob WG.wh = wh oder wh = warehouse;
-
+    }
     public List<Process_instance> getWaiting_Orders() {
         return waiting_Orders;
     }
