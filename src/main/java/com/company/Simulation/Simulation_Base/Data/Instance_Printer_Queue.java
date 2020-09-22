@@ -42,44 +42,45 @@ public class Instance_Printer_Queue implements Runnable {
     @Override
     public synchronized void run() {
         {
-            synchronized (t) {
-                try {
-                    wait(1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+            while (not_killed) {
+                synchronized (t) {
+                    try {
+                        wait(100);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
-            }
+                synchronized (instance_printer_gate.getI_printer_Lock()) {
+                    List<Instance_Print_File> List = get_PrintList();
+                    if (!List.isEmpty()) {
+                        String s = new Gson().toString();
+                        GsonBuilder gsonBuilder = new GsonBuilder();
+                        Gson gson = gsonBuilder.create();
+                        String JSONObject = gson.toJson(List);
 
-            synchronized (instance_printer_gate.getI_printer_Lock()) {
-                List<Instance_Print_File> List = get_PrintList();
-                if (!List.isEmpty()) {
-                    String s = new Gson().toString();
-                    GsonBuilder gsonBuilder = new GsonBuilder();
-                    Gson gson = gsonBuilder.create();
-                    String JSONObject = gson.toJson(List);
+                        BufferedWriter writer = null;
+                        try {
+                            writer = new BufferedWriter(new FileWriter("./InstanceLog/Dirty.json"));
+                            writer.write(JSONObject);
+                            writer.close();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        Gson prettyGson = new GsonBuilder().setPrettyPrinting().create();
+                        String prettyJson = prettyGson.toJson(List);
 
-                    BufferedWriter writer = null;
-                    try {
-                        writer = new BufferedWriter(new FileWriter("./InstanceLog/Dirty.json"));
-                        writer.write(JSONObject);
-                        writer.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
+                        BufferedWriter prettyWriter = null;
+                        try {
+                            prettyWriter = new BufferedWriter(new FileWriter("./InstanceLog/Line.json"));
+                            prettyWriter.write(prettyJson);
+                            prettyWriter.close();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+
+                        System.out.println("General Written!");
+                        List.clear();
                     }
-                    Gson prettyGson = new GsonBuilder().setPrettyPrinting().create();
-                    String prettyJson = prettyGson.toJson(List);
-
-                    BufferedWriter prettyWriter = null;
-                    try {
-                        prettyWriter = new BufferedWriter(new FileWriter("./InstanceLog/Line.json"));
-                        prettyWriter.write(prettyJson);
-                        prettyWriter.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-
-                    System.out.println("General Written!");
-                    List.clear();
                 }
             }
         }

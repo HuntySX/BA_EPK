@@ -720,6 +720,9 @@ public class Borderpanecon implements Initializable {
 
             Discrete_Event_Generator Generator = new Discrete_Event_Generator(epk, Final_settings, Final_User, Final_Resource, external_Events);
             Generator.run();
+            I_PQ.setNot_killed(false);
+            printer_queue.setNot_killed(false);
+
 
         }
     }

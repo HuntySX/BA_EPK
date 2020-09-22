@@ -47,75 +47,77 @@ public class Printer_Queue implements Runnable {
     @Override
     public synchronized void run() {
         {
-            synchronized (t) {
-                try {
-                    wait(1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+
+            while (not_killed) {
+                synchronized (t) {
+                    try {
+                        wait(100);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
-            }
+                synchronized (Printer_Gate.get_Printer_Gate()) {
+                    List<Print_File> List = Printer_Gate.get_Printer_Gate().getPrinterList();
+                    List<Print_Event_Driven_File> Nodelist = Printer_Gate.get_Printer_Gate().getNodeList();
+                    if (!List.isEmpty()) {
+                        String s = new Gson().toString();
+                        GsonBuilder gsonBuilder = new GsonBuilder();
+                        Gson gson = gsonBuilder.create();
+                        String JSONObject = gson.toJson(List);
 
-            synchronized (Printer_Gate.get_Printer_Gate()) {
-                List<Print_File> List = Printer_Gate.get_Printer_Gate().getPrinterList();
-                List<Print_Event_Driven_File> Nodelist = Printer_Gate.get_Printer_Gate().getNodeList();
-                if (!List.isEmpty()) {
-                    String s = new Gson().toString();
-                    GsonBuilder gsonBuilder = new GsonBuilder();
-                    Gson gson = gsonBuilder.create();
-                    String JSONObject = gson.toJson(List);
+                        BufferedWriter writer = null;
+                        try {
+                            writer = new BufferedWriter(new FileWriter("./General/Dirty.json"));
+                            writer.write(JSONObject);
+                            writer.close();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        Gson prettyGson = new GsonBuilder().setPrettyPrinting().create();
+                        String prettyJson = prettyGson.toJson(List);
 
-                    BufferedWriter writer = null;
-                    try {
-                        writer = new BufferedWriter(new FileWriter("./General/Dirty.json"));
-                        writer.write(JSONObject);
-                        writer.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
+                        BufferedWriter prettyWriter = null;
+                        try {
+                            prettyWriter = new BufferedWriter(new FileWriter("./General/Pretty.json"));
+                            prettyWriter.write(prettyJson);
+                            prettyWriter.close();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+
+                        System.out.println("General Written!");
+                        List.clear();
                     }
-                    Gson prettyGson = new GsonBuilder().setPrettyPrinting().create();
-                    String prettyJson = prettyGson.toJson(List);
+                    if (!Nodelist.isEmpty()) {
+                        String s = new Gson().toString();
+                        GsonBuilder gsonBuilder = new GsonBuilder();
+                        Gson gson = gsonBuilder.create();
+                        String JSONObject = gson.toJson(Nodelist);
 
-                    BufferedWriter prettyWriter = null;
-                    try {
-                        prettyWriter = new BufferedWriter(new FileWriter("./General/Pretty.json"));
-                        prettyWriter.write(prettyJson);
-                        prettyWriter.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
+                        BufferedWriter writer = null;
+                        try {
+                            writer = new BufferedWriter(new FileWriter("./NodelistLog/Line.json"));
+                            writer.write(JSONObject);
+                            writer.close();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        Gson prettyGson = new GsonBuilder().setPrettyPrinting().create();
+                        String prettyJson = prettyGson.toJson(Nodelist);
+
+                        BufferedWriter prettyWriter = null;
+                        try {
+                            prettyWriter = new BufferedWriter(new FileWriter("./NodelistLog/Formatted.json"));
+                            prettyWriter.write(prettyJson);
+                            prettyWriter.close();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        System.out.println("Nodelist Written!");
+                        Nodelist.clear();
                     }
 
-                    System.out.println("General Written!");
-                    List.clear();
                 }
-                if (!Nodelist.isEmpty()) {
-                    String s = new Gson().toString();
-                    GsonBuilder gsonBuilder = new GsonBuilder();
-                    Gson gson = gsonBuilder.create();
-                    String JSONObject = gson.toJson(Nodelist);
-
-                    BufferedWriter writer = null;
-                    try {
-                        writer = new BufferedWriter(new FileWriter("./NodelistLog/Line.json"));
-                        writer.write(JSONObject);
-                        writer.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    Gson prettyGson = new GsonBuilder().setPrettyPrinting().create();
-                    String prettyJson = prettyGson.toJson(Nodelist);
-
-                    BufferedWriter prettyWriter = null;
-                    try {
-                        prettyWriter = new BufferedWriter(new FileWriter("./NodelistLog/Formatted.json"));
-                        prettyWriter.write(prettyJson);
-                        prettyWriter.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    System.out.println("Nodelist Written!");
-                    Nodelist.clear();
-                }
-
             }
         }
     }
