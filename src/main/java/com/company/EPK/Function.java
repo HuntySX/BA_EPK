@@ -4,6 +4,7 @@ import com.company.Enums.Function_Type;
 import com.company.Simulation.Simulation_Base.Data.Discrete_Data.Resource;
 import com.company.Simulation.Simulation_Base.Data.Discrete_Data.Workingtime;
 import com.company.Simulation.Simulation_Base.Data.Threading_Data.Process_instance;
+import org.apache.commons.math3.distribution.NormalDistribution;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +19,12 @@ public class Function extends EPK_Node implements Printable_Node, Is_Tagged {
     private List<Resource> Needed_Resources;
     private List<Workforce> Needed_Workforce;
     private Consumer<Process_instance> ConsumableMethod;
-    private Workingtime WorkingTime;
+    private boolean isDeterministic;
+    private Workingtime DeterministicWorkingTime;
+    private Workingtime Min_Workingtime;
+    private Workingtime Max_Workingtime;
+    private Workingtime Mean_Value;
+    private Workingtime Time_Standart_Deviation;
 
     public Function(String function_tag, Function_Type type, int ID, Workingtime workingtime) {
         super(ID);
@@ -33,11 +39,52 @@ public class Function extends EPK_Node implements Printable_Node, Is_Tagged {
         this.function_type = type;
         Needed_Workforce = new ArrayList<>();
         Needed_Resources = new ArrayList<>();
+        isDeterministic = true;
         if (workingtime != null) {
-            WorkingTime = workingtime;
+            DeterministicWorkingTime = workingtime;
         } else {
-            WorkingTime = new Workingtime();
+            DeterministicWorkingTime = new Workingtime();
         }
+    }
+
+    public Function(String function_tag, Function_Type type, int ID, Workingtime workingtime,
+                    Workingtime Min, Workingtime Max, Workingtime Mean, Workingtime Deviation) {
+        super(ID);
+        if (function_tag == null) {
+            String a = "Function ";
+            String b = Integer.toString(ID);
+            a = a.concat(b);
+            this.Function_tag = a;
+        } else {
+            this.Function_tag = function_tag;
+        }
+        this.function_type = type;
+        Needed_Workforce = new ArrayList<>();
+        Needed_Resources = new ArrayList<>();
+        DeterministicWorkingTime = null;
+        isDeterministic = false;
+
+        if (Min != null) {
+            Min_Workingtime = Min;
+        } else {
+            Min_Workingtime = new Workingtime();
+        }
+        if (Max != null) {
+            Max_Workingtime = Max;
+        } else {
+            Max_Workingtime = new Workingtime();
+        }
+        if (Mean != null) {
+            Mean_Value = Mean;
+        } else {
+            Mean_Value = new Workingtime();
+        }
+        if (Deviation != null) {
+            Time_Standart_Deviation = Deviation;
+        } else {
+            Time_Standart_Deviation = new Workingtime();
+        }
+
     }
 
     public Function() {
@@ -47,6 +94,42 @@ public class Function extends EPK_Node implements Printable_Node, Is_Tagged {
 
     public Function_Type getFunction_type() {
         return function_type;
+    }
+
+    public Function(List<EPK_Node> Next_Elem, int ID, String Function_tag, boolean concurrently, List<Resource> Needed_Resources,
+                    List<Workforce> Needed_Workforce, int Min_Workinghours, int Min_Workingminutes, int Min_Workingseconds,
+                    int Max_Workinghours, int Max_Workingminutes, int Max_Workingseconds, int Mean_Workinghours, int Mean_Workingminutes,
+                    int Mean_Workingseconds, int Deviation_Hours, int Deviation_Minutes, int Deviation_Seconds) {
+        super(Next_Elem, ID);
+        if (Function_tag == null) {
+            String a = "Function ";
+            String b = Integer.toString(ID);
+            a = a.concat(b);
+            this.Function_tag = a;
+        } else {
+            this.Function_tag = Function_tag;
+        }
+        this.concurrently = concurrently;
+        this.ConsumableMethod = null;
+        if (Needed_Resources == null) {
+            this.Needed_Resources = new ArrayList<>();
+        } else {
+            this.Needed_Resources = Needed_Resources;
+        }
+        if (Needed_Workforce == null) {
+            this.Needed_Workforce = new ArrayList<>();
+        } else {
+            this.Needed_Workforce = Needed_Workforce;
+        }
+
+        isDeterministic = false;
+        this.DeterministicWorkingTime = new Workingtime();
+
+        Min_Workingtime = new Workingtime(Min_Workinghours, Min_Workingminutes, Min_Workingseconds);
+        Max_Workingtime = new Workingtime(Max_Workinghours, Max_Workingminutes, Max_Workingseconds);
+        Mean_Value = new Workingtime(Mean_Workinghours, Mean_Workingminutes, Mean_Workingseconds);
+        Time_Standart_Deviation = new Workingtime(Deviation_Hours, Deviation_Minutes, Deviation_Seconds);
+
     }
 
     public Function(List<EPK_Node> Next_Elem, int ID, String Function_tag, boolean concurrently, List<Resource> Needed_Resources,
@@ -72,7 +155,9 @@ public class Function extends EPK_Node implements Printable_Node, Is_Tagged {
         } else {
             this.Needed_Workforce = Needed_Workforce;
         }
-        this.WorkingTime = new Workingtime(Workinghours, Workingminutes, Workingseconds);
+
+        isDeterministic = true;
+        this.DeterministicWorkingTime = new Workingtime(Workinghours, Workingminutes, Workingseconds);
     }
 
     public String getFunction_tag() {
@@ -120,24 +205,40 @@ public class Function extends EPK_Node implements Printable_Node, Is_Tagged {
         ConsumableMethod = consumableMethod;
     }
 
+
     public Workingtime getWorkingTime() {
-        return WorkingTime;
+        if (isDeterministic) {
+            return DeterministicWorkingTime;
+        } else {
+            NormalDistribution Distribution = new NormalDistribution(Mean_Value.get_Duration_to_Seconds(), Time_Standart_Deviation.get_Duration_to_Seconds());
+            int ResultingNonDetSeconds = (int) Distribution.sample();
+            Workingtime ResultingNonDetWorkingtime = new Workingtime(ResultingNonDetSeconds);
+
+            if (Min_Workingtime.isBefore(ResultingNonDetWorkingtime)) {
+                ResultingNonDetWorkingtime = Min_Workingtime;
+            }
+            if (Max_Workingtime.isAfter(ResultingNonDetWorkingtime)) {
+                ResultingNonDetWorkingtime = Max_Workingtime;
+            }
+
+            return ResultingNonDetWorkingtime;
+        }
     }
 
-    public void setWorkingTime(Workingtime workingTime) {
-        WorkingTime = workingTime;
+    public void setDeterministicWorkingTime(Workingtime deterministicWorkingTime) {
+        DeterministicWorkingTime = deterministicWorkingTime;
     }
 
     public void setWorkingHours(int Hours) {
-        WorkingTime.setHours(Hours);
+        DeterministicWorkingTime.setHours(Hours);
     }
 
     public void setWorkingMinutes(int Minutes) {
-        WorkingTime.setMinutes(Minutes);
+        DeterministicWorkingTime.setMinutes(Minutes);
     }
 
     public void setWorkingSeconds(int Seconds) {
-        WorkingTime.setSeconds(Seconds);
+        DeterministicWorkingTime.setSeconds(Seconds);
     }
 
 
@@ -161,7 +262,7 @@ public class Function extends EPK_Node implements Printable_Node, Is_Tagged {
         if (Needed_Workforce == null || Needed_Workforce.isEmpty()) {
             Check = false;
         }
-        if (WorkingTime == null) {
+        if (DeterministicWorkingTime == null) {
             Check = false;
         }
         if (Function_tag == null || Function_tag.equals("")) {
@@ -220,5 +321,29 @@ public class Function extends EPK_Node implements Printable_Node, Is_Tagged {
 
     public void setNeeded_Workforce(List<Workforce> needed_Workforce) {
         Needed_Workforce = needed_Workforce;
+    }
+
+    public boolean isDeterministic() {
+        return isDeterministic;
+    }
+
+    public void setDeterministic(boolean deterministic) {
+        isDeterministic = deterministic;
+    }
+
+    public Workingtime getMin_Workingtime() {
+        return Min_Workingtime;
+    }
+
+    public Workingtime getMax_Workingtime() {
+        return Max_Workingtime;
+    }
+
+    public Workingtime getMean_Value() {
+        return Mean_Value;
+    }
+
+    public Workingtime getTime_Standart_Deviation() {
+        return Time_Standart_Deviation;
     }
 }

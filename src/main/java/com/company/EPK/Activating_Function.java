@@ -4,7 +4,9 @@ import com.company.Enums.Decide_Activation_Type;
 import com.company.Enums.Function_Type;
 import com.company.Simulation.Simulation_Base.Data.Discrete_Data.Event_Calendar;
 import com.company.Simulation.Simulation_Base.Data.Discrete_Data.Instance_Workflow;
+import com.company.Simulation.Simulation_Base.Data.Discrete_Data.Resource;
 import com.company.Simulation.Simulation_Base.Data.Discrete_Data.Workingtime;
+import org.apache.commons.math3.distribution.NormalDistribution;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +19,10 @@ public class Activating_Function extends Function implements Printable_Node, Is_
 
     private Activating_Start_Event Start_Event;
     private Workingtime Instantiate_Time;
+    private Workingtime Min_Instantiate_Time;
+    private Workingtime Max_Instantiate_Time;
+    private Workingtime Mean_Instantiate_Time;
+    private Workingtime Standard_Distribution_Instantiate_Time;
     private int chance_for_instantiation;
     private int waiting_Ticket;
     private List<Instance_Workflow> Waiting_For_Activation_Instances;
@@ -39,9 +45,50 @@ public class Activating_Function extends Function implements Printable_Node, Is_
         waiting_Ticket = 0;
     }
 
-    public void Instantiate_Activation(Instance_Workflow instance) {
+    public Activating_Function(String function_tag, Workingtime instantiate_Time, boolean concurrently, List<Resource> Needed_Resources,
+                               int chance_for_instantiation, int Min_Workinghours, int Min_Workingminutes, int Min_Workingseconds,
+                               int Max_Workinghours, int Max_Workingminutes, int Max_Workingseconds, int Mean_Workinghours, int Mean_Workingminutes,
+                               int Mean_Workingseconds, int Deviation_Hours, int Deviation_Minutes, int Deviation_Seconds,
+                               int Min_Instantiate_Hours, int Min_Instantiate_Minutes, int Min_Instantiate_Seconds,
+                               int Max_Instantiate_Hours, int Max_Instantiate_Minutes, int Max_Instantiate_Seconds,
+                               int Mean_Instantiate_Hours, int Mean_Instantiate_Minutes, int Mean_Instantiate_Seconds,
+                               int SD_Instantiate_Hours, int SD_Instantiate_Minutes, int SD_Instantiate_Seconds,
+                               Function_Type type, int ID, Activating_Start_Event start_Event, Event_Calendar calendar,
+                               Decide_Activation_Type decision
+    ) {
 
-        calendar.instantiate_new_Activation_Event(Start_Event, this, instance, Instantiate_Time);
+        super(null, ID, function_tag, concurrently, Needed_Resources,
+                null, Min_Workinghours, Min_Workingminutes, Min_Workingseconds,
+                Max_Workinghours, Max_Workingminutes, Max_Workingseconds, Mean_Workinghours, Mean_Workingminutes,
+                Mean_Workingseconds, Deviation_Hours, Deviation_Minutes, Deviation_Seconds);
+        Start_Event = start_Event;
+        this.Min_Instantiate_Time = new Workingtime(Min_Instantiate_Hours, Min_Instantiate_Minutes, Min_Instantiate_Seconds);
+        this.Max_Instantiate_Time = new Workingtime(Max_Instantiate_Hours, Max_Instantiate_Minutes, Max_Instantiate_Seconds);
+        this.Mean_Instantiate_Time = new Workingtime(Mean_Instantiate_Hours, Mean_Instantiate_Minutes, Mean_Instantiate_Seconds);
+        this.Standard_Distribution_Instantiate_Time = new Workingtime(SD_Instantiate_Hours, SD_Instantiate_Minutes, SD_Instantiate_Seconds);
+        this.chance_for_instantiation = chance_for_instantiation;
+        this.Waiting_For_Activation_Instances = new ArrayList<>();
+        this.calendar = calendar;
+        this.DecisionType = decision;
+
+        waiting_Ticket = 0;
+    }
+
+    public void Instantiate_Activation(Instance_Workflow instance) {
+        Workingtime to_Instantiate = null;
+        if (isDeterministic()) {
+            to_Instantiate = Instantiate_Time;
+        } else {
+            NormalDistribution Distribution = new NormalDistribution(Mean_Instantiate_Time.get_Duration_to_Seconds(), Standard_Distribution_Instantiate_Time.get_Duration_to_Seconds())
+            int Seconds_to_Instantiate = (int) Distribution.sample();
+            to_Instantiate = new Workingtime(Seconds_to_Instantiate);
+            if (Min_Instantiate_Time.isBefore(to_Instantiate)) {
+                to_Instantiate = Min_Instantiate_Time;
+            } else if (Max_Instantiate_Time.isAfter(to_Instantiate)) {
+                to_Instantiate = Max_Instantiate_Time;
+            }
+        }
+        calendar.instantiate_new_Activation_Event(Start_Event, this, instance, to_Instantiate);
         add_to_Waiting_For_Activation(instance);
     }
 
@@ -151,6 +198,22 @@ public class Activating_Function extends Function implements Printable_Node, Is_
         Instantiate_Time.setMinutes(Seconds);
     }
 
+    public Workingtime getMin_Instantiate_Time() {
+        return Min_Instantiate_Time;
+    }
+
+    public void setMin_Instantiate_Time(Workingtime min_Instantiate_Time) {
+        Min_Instantiate_Time = min_Instantiate_Time;
+    }
+
+    public Workingtime getMax_Instantiate_Time() {
+        return Max_Instantiate_Time;
+    }
+
+    public void setMax_Instantiate_Time(Workingtime max_Instantiate_Time) {
+        Max_Instantiate_Time = max_Instantiate_Time;
+    }
+
     public Workingtime getInstantiate_Time() {
         return Instantiate_Time;
     }
@@ -181,5 +244,21 @@ public class Activating_Function extends Function implements Printable_Node, Is_
 
     public void setChance_for_instantiation(int chance_for_instantiation) {
         this.chance_for_instantiation = chance_for_instantiation;
+    }
+
+    public Workingtime getMean_Instantiate_Time() {
+        return Mean_Instantiate_Time;
+    }
+
+    public void setMean_Instantiate_Time(Workingtime mean_Instantiate_Time) {
+        Mean_Instantiate_Time = mean_Instantiate_Time;
+    }
+
+    public Workingtime getStandard_Distribution_Instantiate_Time() {
+        return Standard_Distribution_Instantiate_Time;
+    }
+
+    public void setStandard_Distribution_Instantiate_Time(Workingtime standard_Distribution_Instantiate_Time) {
+        Standard_Distribution_Instantiate_Time = standard_Distribution_Instantiate_Time;
     }
 }

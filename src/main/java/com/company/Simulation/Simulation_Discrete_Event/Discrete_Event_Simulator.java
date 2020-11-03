@@ -607,7 +607,6 @@ public class Discrete_Event_Simulator {
             int lasting_Shifttime_in_Seconds = event_Calendar.getEnd_Time().toSecondOfDay() - event_Calendar.getRuntime().toSecondOfDay();
             int Workingtime_in_Seconds = ((Function) to_Run.getEPKNode()).getWorkingTime().get_Duration_to_Seconds();
 
-
             Duration = Duration.plusSeconds(Workingtime_in_Seconds);
             to_Run.setWorking(true);
             event_Calendar.Remove_From_Upcoming_List(to_Run, day); //fraglich

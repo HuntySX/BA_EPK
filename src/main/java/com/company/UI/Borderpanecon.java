@@ -414,10 +414,20 @@ public class Borderpanecon implements Initializable {
             for (EPK_Node Node : UI_All_Nodes) {
 
                 if (Node instanceof Function && !(Node instanceof Activating_Function)) {
-                    Function newFunc = new Function(null, Node.getID(), ((Function) Node).getFunction_tag(),
-                            ((Function) Node).isConcurrently(), ((Function) Node).getNeeded_Resources(), null,
-                            ((Function) Node).getWorkingTime().getHours(), ((Function) Node).getWorkingTime().getMinutes(), ((Function) Node).getWorkingTime().getSeconds());
-                    Final_List.add(newFunc);
+                    if (((Function) Node).isDeterministic()) {
+                        Function newFunc = new Function(null, Node.getID(), ((Function) Node).getFunction_tag(),
+                                ((Function) Node).isConcurrently(), ((Function) Node).getNeeded_Resources(), null,
+                                ((Function) Node).getWorkingTime().getHours(), ((Function) Node).getWorkingTime().getMinutes(), ((Function) Node).getWorkingTime().getSeconds());
+                        Final_List.add(newFunc);
+                    } else {
+                        Function newFunc = new Function(null, Node.getID(), ((Function) Node).getFunction_tag(),
+                                ((Function) Node).isConcurrently(), ((Function) Node).getNeeded_Resources(), null,
+                                ((Function) Node).getMin_Workingtime().getHours(), ((Function) Node).getMin_Workingtime().getMinutes(), ((Function) Node).getMin_Workingtime().getSeconds(),
+                                ((Function) Node).getMax_Workingtime().getHours(), ((Function) Node).getMax_Workingtime().getMinutes(), ((Function) Node).getMax_Workingtime().getSeconds(),
+                                ((Function) Node).getMean_Value().getHours(), ((Function) Node).getMean_Value().getMinutes(), ((Function) Node).getMean_Value().getSeconds(),
+                                ((Function) Node).getTime_Standart_Deviation().getHours(), ((Function) Node).getTime_Standart_Deviation().getMinutes(), ((Function) Node).getTime_Standart_Deviation().getSeconds());
+                        Final_List.add(newFunc);
+                    }
                     //NEXTELEMBINDING
                 } else if (Node instanceof Event && !(Node instanceof Activating_Start_Event) && !(Node instanceof Start_Event)) {
                     Event newEvent = new Event(null, Node.getID(), ((Event) Node).getEvent_Tag(),
@@ -430,11 +440,29 @@ public class Borderpanecon implements Initializable {
                     Final_List.add(newActivateStartEvent);
                     //ACTIVATE FUNCTION/ NEXTELEMBINDING
                 } else if (Node instanceof Activating_Function) {
-                    Activating_Function newActivatingFunction = new Activating_Function(((Function) Node).getFunction_tag(),
-                            ((Activating_Function) Node).getInstantiate_Time(), ((Activating_Function) Node).getChance_for_instantiation(), ((Function) Node).getWorkingTime(), ((Function) Node).getFunction_type(), Node.getID(),
-                            null, null, ((Activating_Function) Node).getDecisionType());
-                    newActivatingFunction.setNeeded_Resources(((Activating_Function) Node).getNeeded_Resources());
-                    Final_List.add(newActivatingFunction);
+                    if (((Function) Node).isDeterministic()) {
+                        Activating_Function newActivatingFunction = new Activating_Function(((Function) Node).getFunction_tag(),
+                                ((Activating_Function) Node).getInstantiate_Time(), ((Activating_Function) Node).getChance_for_instantiation(), ((Function) Node).getWorkingTime(), ((Function) Node).getFunction_type(), Node.getID(),
+                                null, null, ((Activating_Function) Node).getDecisionType());
+                        newActivatingFunction.setNeeded_Resources(((Activating_Function) Node).getNeeded_Resources());
+                        Final_List.add(newActivatingFunction);
+                    } else {
+                        Activating_Function newActivatingFunction = new Activating_Function(((Function) Node).getFunction_tag(),
+                                ((Activating_Function) Node).getInstantiate_Time(), ((Activating_Function) Node).isConcurrently(),
+                                ((Activating_Function) Node).getNeeded_Resources(), ((Activating_Function) Node).getChance_for_instantiation(),
+                                ((Function) Node).getMin_Workingtime().getHours(), ((Function) Node).getMin_Workingtime().getMinutes(), ((Function) Node).getMin_Workingtime().getSeconds(),
+                                ((Function) Node).getMax_Workingtime().getHours(), ((Function) Node).getMax_Workingtime().getMinutes(), ((Function) Node).getMax_Workingtime().getSeconds(),
+                                ((Function) Node).getMean_Value().getHours(), ((Function) Node).getMean_Value().getMinutes(), ((Function) Node).getMean_Value().getSeconds(),
+                                ((Function) Node).getTime_Standart_Deviation().getHours(), ((Function) Node).getTime_Standart_Deviation().getMinutes(), ((Function) Node).getTime_Standart_Deviation().getSeconds(),
+                                ((Activating_Function) Node).getMin_Instantiate_Time().getHours(), ((Activating_Function) Node).getMin_Instantiate_Time().getMinutes(), ((Activating_Function) Node).getMin_Instantiate_Time().getSeconds(),
+                                ((Activating_Function) Node).getMax_Instantiate_Time().getHours(), ((Activating_Function) Node).getMax_Instantiate_Time().getMinutes(), ((Activating_Function) Node).getMax_Instantiate_Time().getSeconds(),
+                                ((Activating_Function) Node).getMean_Instantiate_Time().getHours(), ((Activating_Function) Node).getMean_Instantiate_Time().getMinutes(), ((Activating_Function) Node).getMean_Instantiate_Time().getSeconds(),
+                                ((Activating_Function) Node).getStandard_Distribution_Instantiate_Time().getHours(), ((Activating_Function) Node).getStandard_Distribution_Instantiate_Time().getMinutes(), ((Activating_Function) Node).getStandard_Distribution_Instantiate_Time().getSeconds(),
+                                ((Function) Node).getFunction_type(), Node.getID(),
+                                null, null, ((Activating_Function) Node).getDecisionType());
+                        newActivatingFunction.setNeeded_Resources(((Activating_Function) Node).getNeeded_Resources());
+                        Final_List.add(newActivatingFunction);
+                    }
                     //NEXTELEM;STARTEVENTBINDING
                 } else if (Node instanceof Event_Con_Join) {
                     Event_Con_Join newCon_Join = new Event_Con_Join(null, Node.getID(), ((Event_Con_Join) Node).getContype());
@@ -628,7 +656,7 @@ public class Borderpanecon implements Initializable {
                             ((Function) Node).getFunction_type(),
                             ((Function) Node).isConcurrently(),
                             Resource_List, Workforce_List,
-                            ((Function) Node).getWorkingTime());
+                            ((Function) Node).getDeterministicWorkingTime());
                     PrinterList.add(Ev);
                 } else if (Node instanceof Activating_Function) {
                     List<Connected_Resource_Print> Resource_List = new ArrayList<>();
@@ -653,7 +681,7 @@ public class Borderpanecon implements Initializable {
                             ((Activating_Function) Node).getFunction_type(),
                             ((Activating_Function) Node).isConcurrently(),
                             Resource_List, Workforce_List,
-                            ((Activating_Function) Node).getWorkingTime(),
+                            ((Activating_Function) Node).getDeterministicWorkingTime(),
                             Start_Event,
                             ((Activating_Function) Node).getInstantiate_Time(),
                             ((Activating_Function) Node).getDecisionType());

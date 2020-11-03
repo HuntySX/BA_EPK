@@ -69,7 +69,7 @@ public class Check_Condition_For_Event {
                 }
 
                 int lasting_Shifttime_in_Seconds = calendar.getEnd_Time().toSecondOfDay() - calendar.getRuntime().toSecondOfDay();
-                int Workingtime_in_Seconds = ((Function) Instance.getEPKNode()).getWorkingTime().get_Duration_to_Seconds();
+                int Workingtime_in_Seconds = ((Function) Instance.getEPKNode()).getDeterministicWorkingTime().get_Duration_to_Seconds();
                 if (Workingtime_in_Seconds <= lasting_Shifttime_in_Seconds) {
                     return true;
                 } else {

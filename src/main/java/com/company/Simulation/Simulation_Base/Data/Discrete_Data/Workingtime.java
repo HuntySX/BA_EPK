@@ -18,6 +18,12 @@ public class Workingtime {
         Seconds = 0;
     }
 
+    public Workingtime(int Seconds) {
+        Hours = Seconds / 3600;
+        Minutes = (Seconds % 3600) / 60;
+        Seconds = Seconds % 60;
+    }
+
     public int getHours() {
         return Hours;
     }
@@ -44,6 +50,14 @@ public class Workingtime {
 
     public int get_Duration_to_Seconds() {
         return (this.Hours * 3600) + (this.Minutes * 60) + (this.Seconds);
+    }
+
+    public boolean isBefore(Workingtime to_check) {
+        return to_check.get_Duration_to_Seconds() < this.get_Duration_to_Seconds();
+    }
+
+    public boolean isAfter(Workingtime to_check) {
+        return to_check.get_Duration_to_Seconds() > this.get_Duration_to_Seconds();
     }
 
     @Override
