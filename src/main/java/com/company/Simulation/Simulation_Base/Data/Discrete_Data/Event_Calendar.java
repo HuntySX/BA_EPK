@@ -3,7 +3,8 @@ package com.company.Simulation.Simulation_Base.Data.Discrete_Data;
 import com.company.EPK.*;
 import com.company.Run.Discrete_Event_Generator;
 import com.company.Simulation.Simulation_Base.Data.Shared_Data.Settings;
-import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
+import org.apache.commons.math3.distribution.ExponentialDistribution;
+import org.apache.commons.math3.distribution.NormalDistribution;
 
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -147,9 +148,33 @@ public class Event_Calendar {
         for (Start_Event sv : Start_Events) {
             int counter_to_Instantiate = sv.getTo_Instantiate();
             if (sv.getStart_event_type() == NORMAL) {
-                DescriptiveStatistics descriptiveStatistics = new DescriptiveStatistics();
+                double Time_Upper_bound = End_Time.toSecondOfDay() - Begin_Time.toSecondOfDay();
+                double Time_Middle_bound = Time_Upper_bound / 2;
+                double time_Standart_deviation = Time_Middle_bound * 0.3;
+                NormalDistribution Distribution = new NormalDistribution(Time_Middle_bound, time_Standart_deviation);
+                for (int i = 0; i < RuntimeDays; i++) {
+                    int[] timerlist = new int[counter_to_Instantiate];
+                    for (int j = 0; j < counter_to_Instantiate; j++) {
+                        int time_to_Generate = -1;
+                        while (!(time_to_Generate >= Begin_Time.toSecondOfDay()
+                                && time_to_Generate <= End_Time.toSecondOfDay())) {
+                            int sample = (int) Distribution.sample();
+                            time_to_Generate = sample + Begin_Time.toSecondOfDay();
+                        }
+                        timerlist[j] = time_to_Generate;
+                    }
+                    QuickSort(timerlist, 0, counter_to_Instantiate - 1);
+                    for (int k : timerlist) {
+                        Event_Instance new_Ev_Instance = new Event_Instance(Generator.get_Unique_case_ID());
+                        new_Ev_Instance.add_To_Scheduled_Work(sv);
+                        LocalTime to_Start = LocalTime.ofSecondOfDay(k);
+                        Instance_Workflow to_Instantiate = new Instance_Workflow(new_Ev_Instance, to_Start, sv);
+                        Upcoming_List.get(i).addTimedEvent(to_Instantiate);
+                    }
+                }
+
             } else if (sv.getStart_event_type() == RANDOM) {
-                //TODO TAGE werden pro SV gefüllt, sorgt für unsortierte Case-ID´s
+
                 for (int i = 0; i < RuntimeDays; i++) {
                     int[] timerlist = new int[counter_to_Instantiate];
                     int duration = endtime - begintime;
@@ -169,7 +194,29 @@ public class Event_Calendar {
                     }
                 }
             } else if (sv.getStart_event_type() == EXPONENTIAL) {
-                //DescriptiveStatistics descriptiveStatistics = new DescriptiveStatistics();
+                double Time_Upper_bound = End_Time.toSecondOfDay() - Begin_Time.toSecondOfDay();
+                double Time_Middle_bound = Time_Upper_bound / 2;
+                ExponentialDistribution Distribution = new ExponentialDistribution(Time_Middle_bound);
+                for (int i = 0; i < RuntimeDays; i++) {
+                    int[] timerlist = new int[counter_to_Instantiate];
+                    for (int j = 0; j < counter_to_Instantiate; j++) {
+                        int time_to_Generate = -1;
+                        while (!(time_to_Generate >= Begin_Time.toSecondOfDay()
+                                && time_to_Generate <= End_Time.toSecondOfDay())) {
+                            int sample = (int) Distribution.sample();
+                            time_to_Generate = End_Time.toSecondOfDay() - sample;
+                        }
+                        timerlist[j] = time_to_Generate;
+                    }
+                    QuickSort(timerlist, 0, counter_to_Instantiate - 1);
+                    for (int k : timerlist) {
+                        Event_Instance new_Ev_Instance = new Event_Instance(Generator.get_Unique_case_ID());
+                        new_Ev_Instance.add_To_Scheduled_Work(sv);
+                        LocalTime to_Start = LocalTime.ofSecondOfDay(k);
+                        Instance_Workflow to_Instantiate = new Instance_Workflow(new_Ev_Instance, to_Start, sv);
+                        Upcoming_List.get(i).addTimedEvent(to_Instantiate);
+                    }
+                }
             }
         /*else if(fillingType == ){
 

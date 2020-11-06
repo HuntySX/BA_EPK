@@ -5,7 +5,7 @@ import com.company.Simulation.Simulation_Base.Data.Discrete_Data.Workingtime;
 
 import java.util.List;
 
-public class Print_Function extends Print_Event_Driven_File {
+public class Print_Det_Function extends Print_Event_Driven_File {
     private String Tag;
     private Function_Type function_type;
     private boolean concurrently;
@@ -13,14 +13,18 @@ public class Print_Function extends Print_Event_Driven_File {
     private List<Connected_Workforce_Print> Workforces;
     private Workingtime WorkingTime;
 
-    public Print_Function(int ID, List<Connected_Elem_Print> Next_elements, String tag, Function_Type function_type, boolean concurrently, List<Connected_Resource_Print> resources, List<Connected_Workforce_Print> workforces, Workingtime workingTime) {
+    public Print_Det_Function(int ID, List<Connected_Elem_Print> Next_elements, String tag, Function_Type function_type,
+                              boolean concurrently,
+                              List<Connected_Resource_Print> resources, List<Connected_Workforce_Print> workforces,
+                              Workingtime workingTime) {
         super(Node_Type.Function, ID, Next_elements);
         Tag = tag;
         this.function_type = function_type;
         this.concurrently = concurrently;
         Resources = resources;
         Workforces = workforces;
-        WorkingTime = workingTime;
+        this.WorkingTime = workingTime;
+
     }
 
 

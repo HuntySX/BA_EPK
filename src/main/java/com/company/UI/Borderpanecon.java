@@ -6,7 +6,6 @@ import com.company.Run.Discrete_Event_Generator;
 import com.company.Simulation.Simulation_Base.Data.Discrete_Data.External_Event;
 import com.company.Simulation.Simulation_Base.Data.Discrete_Data.Resource;
 import com.company.Simulation.Simulation_Base.Data.Instance_Printer_Gate;
-import com.company.Simulation.Simulation_Base.Data.Instance_Printer_Queue;
 import com.company.Simulation.Simulation_Base.Data.Printer_Gate;
 import com.company.Simulation.Simulation_Base.Data.Printer_Queue;
 import com.company.Simulation.Simulation_Base.Data.Shared_Data.Settings;
@@ -422,10 +421,8 @@ public class Borderpanecon implements Initializable {
                     } else {
                         Function newFunc = new Function(null, Node.getID(), ((Function) Node).getFunction_tag(),
                                 ((Function) Node).isConcurrently(), ((Function) Node).getNeeded_Resources(), null,
-                                ((Function) Node).getMin_Workingtime().getHours(), ((Function) Node).getMin_Workingtime().getMinutes(), ((Function) Node).getMin_Workingtime().getSeconds(),
-                                ((Function) Node).getMax_Workingtime().getHours(), ((Function) Node).getMax_Workingtime().getMinutes(), ((Function) Node).getMax_Workingtime().getSeconds(),
-                                ((Function) Node).getMean_Value().getHours(), ((Function) Node).getMean_Value().getMinutes(), ((Function) Node).getMean_Value().getSeconds(),
-                                ((Function) Node).getTime_Standart_Deviation().getHours(), ((Function) Node).getTime_Standart_Deviation().getMinutes(), ((Function) Node).getTime_Standart_Deviation().getSeconds());
+                                ((Function) Node).getMin_Workingtime(), ((Function) Node).getMax_Workingtime(),
+                                ((Function) Node).getMean_Workingtime(), ((Function) Node).getDeviation_Workintime());
                         Final_List.add(newFunc);
                     }
                     //NEXTELEMBINDING
@@ -450,14 +447,14 @@ public class Borderpanecon implements Initializable {
                         Activating_Function newActivatingFunction = new Activating_Function(((Function) Node).getFunction_tag(),
                                 ((Activating_Function) Node).getInstantiate_Time(), ((Activating_Function) Node).isConcurrently(),
                                 ((Activating_Function) Node).getNeeded_Resources(), ((Activating_Function) Node).getChance_for_instantiation(),
-                                ((Function) Node).getMin_Workingtime().getHours(), ((Function) Node).getMin_Workingtime().getMinutes(), ((Function) Node).getMin_Workingtime().getSeconds(),
-                                ((Function) Node).getMax_Workingtime().getHours(), ((Function) Node).getMax_Workingtime().getMinutes(), ((Function) Node).getMax_Workingtime().getSeconds(),
-                                ((Function) Node).getMean_Value().getHours(), ((Function) Node).getMean_Value().getMinutes(), ((Function) Node).getMean_Value().getSeconds(),
-                                ((Function) Node).getTime_Standart_Deviation().getHours(), ((Function) Node).getTime_Standart_Deviation().getMinutes(), ((Function) Node).getTime_Standart_Deviation().getSeconds(),
-                                ((Activating_Function) Node).getMin_Instantiate_Time().getHours(), ((Activating_Function) Node).getMin_Instantiate_Time().getMinutes(), ((Activating_Function) Node).getMin_Instantiate_Time().getSeconds(),
-                                ((Activating_Function) Node).getMax_Instantiate_Time().getHours(), ((Activating_Function) Node).getMax_Instantiate_Time().getMinutes(), ((Activating_Function) Node).getMax_Instantiate_Time().getSeconds(),
-                                ((Activating_Function) Node).getMean_Instantiate_Time().getHours(), ((Activating_Function) Node).getMean_Instantiate_Time().getMinutes(), ((Activating_Function) Node).getMean_Instantiate_Time().getSeconds(),
-                                ((Activating_Function) Node).getStandard_Distribution_Instantiate_Time().getHours(), ((Activating_Function) Node).getStandard_Distribution_Instantiate_Time().getMinutes(), ((Activating_Function) Node).getStandard_Distribution_Instantiate_Time().getSeconds(),
+                                ((Function) Node).getMin_Workingtime(),
+                                ((Function) Node).getMax_Workingtime(),
+                                ((Function) Node).getMean_Workingtime(),
+                                ((Function) Node).getDeviation_Workintime(),
+                                ((Activating_Function) Node).getMin_Instantiate_Time(),
+                                ((Activating_Function) Node).getMax_Instantiate_Time(),
+                                ((Activating_Function) Node).getMean_Instantiate_Time(),
+                                ((Activating_Function) Node).getDeviation_Instantiate_Time(),
                                 ((Function) Node).getFunction_type(), Node.getID(),
                                 null, null, ((Activating_Function) Node).getDecisionType());
                         newActivatingFunction.setNeeded_Resources(((Activating_Function) Node).getNeeded_Resources());
@@ -651,13 +648,26 @@ public class Borderpanecon implements Initializable {
                         Connected_Workforce_Print force = new Connected_Workforce_Print(needed.getW_ID(), needed.getPermission());
                         Workforce_List.add(force);
                     }
-                    Print_Function Ev = new Print_Function(Node.getID(), Next_elems,
-                            ((Function) Node).getTag(),
-                            ((Function) Node).getFunction_type(),
-                            ((Function) Node).isConcurrently(),
-                            Resource_List, Workforce_List,
-                            ((Function) Node).getDeterministicWorkingTime());
-                    PrinterList.add(Ev);
+                    if (((Function) Node).isDeterministic()) {
+                        Print_Det_Function Ev = new Print_Det_Function(Node.getID(), Next_elems,
+                                ((Function) Node).getTag(),
+                                ((Function) Node).getFunction_type(),
+                                ((Function) Node).isConcurrently(),
+                                Resource_List, Workforce_List,
+                                ((Function) Node).getDeterministicWorkingTime());
+                        PrinterList.add(Ev);
+                    } else {
+                        Print_NonDet_Function Ev = new Print_NonDet_Function(Node.getID(), Next_elems,
+                                ((Function) Node).getTag(),
+                                ((Function) Node).getFunction_type(),
+                                ((Function) Node).isConcurrently(),
+                                Resource_List, Workforce_List,
+                                ((Function) Node).getMin_Workingtime(),
+                                ((Function) Node).getMax_Workingtime(),
+                                ((Function) Node).getMean_Workingtime(),
+                                ((Function) Node).getDeviation_Workintime());
+                        PrinterList.add(Ev);
+                    }
                 } else if (Node instanceof Activating_Function) {
                     List<Connected_Resource_Print> Resource_List = new ArrayList<>();
                     List<Connected_Workforce_Print> Workforce_List = new ArrayList<>();
@@ -676,16 +686,35 @@ public class Borderpanecon implements Initializable {
                         Start_Event = new Connected_Elem_Print(0, "");
 
                     }
-                    Print_Activating_Function Ev = new Print_Activating_Function(Node.getID(), Next_elems,
-                            ((Activating_Function) Node).getTag(),
-                            ((Activating_Function) Node).getFunction_type(),
-                            ((Activating_Function) Node).isConcurrently(),
-                            Resource_List, Workforce_List,
-                            ((Activating_Function) Node).getDeterministicWorkingTime(),
-                            Start_Event,
-                            ((Activating_Function) Node).getInstantiate_Time(),
-                            ((Activating_Function) Node).getDecisionType());
-                    PrinterList.add(Ev);
+                    if (((Activating_Function) Node).isDeterministic()) {
+                        Print_Det_Activating_Function Ev = new Print_Det_Activating_Function(Node.getID(), Next_elems,
+                                ((Activating_Function) Node).getTag(),
+                                ((Activating_Function) Node).getFunction_type(),
+                                ((Activating_Function) Node).isConcurrently(),
+                                Resource_List, Workforce_List,
+                                ((Activating_Function) Node).getDeterministicWorkingTime(),
+                                Start_Event,
+                                ((Activating_Function) Node).getInstantiate_Time(),
+                                ((Activating_Function) Node).getDecisionType());
+                        PrinterList.add(Ev);
+                    } else {
+                        Print_NonDet_Activating_Function Ev = new Print_NonDet_Activating_Function(Node.getID(), Next_elems,
+                                ((Activating_Function) Node).getTag(),
+                                ((Activating_Function) Node).getFunction_type(),
+                                ((Activating_Function) Node).isConcurrently(),
+                                Resource_List, Workforce_List,
+                                ((Activating_Function) Node).getMin_Workingtime(),
+                                ((Activating_Function) Node).getMax_Workingtime(),
+                                ((Activating_Function) Node).getMean_Workingtime(),
+                                ((Activating_Function) Node).getDeviation_Workintime(),
+                                ((Activating_Function) Node).getMin_Instantiate_Time(),
+                                ((Activating_Function) Node).getMax_Instantiate_Time(),
+                                ((Activating_Function) Node).getMean_Instantiate_Time(),
+                                ((Activating_Function) Node).getDeviation_Instantiate_Time(),
+                                Start_Event,
+                                ((Activating_Function) Node).getDecisionType());
+                        PrinterList.add(Ev);
+                    }
                 } else if (Node instanceof Activating_Start_Event) {
                     Connected_Elem_Print Activate_Function = null;
                     if (((Activating_Start_Event) Node).getActivating_Function() != null) {
@@ -727,10 +756,10 @@ public class Borderpanecon implements Initializable {
             PQ.start();
 
             Instance_Printer_Gate instance_printer_gate = Instance_Printer_Gate.getInstance_Printer_Gate();
-            Instance_Printer_Queue I_PQ = new Instance_Printer_Queue();
-            Thread I_Pq_T = new Thread(I_PQ);
-            I_PQ.setT(I_Pq_T);
-            I_Pq_T.start();
+            //Instance_Printer_Queue I_PQ = new Instance_Printer_Queue();
+            Instance_Printer_FilePrinter Print_File = new Instance_Printer_FilePrinter();
+            //Thread I_Pq_T = new Thread(I_PQ);
+            //I_PQ.setT(I_Pq_T);
 
             Settings Final_settings = new Settings();
             Final_settings.setBeginTime(settings.getBeginTime());
@@ -748,10 +777,13 @@ public class Borderpanecon implements Initializable {
 
             Discrete_Event_Generator Generator = new Discrete_Event_Generator(epk, Final_settings, Final_User, Final_Resource, external_Events);
             Generator.run();
-            I_PQ.setNot_killed(false);
-            printer_queue.setNot_killed(false);
+            Print_File.run();
+            //I_Pq_T.start();
 
 
+            //*Process_Mining_Main Miner_Main = new Process_Mining_Main();
+
+            //Miner_Main.run();
         }
     }
 

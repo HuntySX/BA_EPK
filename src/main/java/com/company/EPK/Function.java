@@ -23,8 +23,8 @@ public class Function extends EPK_Node implements Printable_Node, Is_Tagged {
     private Workingtime DeterministicWorkingTime;
     private Workingtime Min_Workingtime;
     private Workingtime Max_Workingtime;
-    private Workingtime Mean_Value;
-    private Workingtime Time_Standart_Deviation;
+    private Workingtime Mean_Workingtime;
+    private Workingtime Deviation_Workintime;
 
     public Function(String function_tag, Function_Type type, int ID, Workingtime workingtime) {
         super(ID);
@@ -75,14 +75,14 @@ public class Function extends EPK_Node implements Printable_Node, Is_Tagged {
             Max_Workingtime = new Workingtime();
         }
         if (Mean != null) {
-            Mean_Value = Mean;
+            Mean_Workingtime = Mean;
         } else {
-            Mean_Value = new Workingtime();
+            Mean_Workingtime = new Workingtime();
         }
         if (Deviation != null) {
-            Time_Standart_Deviation = Deviation;
+            Deviation_Workintime = Deviation;
         } else {
-            Time_Standart_Deviation = new Workingtime();
+            Deviation_Workintime = new Workingtime();
         }
 
     }
@@ -97,9 +97,8 @@ public class Function extends EPK_Node implements Printable_Node, Is_Tagged {
     }
 
     public Function(List<EPK_Node> Next_Elem, int ID, String Function_tag, boolean concurrently, List<Resource> Needed_Resources,
-                    List<Workforce> Needed_Workforce, int Min_Workinghours, int Min_Workingminutes, int Min_Workingseconds,
-                    int Max_Workinghours, int Max_Workingminutes, int Max_Workingseconds, int Mean_Workinghours, int Mean_Workingminutes,
-                    int Mean_Workingseconds, int Deviation_Hours, int Deviation_Minutes, int Deviation_Seconds) {
+                    List<Workforce> Needed_Workforce, Workingtime Min_Workingtime, Workingtime Max_Workingtime,
+                    Workingtime Mean_Workingtime, Workingtime Deviation_Workingtime) {
         super(Next_Elem, ID);
         if (Function_tag == null) {
             String a = "Function ";
@@ -125,10 +124,10 @@ public class Function extends EPK_Node implements Printable_Node, Is_Tagged {
         isDeterministic = false;
         this.DeterministicWorkingTime = new Workingtime();
 
-        Min_Workingtime = new Workingtime(Min_Workinghours, Min_Workingminutes, Min_Workingseconds);
-        Max_Workingtime = new Workingtime(Max_Workinghours, Max_Workingminutes, Max_Workingseconds);
-        Mean_Value = new Workingtime(Mean_Workinghours, Mean_Workingminutes, Mean_Workingseconds);
-        Time_Standart_Deviation = new Workingtime(Deviation_Hours, Deviation_Minutes, Deviation_Seconds);
+        this.Min_Workingtime = Min_Workingtime;
+        this.Max_Workingtime = Max_Workingtime;
+        this.Mean_Workingtime = Mean_Workingtime;
+        this.Deviation_Workintime = Deviation_Workingtime;
 
     }
 
@@ -210,7 +209,7 @@ public class Function extends EPK_Node implements Printable_Node, Is_Tagged {
         if (isDeterministic) {
             return DeterministicWorkingTime;
         } else {
-            NormalDistribution Distribution = new NormalDistribution(Mean_Value.get_Duration_to_Seconds(), Time_Standart_Deviation.get_Duration_to_Seconds());
+            NormalDistribution Distribution = new NormalDistribution(Mean_Workingtime.get_Duration_to_Seconds(), Deviation_Workintime.get_Duration_to_Seconds());
             int ResultingNonDetSeconds = (int) Distribution.sample();
             Workingtime ResultingNonDetWorkingtime = new Workingtime(ResultingNonDetSeconds);
 
@@ -335,15 +334,19 @@ public class Function extends EPK_Node implements Printable_Node, Is_Tagged {
         return Min_Workingtime;
     }
 
+    public Workingtime getDeterministicWorkingTime() {
+        return DeterministicWorkingTime;
+    }
+
     public Workingtime getMax_Workingtime() {
         return Max_Workingtime;
     }
 
-    public Workingtime getMean_Value() {
-        return Mean_Value;
+    public Workingtime getMean_Workingtime() {
+        return Mean_Workingtime;
     }
 
-    public Workingtime getTime_Standart_Deviation() {
-        return Time_Standart_Deviation;
+    public Workingtime getDeviation_Workintime() {
+        return Deviation_Workintime;
     }
 }

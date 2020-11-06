@@ -22,7 +22,7 @@ public class Activating_Function extends Function implements Printable_Node, Is_
     private Workingtime Min_Instantiate_Time;
     private Workingtime Max_Instantiate_Time;
     private Workingtime Mean_Instantiate_Time;
-    private Workingtime Standard_Distribution_Instantiate_Time;
+    private Workingtime Deviation_Instantiate_Time;
     private int chance_for_instantiation;
     private int waiting_Ticket;
     private List<Instance_Workflow> Waiting_For_Activation_Instances;
@@ -46,26 +46,21 @@ public class Activating_Function extends Function implements Printable_Node, Is_
     }
 
     public Activating_Function(String function_tag, Workingtime instantiate_Time, boolean concurrently, List<Resource> Needed_Resources,
-                               int chance_for_instantiation, int Min_Workinghours, int Min_Workingminutes, int Min_Workingseconds,
-                               int Max_Workinghours, int Max_Workingminutes, int Max_Workingseconds, int Mean_Workinghours, int Mean_Workingminutes,
-                               int Mean_Workingseconds, int Deviation_Hours, int Deviation_Minutes, int Deviation_Seconds,
-                               int Min_Instantiate_Hours, int Min_Instantiate_Minutes, int Min_Instantiate_Seconds,
-                               int Max_Instantiate_Hours, int Max_Instantiate_Minutes, int Max_Instantiate_Seconds,
-                               int Mean_Instantiate_Hours, int Mean_Instantiate_Minutes, int Mean_Instantiate_Seconds,
-                               int SD_Instantiate_Hours, int SD_Instantiate_Minutes, int SD_Instantiate_Seconds,
+                               int chance_for_instantiation, Workingtime Min_Workingtime,
+                               Workingtime Max_Workingtime, Workingtime Mean_Workingtime, Workingtime Deviation_Workingtime,
+                               Workingtime Min_Instantiate_time, Workingtime Max_Instantiate_time,
+                               Workingtime Mean_Instantiate_time, Workingtime Deviation_Instantiate_time,
                                Function_Type type, int ID, Activating_Start_Event start_Event, Event_Calendar calendar,
                                Decide_Activation_Type decision
     ) {
 
         super(null, ID, function_tag, concurrently, Needed_Resources,
-                null, Min_Workinghours, Min_Workingminutes, Min_Workingseconds,
-                Max_Workinghours, Max_Workingminutes, Max_Workingseconds, Mean_Workinghours, Mean_Workingminutes,
-                Mean_Workingseconds, Deviation_Hours, Deviation_Minutes, Deviation_Seconds);
+                null, Min_Workingtime, Max_Workingtime, Mean_Workingtime, Deviation_Workingtime);
         Start_Event = start_Event;
-        this.Min_Instantiate_Time = new Workingtime(Min_Instantiate_Hours, Min_Instantiate_Minutes, Min_Instantiate_Seconds);
-        this.Max_Instantiate_Time = new Workingtime(Max_Instantiate_Hours, Max_Instantiate_Minutes, Max_Instantiate_Seconds);
-        this.Mean_Instantiate_Time = new Workingtime(Mean_Instantiate_Hours, Mean_Instantiate_Minutes, Mean_Instantiate_Seconds);
-        this.Standard_Distribution_Instantiate_Time = new Workingtime(SD_Instantiate_Hours, SD_Instantiate_Minutes, SD_Instantiate_Seconds);
+        this.Min_Instantiate_Time = Min_Instantiate_time;
+        this.Max_Instantiate_Time = Max_Instantiate_time;
+        this.Mean_Instantiate_Time = Mean_Instantiate_time;
+        this.Deviation_Instantiate_Time = Deviation_Instantiate_time;
         this.chance_for_instantiation = chance_for_instantiation;
         this.Waiting_For_Activation_Instances = new ArrayList<>();
         this.calendar = calendar;
@@ -79,7 +74,7 @@ public class Activating_Function extends Function implements Printable_Node, Is_
         if (isDeterministic()) {
             to_Instantiate = Instantiate_Time;
         } else {
-            NormalDistribution Distribution = new NormalDistribution(Mean_Instantiate_Time.get_Duration_to_Seconds(), Standard_Distribution_Instantiate_Time.get_Duration_to_Seconds())
+            NormalDistribution Distribution = new NormalDistribution(Mean_Instantiate_Time.get_Duration_to_Seconds(), Deviation_Instantiate_Time.get_Duration_to_Seconds());
             int Seconds_to_Instantiate = (int) Distribution.sample();
             to_Instantiate = new Workingtime(Seconds_to_Instantiate);
             if (Min_Instantiate_Time.isBefore(to_Instantiate)) {
@@ -254,11 +249,11 @@ public class Activating_Function extends Function implements Printable_Node, Is_
         Mean_Instantiate_Time = mean_Instantiate_Time;
     }
 
-    public Workingtime getStandard_Distribution_Instantiate_Time() {
-        return Standard_Distribution_Instantiate_Time;
+    public Workingtime getDeviation_Instantiate_Time() {
+        return Deviation_Instantiate_Time;
     }
 
-    public void setStandard_Distribution_Instantiate_Time(Workingtime standard_Distribution_Instantiate_Time) {
-        Standard_Distribution_Instantiate_Time = standard_Distribution_Instantiate_Time;
+    public void setDeviation_Instantiate_Time(Workingtime deviation_Instantiate_Time) {
+        Deviation_Instantiate_Time = deviation_Instantiate_Time;
     }
 }
