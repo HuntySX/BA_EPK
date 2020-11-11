@@ -330,7 +330,7 @@ public class Discrete_Event_Simulator {
                             ActivateFunction(to_Run, event_Calendar.getAct_runtimeDay());
                             System.out.println("Function started: " + ((Function) to_Run.getEPKNode()).getFunction_tag() + "for: " +
                                     to_Run.getInstance().getCase_ID() +
-                                    " At: [" + event_Calendar.getRuntime().toString() + "] Should be: [" + to_Run.getTo_Start().toString() + "]");
+                                    " At: [" + event_Calendar.getRuntime().toString() + "]  Should be: [" + to_Run.getTo_Start().toString() + "]");
                             if (event_Calendar.getRuntime().toNanoOfDay() - to_Run.getTo_Start().toNanoOfDay() != 0) {
                                 System.out.println("Function is Late: " + (event_Calendar.getRuntime().toNanoOfDay() - to_Run.getTo_Start().toNanoOfDay()));
                             }
@@ -606,7 +606,7 @@ public class Discrete_Event_Simulator {
             LocalTime Duration = event_Calendar.getRuntime();
             int lasting_Shifttime_in_Seconds = event_Calendar.getEnd_Time().toSecondOfDay() - event_Calendar.getRuntime().toSecondOfDay();
             int Workingtime_in_Seconds = ((Function) to_Run.getEPKNode()).getWorkingTime().get_Duration_to_Seconds();
-
+            System.out.println("Duration for Next Instance: " + new Workingtime(Workingtime_in_Seconds).toString());
             Duration = Duration.plusSeconds(Workingtime_in_Seconds);
             to_Run.setWorking(true);
             event_Calendar.Remove_From_Upcoming_List(to_Run, day); //fraglich
@@ -663,6 +663,11 @@ public class Discrete_Event_Simulator {
                     advanceday++;
                 }
 
+
+                //TODO Nächster Code Fragment fragt nach ob die Funktion überhaupt beendet werden kann.
+                // Zum fixen wird dieser dann aber eine sekunde später hinzugefügt. da sollte es eigentlich auch nichtmehr lösbar sein.
+                // trotzdem startet er es im ersten Fall nicht, (Verspätung -1s) im zweiten dafür schon.
+                // Jenachdem welches Setting gewählt wurde (starten oder nicht) sollte die Instanz gedroppt werden (oder nicht).
                 if (advanceday >= event_Calendar.getRuntimeDays() - event_Calendar.getAct_runtimeDay()) {
                     System.out.println("DEBUG: Time not provided but should be");
                     System.out.println("Fixing: Adding Instance back to Waiting List");
@@ -670,14 +675,14 @@ public class Discrete_Event_Simulator {
                     event_Calendar.getWaiting_List().addTimedEvent(to_Run);
                 }
 
-                Duration.plusSeconds(Workingtime_in_Seconds);
+                Duration = Duration.plusSeconds(Workingtime_in_Seconds);
                 to_Run.setWorking(true);
                 event_Calendar.Remove_From_Upcoming_List(to_Run, day);
                 for (User u : CalculateUsers) {
                     u.setActive(true);
                 }
 
-                Instance_Workflow Running_Instance = new Instance_Workflow(to_Run.getInstance(), Duration, to_Run.getEPKNode());
+                Instance_Workflow Running_Instance = new Instance_Workflow(to_Run.getInstance(), Duration, to_Run.getEPKNode(), to_Run.isWorking());
                 Running_Instance.Add_Active_Users(CalculateUsers);
                 Running_Instance.Add_Active_Resources(CalculateResource);
 

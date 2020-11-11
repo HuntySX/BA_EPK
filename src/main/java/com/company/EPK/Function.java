@@ -157,6 +157,10 @@ public class Function extends EPK_Node implements Printable_Node, Is_Tagged {
 
         isDeterministic = true;
         this.DeterministicWorkingTime = new Workingtime(Workinghours, Workingminutes, Workingseconds);
+        Min_Workingtime = new Workingtime();
+        Max_Workingtime = new Workingtime();
+        Mean_Workingtime = new Workingtime();
+        Deviation_Workintime = new Workingtime();
     }
 
     public String getFunction_tag() {
@@ -330,6 +334,7 @@ public class Function extends EPK_Node implements Printable_Node, Is_Tagged {
         isDeterministic = deterministic;
     }
 
+
     public Workingtime getMin_Workingtime() {
         return Min_Workingtime;
     }
@@ -348,5 +353,21 @@ public class Function extends EPK_Node implements Printable_Node, Is_Tagged {
 
     public Workingtime getDeviation_Workintime() {
         return Deviation_Workintime;
+    }
+
+    public void setMin_Workingtime(Workingtime min_Workingtime) {
+        Min_Workingtime = min_Workingtime;
+    }
+
+    public void setMax_Workingtime(Workingtime max_Workingtime) {
+        Max_Workingtime = max_Workingtime;
+    }
+
+    public void setMean_Workingtime(Workingtime mean_Workingtime) {
+        Mean_Workingtime = mean_Workingtime;
+    }
+
+    public void setDeviation_Workintime(Workingtime deviation_Workintime) {
+        Deviation_Workintime = deviation_Workintime;
     }
 }

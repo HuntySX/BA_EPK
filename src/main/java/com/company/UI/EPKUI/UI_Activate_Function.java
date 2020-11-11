@@ -42,9 +42,68 @@ public class UI_Activate_Function extends Activating_Function implements UI_Inst
     private IntegerProperty Workingtime_Seconds = new SimpleIntegerProperty();
     private IntegerProperty UI_ID;
     private IntegerProperty Chance;
-    private IntegerProperty Order_Hours = new SimpleIntegerProperty();
-    private IntegerProperty Order_Minutes = new SimpleIntegerProperty();
-    private IntegerProperty Order_Seconds = new SimpleIntegerProperty();
+    private IntegerProperty Ordertime_Hours = new SimpleIntegerProperty();
+    private IntegerProperty Ordertime_Minutes = new SimpleIntegerProperty();
+    private IntegerProperty Ordertime_Seconds = new SimpleIntegerProperty();
+
+    private BooleanProperty isDeterministic_Workingtime = new SimpleBooleanProperty(true);
+    private boolean ISDet_Workingtime_UI = true;
+    private BooleanField UI_IS_DETERMINISTIC_WORKINGTIME;
+
+    private BooleanProperty isDeterministic_Ordertime = new SimpleBooleanProperty(true);
+    private boolean ISDet_Ordertime_UI = true;
+    private BooleanField UI_IS_DETERMINISTIC_ORDERTIME;
+
+    private IntegerProperty MIN_NONDET_Workingtime_Hours = new SimpleIntegerProperty();
+    private IntegerProperty MIN_NONDET_Workingtime_Minutes = new SimpleIntegerProperty();
+    private IntegerProperty MIN_NONDET_Workingtime_Seconds = new SimpleIntegerProperty();
+    private IntegerProperty MAX_NONDET_Workingtime_Hours = new SimpleIntegerProperty();
+    private IntegerProperty MAX_NONDET_Workingtime_Minutes = new SimpleIntegerProperty();
+    private IntegerProperty MAX_NONDET_Workingtime_Seconds = new SimpleIntegerProperty();
+    private IntegerProperty MEAN_NONDET_Workingtime_Hours = new SimpleIntegerProperty();
+    private IntegerProperty MEAN_NONDET_Workingtime_Minutes = new SimpleIntegerProperty();
+    private IntegerProperty MEAN_NONDET_Workingtime_Seconds = new SimpleIntegerProperty();
+    private IntegerProperty DEVIATION_NONDET_Workingtime_Hours = new SimpleIntegerProperty();
+    private IntegerProperty DEVIATION_NONDET_Workingtime_Minutes = new SimpleIntegerProperty();
+    private IntegerProperty DEVIATION_NONDET_Workingtime_Seconds = new SimpleIntegerProperty();
+    private IntegerField UI_MIN_NONDET_WORKINGTIME_HOURS_FIELD;
+    private IntegerField UI_MIN_NONDET_WORKINGTIME_MINUTES_FIELD;
+    private IntegerField UI_MIN_NONDET_WORKINGTIME_SECONDS_FIELD;
+    private IntegerField UI_MAX_NONDET_WORKINGTIME_HOURS_FIELD;
+    private IntegerField UI_MAX_NONDET_WORKINGTIME_MINUTES_FIELD;
+    private IntegerField UI_MAX_NONDET_WORKINGTIME_SECONDS_FIELD;
+    private IntegerField UI_MEAN_NONDET_WORKINGTIME_HOURS_FIELD;
+    private IntegerField UI_MEAN_NONDET_WORKINGTIME_MINUTES_FIELD;
+    private IntegerField UI_MEAN_NONDET_WORKINGTIME_SECONDS_FIELD;
+    private IntegerField UI_DEVIATION_NONDET_WORKINGTIME_HOURS_FIELD;
+    private IntegerField UI_DEVIATION_NONDET_WORKINGTIME_MINUTES_FIELD;
+    private IntegerField UI_DEVIATION_NONDET_WORKINGTIME_SECONDS_FIELD;
+
+    private IntegerProperty MIN_NONDET_Ordertime_Hours = new SimpleIntegerProperty();
+    private IntegerProperty MIN_NONDET_Ordertime_Minutes = new SimpleIntegerProperty();
+    private IntegerProperty MIN_NONDET_Ordertime_Seconds = new SimpleIntegerProperty();
+    private IntegerProperty MAX_NONDET_Ordertime_Hours = new SimpleIntegerProperty();
+    private IntegerProperty MAX_NONDET_Ordertime_Minutes = new SimpleIntegerProperty();
+    private IntegerProperty MAX_NONDET_Ordertime_Seconds = new SimpleIntegerProperty();
+    private IntegerProperty MEAN_NONDET_Ordertime_Hours = new SimpleIntegerProperty();
+    private IntegerProperty MEAN_NONDET_Ordertime_Minutes = new SimpleIntegerProperty();
+    private IntegerProperty MEAN_NONDET_Ordertime_Seconds = new SimpleIntegerProperty();
+    private IntegerProperty DEVIATION_NONDET_Ordertime_Hours = new SimpleIntegerProperty();
+    private IntegerProperty DEVIATION_NONDET_Ordertime_Minutes = new SimpleIntegerProperty();
+    private IntegerProperty DEVIATION_NONDET_Ordertime_Seconds = new SimpleIntegerProperty();
+    private IntegerField UI_MIN_NONDET_ORDERTIME_HOURS_FIELD;
+    private IntegerField UI_MIN_NONDET_ORDERTIME_MINUTES_FIELD;
+    private IntegerField UI_MIN_NONDET_ORDERTIME_SECONDS_FIELD;
+    private IntegerField UI_MAX_NONDET_ORDERTIME_HOURS_FIELD;
+    private IntegerField UI_MAX_NONDET_ORDERTIME_MINUTES_FIELD;
+    private IntegerField UI_MAX_NONDET_ORDERTIME_SECONDS_FIELD;
+    private IntegerField UI_MEAN_NONDET_ORDERTIME_HOURS_FIELD;
+    private IntegerField UI_MEAN_NONDET_ORDERTIME_MINUTES_FIELD;
+    private IntegerField UI_MEAN_NONDET_ORDERTIME_SECONDS_FIELD;
+    private IntegerField UI_DEVIATION_NONDET_ORDERTIME_HOURS_FIELD;
+    private IntegerField UI_DEVIATION_NONDET_ORDERTIME_MINUTES_FIELD;
+    private IntegerField UI_DEVIATION_NONDET_ORDERTIME_SECONDS_FIELD;
+
     private UI_Event_Activating_Starter Chosen_Starter;
     private StringField UI_TAG_FIELD;
     private IntegerField UI_ID_FIELD;
@@ -68,6 +127,10 @@ public class UI_Activate_Function extends Activating_Function implements UI_Inst
     private FormRenderer UI_DECIDE_ACTIVATION_TYPE;
     private FormRenderer UI_ACTIVATING_EVENT;
     private FormRenderer ORDER_TIME_UI;
+    private FormRenderer NONDET_WORKINGTIME_UI;
+    private FormRenderer DETERMINISTIC_WORKINGTIME_UI;
+    private FormRenderer NONDET_ORDERTIME_UI;
+    private FormRenderer DETERMINISTIC_ORDERTIME_UI;
     private SingleSelectionField<Decide_Activation_Type> DECIDE_ACTIVATION_TYPE_FIELD;
     private SingleSelectionField<UI_Event_Activating_Starter> ACTIVATING_EVENT_FIELD;
     private SingleSelectionField<EPK_Node> UI_NEXT_ELEMENTS_FIELD;
@@ -100,17 +163,62 @@ public class UI_Activate_Function extends Activating_Function implements UI_Inst
                 .tooltip("Wahrscheinlichkeitsverteilung nach der Instanzen am ausgewählten" +
                         " Start Event generiert werden").editable(true);
 
-        UI_ORDERTIME_HOURS_FIELD = Field.ofIntegerType(Order_Hours).label("Stunden").placeholder("0").tooltip("Stunden bis Ankunft der Instanzierung");
-        UI_ORDERTIME_MINUTES_FIELD = Field.ofIntegerType(Order_Minutes).label("Minuten").placeholder("0").tooltip("Minuten bis Ankunft der Instanzierung");
-        UI_ORDERTIME_SECONDS_FIELD = Field.ofIntegerType(Order_Seconds).label("Sekunden").placeholder("60").tooltip("Sekunden bis Ankunft der Instanzierung");
+        UI_ORDERTIME_HOURS_FIELD = Field.ofIntegerType(Ordertime_Hours).label("Stunden").placeholder("0").tooltip("Stunden bis Ankunft der Instanzierung");
+        UI_ORDERTIME_MINUTES_FIELD = Field.ofIntegerType(Ordertime_Minutes).label("Minuten").placeholder("0").tooltip("Minuten bis Ankunft der Instanzierung");
+        UI_ORDERTIME_SECONDS_FIELD = Field.ofIntegerType(Ordertime_Seconds).label("Sekunden").placeholder("60").tooltip("Sekunden bis Ankunft der Instanzierung");
         UI_WORKINGTIME_HOURS_FIELD = Field.ofIntegerType(Workingtime_Hours).label("Stunden").placeholder("0").tooltip("Arbeitszeitstunden");
         UI_WORKINGTIME_MINUTES_FIELD = Field.ofIntegerType(Workingtime_Minutes).label("Minuten").placeholder("0").tooltip("Arbeitszeitminuten");
         UI_WORKINGTIME_SECONDS_FIELD = Field.ofIntegerType(Workingtime_Seconds).label("Sekunden").placeholder("60").tooltip("Arbeitszeitsekunden");
         ID_TAG_UI = new FormRenderer(Form.of(Group.of(UI_ID_FIELD, UI_TAG_FIELD)));
         UI_DECIDE_ACTIVATION_TYPE = new FormRenderer(Form.of(Group.of(DECIDE_ACTIVATION_TYPE_FIELD)));
         CHANCE_UI = new FormRenderer(Form.of(Group.of(UI_CHANCE)));
+
+        UI_IS_DETERMINISTIC_WORKINGTIME = Field.ofBooleanType(isDeterministic_Workingtime).label("Deterministic").placeholder("true").tooltip("Determisitic / Nondeterministic Workingtime");
+        DETERMINISTIC_WORKINGTIME_UI = new FormRenderer(Form.of(Group.of(UI_IS_DETERMINISTIC_WORKINGTIME)));
+
+        UI_IS_DETERMINISTIC_ORDERTIME = Field.ofBooleanType(isDeterministic_Ordertime).label("Deterministic").placeholder("true").tooltip("Determisitic / Nondeterministic Ordertime");
+        DETERMINISTIC_ORDERTIME_UI = new FormRenderer(Form.of(Group.of(UI_IS_DETERMINISTIC_ORDERTIME)));
+
+        UI_MIN_NONDET_WORKINGTIME_HOURS_FIELD = Field.ofIntegerType(MIN_NONDET_Workingtime_Hours).label("Min - Hours").placeholder("0").tooltip("Minimal Workingtime(Hours)");
+        UI_MIN_NONDET_WORKINGTIME_MINUTES_FIELD = Field.ofIntegerType(MIN_NONDET_Workingtime_Minutes).label("Min - Minutes").placeholder("0").tooltip("Minimal Workingtime(Minutes)");
+        UI_MIN_NONDET_WORKINGTIME_SECONDS_FIELD = Field.ofIntegerType(MIN_NONDET_Workingtime_Seconds).label("Min - Seconds").placeholder("0").tooltip("Minimal Workingtime(Seconds)");
+        UI_MAX_NONDET_WORKINGTIME_HOURS_FIELD = Field.ofIntegerType(MAX_NONDET_Workingtime_Hours).label("Max - Hours").placeholder("0").tooltip("Maximum Workingtime(Hours)");
+        UI_MAX_NONDET_WORKINGTIME_MINUTES_FIELD = Field.ofIntegerType(MAX_NONDET_Workingtime_Minutes).label("Max - Minutes").placeholder("0").tooltip("Maximum Workingtime(Minutes)");
+        UI_MAX_NONDET_WORKINGTIME_SECONDS_FIELD = Field.ofIntegerType(MAX_NONDET_Workingtime_Seconds).label("Max - Seconds").placeholder("0").tooltip("Maximum Workingtime(Seconds)");
+        UI_MEAN_NONDET_WORKINGTIME_HOURS_FIELD = Field.ofIntegerType(MEAN_NONDET_Workingtime_Hours).label("Mean - Hours").placeholder("0").tooltip("Mean Workingtime(Hours)");
+        UI_MEAN_NONDET_WORKINGTIME_MINUTES_FIELD = Field.ofIntegerType(MEAN_NONDET_Workingtime_Minutes).label("Mean - Minutes").placeholder("0").tooltip("Mean Workingtime(Minutes)");
+        UI_MEAN_NONDET_WORKINGTIME_SECONDS_FIELD = Field.ofIntegerType(MEAN_NONDET_Workingtime_Seconds).label("Mean - Seconds").placeholder("0").tooltip("Mean Workingtime(Seconds)");
+        UI_DEVIATION_NONDET_WORKINGTIME_HOURS_FIELD = Field.ofIntegerType(DEVIATION_NONDET_Workingtime_Hours).label("Deviation - Stunden").placeholder("0").tooltip("Deviation Workingtime(Hours)");
+        UI_DEVIATION_NONDET_WORKINGTIME_MINUTES_FIELD = Field.ofIntegerType(DEVIATION_NONDET_Workingtime_Minutes).label("Deviation - Minutes").placeholder("0").tooltip("Deviation Workingtime(Minutes)");
+        UI_DEVIATION_NONDET_WORKINGTIME_SECONDS_FIELD = Field.ofIntegerType(DEVIATION_NONDET_Workingtime_Seconds).label("Deviation - Seconds").placeholder("0").tooltip("Deviation Workingtime(Seconds)");
+        UI_MIN_NONDET_ORDERTIME_HOURS_FIELD = Field.ofIntegerType(MIN_NONDET_Ordertime_Hours).label("Min - Orderhours").placeholder("0").tooltip("Minimal Ordertime(Hours)");
+        UI_MIN_NONDET_ORDERTIME_MINUTES_FIELD = Field.ofIntegerType(MIN_NONDET_Ordertime_Minutes).label("Min - Orderminutes").placeholder("0").tooltip("Minimal Ordertime(Minutes)");
+        UI_MIN_NONDET_ORDERTIME_SECONDS_FIELD = Field.ofIntegerType(MIN_NONDET_Ordertime_Seconds).label("Min - Orderseconds").placeholder("0").tooltip("Minimal Ordertime(Seconds)");
+        UI_MAX_NONDET_ORDERTIME_HOURS_FIELD = Field.ofIntegerType(MAX_NONDET_Ordertime_Hours).label("Max - Orderhours").placeholder("0").tooltip("Maximum Ordertime(Hours)");
+        UI_MAX_NONDET_ORDERTIME_MINUTES_FIELD = Field.ofIntegerType(MAX_NONDET_Ordertime_Minutes).label("Max - Orderminutes").placeholder("0").tooltip("Maximum Ordertime(Minutes)");
+        UI_MAX_NONDET_ORDERTIME_SECONDS_FIELD = Field.ofIntegerType(MAX_NONDET_Ordertime_Seconds).label("Max - Orderseconds").placeholder("0").tooltip("Maximum Ordertime(Seconds)");
+        UI_MEAN_NONDET_ORDERTIME_HOURS_FIELD = Field.ofIntegerType(MEAN_NONDET_Ordertime_Hours).label("Mean - Orderhours").placeholder("0").tooltip("Mean Ordertime(Hours)");
+        UI_MEAN_NONDET_ORDERTIME_MINUTES_FIELD = Field.ofIntegerType(MEAN_NONDET_Ordertime_Minutes).label("Mean - Orderminutes").placeholder("0").tooltip("Mean Ordertime(Minutes)");
+        UI_MEAN_NONDET_ORDERTIME_SECONDS_FIELD = Field.ofIntegerType(MEAN_NONDET_Ordertime_Seconds).label("Mean - Orderseconds").placeholder("0").tooltip("Mean Ordertime(Seconds)");
+        UI_DEVIATION_NONDET_ORDERTIME_HOURS_FIELD = Field.ofIntegerType(DEVIATION_NONDET_Ordertime_Hours).label("Deviation - Orderhours").placeholder("0").tooltip("Deviation Ordertime(Hours)");
+        UI_DEVIATION_NONDET_ORDERTIME_MINUTES_FIELD = Field.ofIntegerType(DEVIATION_NONDET_Ordertime_Minutes).label("Deviation - Orderminutes").placeholder("0").tooltip("Deviation Ordertime(Minutes)");
+        UI_DEVIATION_NONDET_ORDERTIME_SECONDS_FIELD = Field.ofIntegerType(DEVIATION_NONDET_Ordertime_Seconds).label("Deviation - Orderseconds").placeholder("0").tooltip("Deviation Ordertime(Seconds)");
+
         ORDER_TIME_UI = new FormRenderer(Form.of(Group.of(UI_ORDERTIME_HOURS_FIELD, UI_ORDERTIME_MINUTES_FIELD, UI_ORDERTIME_SECONDS_FIELD)));
         WORKINGTIME_UI = new FormRenderer(Form.of(Group.of(UI_WORKINGTIME_HOURS_FIELD, UI_WORKINGTIME_MINUTES_FIELD, UI_WORKINGTIME_SECONDS_FIELD)));
+        NONDET_WORKINGTIME_UI = new FormRenderer(Form.of(Group.of(
+                UI_MIN_NONDET_WORKINGTIME_HOURS_FIELD, UI_MIN_NONDET_WORKINGTIME_MINUTES_FIELD, UI_MIN_NONDET_WORKINGTIME_SECONDS_FIELD,
+                UI_MAX_NONDET_WORKINGTIME_HOURS_FIELD, UI_MAX_NONDET_WORKINGTIME_MINUTES_FIELD, UI_MAX_NONDET_WORKINGTIME_SECONDS_FIELD,
+                UI_MEAN_NONDET_WORKINGTIME_HOURS_FIELD, UI_MEAN_NONDET_WORKINGTIME_MINUTES_FIELD, UI_MEAN_NONDET_WORKINGTIME_SECONDS_FIELD,
+                UI_DEVIATION_NONDET_WORKINGTIME_HOURS_FIELD, UI_DEVIATION_NONDET_WORKINGTIME_MINUTES_FIELD, UI_DEVIATION_NONDET_WORKINGTIME_SECONDS_FIELD)));
+
+        NONDET_ORDERTIME_UI = new FormRenderer(Form.of(Group.of(
+                UI_MIN_NONDET_ORDERTIME_HOURS_FIELD, UI_MIN_NONDET_ORDERTIME_MINUTES_FIELD, UI_MIN_NONDET_ORDERTIME_SECONDS_FIELD,
+                UI_MAX_NONDET_ORDERTIME_HOURS_FIELD, UI_MAX_NONDET_ORDERTIME_MINUTES_FIELD, UI_MAX_NONDET_ORDERTIME_SECONDS_FIELD,
+                UI_MEAN_NONDET_ORDERTIME_HOURS_FIELD, UI_MEAN_NONDET_ORDERTIME_MINUTES_FIELD, UI_MEAN_NONDET_ORDERTIME_SECONDS_FIELD,
+                UI_DEVIATION_NONDET_ORDERTIME_HOURS_FIELD, UI_DEVIATION_NONDET_ORDERTIME_MINUTES_FIELD, UI_DEVIATION_NONDET_ORDERTIME_SECONDS_FIELD)));
+
+
     }
 
     public UI_Activate_Function(String function_tag, Workingtime workingtime, int chance_for_instantiation, Workingtime instantiate_Time, Function_Type type, int ID, Activating_Start_Event start_Event, Event_Calendar calendar, Decide_Activation_Type decision) {
@@ -131,6 +239,14 @@ public class UI_Activate_Function extends Activating_Function implements UI_Inst
     public VBox Get_UI() {
 
 
+        if (UI_IS_DETERMINISTIC_WORKINGTIME.getValue() != ISDet_Workingtime_UI) {
+            isDeterministic_Workingtime.setValue(ISDet_Workingtime_UI);
+            UI_IS_DETERMINISTIC_WORKINGTIME.reset();
+        }
+        if (UI_IS_DETERMINISTIC_ORDERTIME.getValue() != ISDet_Ordertime_UI) {
+            isDeterministic_Ordertime.setValue(ISDet_Ordertime_UI);
+            UI_IS_DETERMINISTIC_ORDERTIME.reset();
+        }
 
         UI_NEEDED_RESOURCES_FIELD = Field.ofSingleSelectionType(Resources).label("Benötigte Ressourcen").tooltip("Benötigte Ressourcen");
         UI_RESOURCE_COUNT = Field.ofIntegerType(0).label("Count").tooltip("Choose number of selected resource to add to the function");
@@ -314,19 +430,83 @@ public class UI_Activate_Function extends Activating_Function implements UI_Inst
         ButtonBar WorkforcesBar = new ButtonBar();
         WorkforcesBar.getButtons().add(Add_Workforce);
         WorkforcesBar.getButtons().add(Remove_Workforce);
+
+        Button Change_Det_Workingtime = new Button("Change");
+        Change_Det_Workingtime.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                if (UI_IS_DETERMINISTIC_WORKINGTIME.getValue() != ISDet_Workingtime_UI) {
+                    if (UI_IS_DETERMINISTIC_WORKINGTIME.getValue()) {
+                        MIN_NONDET_Workingtime_Hours.setValue(0);
+                        MIN_NONDET_Workingtime_Minutes.setValue(0);
+                        MIN_NONDET_Workingtime_Seconds.setValue(0);
+                        MAX_NONDET_Workingtime_Hours.setValue(0);
+                        MAX_NONDET_Workingtime_Minutes.setValue(0);
+                        MAX_NONDET_Workingtime_Seconds.setValue(0);
+                        MEAN_NONDET_Workingtime_Hours.setValue(0);
+                        MEAN_NONDET_Workingtime_Minutes.setValue(0);
+                        MEAN_NONDET_Workingtime_Seconds.setValue(0);
+                        DEVIATION_NONDET_Workingtime_Hours.setValue(0);
+                        DEVIATION_NONDET_Workingtime_Minutes.setValue(0);
+                        DEVIATION_NONDET_Workingtime_Seconds.setValue(0);
+                    } else {
+                        Workingtime_Hours.setValue(0);
+                        Workingtime_Minutes.setValue(0);
+                        Workingtime_Seconds.setValue(0);
+                    }
+                    ISDet_Workingtime_UI = UI_IS_DETERMINISTIC_WORKINGTIME.getValue();
+                    EPK.activate();
+                }
+            }
+        });
+        ButtonBar Changebar = new ButtonBar();
+        Changebar.getButtons().add(Change_Det_Workingtime);
+
+        Button Change_Det_Ordertime = new Button("Change");
+        Change_Det_Ordertime.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                if (UI_IS_DETERMINISTIC_ORDERTIME.getValue() != ISDet_Ordertime_UI) {
+                    if (UI_IS_DETERMINISTIC_ORDERTIME.getValue()) {
+                        MIN_NONDET_Ordertime_Hours.setValue(0);
+                        MIN_NONDET_Ordertime_Minutes.setValue(0);
+                        MIN_NONDET_Ordertime_Seconds.setValue(0);
+                        MAX_NONDET_Ordertime_Hours.setValue(0);
+                        MAX_NONDET_Ordertime_Minutes.setValue(0);
+                        MAX_NONDET_Ordertime_Seconds.setValue(0);
+                        MEAN_NONDET_Ordertime_Hours.setValue(0);
+                        MEAN_NONDET_Ordertime_Minutes.setValue(0);
+                        MEAN_NONDET_Ordertime_Seconds.setValue(0);
+                        DEVIATION_NONDET_Ordertime_Hours.setValue(0);
+                        DEVIATION_NONDET_Ordertime_Minutes.setValue(0);
+                        DEVIATION_NONDET_Ordertime_Seconds.setValue(0);
+                    } else {
+                        Ordertime_Hours.setValue(0);
+                        Ordertime_Minutes.setValue(0);
+                        Ordertime_Seconds.setValue(0);
+                    }
+                    ISDet_Ordertime_UI = UI_IS_DETERMINISTIC_ORDERTIME.getValue();
+                    EPK.activate();
+                }
+            }
+        });
+        ButtonBar Changebar_Ordertime = new ButtonBar();
+        Changebar_Ordertime.getButtons().add(Change_Det_Ordertime);
+
+
         Box.getChildren().add(btn);
         Box.getChildren().add(new Separator());
-        Box.getChildren().add(UI_DECIDE_ACTIVATION_TYPE);
-        Box.getChildren().add(new Separator());
-        Box.getChildren().add(Activating_Event_Label);
-        Box.getChildren().add(UI_ACTIVATING_EVENT);
-        Box.getChildren().add(CHANCE_UI);
-        Box.getChildren().add(Selection);
-        Box.getChildren().add(new Separator());
-        Box.getChildren().add(ORDER_TIME_UI);
+        Box.getChildren().add(new Label("Det/NonDet Workingtime"));
+        Box.getChildren().add(DETERMINISTIC_WORKINGTIME_UI);
+        Box.getChildren().add(Changebar);
         Box.getChildren().add(new Separator());
         Box.getChildren().add(new Label("Arbeitsstunden"));
-        Box.getChildren().add(WORKINGTIME_UI);
+        if (!ISDet_Workingtime_UI) {
+            Box.getChildren().add(NONDET_WORKINGTIME_UI);
+        } else {
+            Box.getChildren().add(WORKINGTIME_UI);
+        }
+        Box.getChildren().add(new Separator());
         Box.getChildren().add(new Label("Benötigte Ressourcen"));
         Box.getChildren().add(AddedResources);
         Box.getChildren().add(RESOURCES_UI);
@@ -335,6 +515,24 @@ public class UI_Activate_Function extends Activating_Function implements UI_Inst
         Box.getChildren().add(AddedWorkforces);
         Box.getChildren().add(WORKFORCES_UI);
         Box.getChildren().add(WorkforcesBar);
+        Box.getChildren().add(new Separator());
+        Box.getChildren().add(UI_DECIDE_ACTIVATION_TYPE);
+        Box.getChildren().add(new Separator());
+        Box.getChildren().add(Activating_Event_Label);
+        Box.getChildren().add(UI_ACTIVATING_EVENT);
+        Box.getChildren().add(CHANCE_UI);
+        Box.getChildren().add(Selection);
+        Box.getChildren().add(new Label("Det/NonDet Ordertime"));
+        Box.getChildren().add(DETERMINISTIC_ORDERTIME_UI);
+        Box.getChildren().add(Changebar_Ordertime);
+        Box.getChildren().add(new Separator());
+        Box.getChildren().add(new Label("Ordertime"));
+        if (!ISDet_Ordertime_UI) {
+            Box.getChildren().add(NONDET_ORDERTIME_UI);
+        } else {
+            Box.getChildren().add(ORDER_TIME_UI);
+        }
+        Box.getChildren().add(new Separator());
 
 
         return Box;
@@ -356,12 +554,64 @@ public class UI_Activate_Function extends Activating_Function implements UI_Inst
     @Override
     public void save_Settings() {
         setDecisionType(DECIDE_ACTIVATION_TYPE_FIELD.getSelection());
+        setChance_for_instantiation(UI_CHANCE.getValue());
         setFunction_tag(UI_TAG_FIELD.getValue());
-        setWorkingHours(UI_WORKINGTIME_HOURS_FIELD.getValue());
-        setWorkingMinutes(UI_WORKINGTIME_MINUTES_FIELD.getValue());
-        setWorkingSeconds(UI_WORKINGTIME_SECONDS_FIELD.getValue());
-        setInstantiateHours(UI_ORDERTIME_HOURS_FIELD.getValue());
-        setInstantiateMinutes(UI_ORDERTIME_MINUTES_FIELD.getValue());
-        setInstantiateSeconds(UI_ORDERTIME_SECONDS_FIELD.getValue());
+
+        if (ISDet_Workingtime_UI) {
+            setDeterministic(true);
+            setWorkingHours(UI_WORKINGTIME_HOURS_FIELD.getValue());
+            setWorkingMinutes(UI_WORKINGTIME_MINUTES_FIELD.getValue());
+            setWorkingSeconds(UI_WORKINGTIME_SECONDS_FIELD.getValue());
+            setMin_Workingtime(new Workingtime());
+            setMax_Workingtime(new Workingtime());
+            setMean_Workingtime(new Workingtime());
+            setDeviation_Workintime(new Workingtime());
+        } else {
+            setDeterministic(false);
+            setWorkingHours(0);
+            setWorkingMinutes(0);
+            setWorkingSeconds(0);
+            setMin_Workingtime(new Workingtime(UI_MIN_NONDET_WORKINGTIME_HOURS_FIELD.getValue(),
+                    UI_MIN_NONDET_WORKINGTIME_MINUTES_FIELD.getValue(),
+                    UI_MIN_NONDET_WORKINGTIME_SECONDS_FIELD.getValue()));
+            setMax_Workingtime(new Workingtime(UI_MAX_NONDET_WORKINGTIME_HOURS_FIELD.getValue(),
+                    UI_MAX_NONDET_WORKINGTIME_MINUTES_FIELD.getValue(),
+                    UI_MAX_NONDET_WORKINGTIME_SECONDS_FIELD.getValue()));
+            setMean_Workingtime(new Workingtime(UI_MEAN_NONDET_WORKINGTIME_HOURS_FIELD.getValue(),
+                    UI_MEAN_NONDET_WORKINGTIME_MINUTES_FIELD.getValue(),
+                    UI_MEAN_NONDET_WORKINGTIME_SECONDS_FIELD.getValue()));
+            setDeviation_Workintime(new Workingtime(UI_DEVIATION_NONDET_WORKINGTIME_HOURS_FIELD.getValue(),
+                    UI_DEVIATION_NONDET_WORKINGTIME_MINUTES_FIELD.getValue(),
+                    UI_DEVIATION_NONDET_WORKINGTIME_SECONDS_FIELD.getValue()));
+        }
+
+        if (ISDet_Ordertime_UI) {
+            set_Deterministic_Ordertime(true);
+            getInstantiate_Time().setSeconds(UI_ORDERTIME_HOURS_FIELD.getValue());
+            getInstantiate_Time().setMinutes(UI_ORDERTIME_MINUTES_FIELD.getValue());
+            getInstantiate_Time().setHours(UI_ORDERTIME_SECONDS_FIELD.getValue());
+            setMin_Instantiate_Time(new Workingtime());
+            setMax_Instantiate_Time(new Workingtime());
+            setMean_Instantiate_Time(new Workingtime());
+            setDeviation_Instantiate_Time(new Workingtime());
+        } else {
+            set_Deterministic_Ordertime(false);
+            getInstantiate_Time().setSeconds(0);
+            getInstantiate_Time().setMinutes(0);
+            getInstantiate_Time().setHours(0);
+            setMin_Instantiate_Time(new Workingtime(UI_MIN_NONDET_ORDERTIME_HOURS_FIELD.getValue(),
+                    UI_MIN_NONDET_ORDERTIME_MINUTES_FIELD.getValue(),
+                    UI_MIN_NONDET_ORDERTIME_SECONDS_FIELD.getValue()));
+            setMax_Instantiate_Time(new Workingtime(UI_MAX_NONDET_ORDERTIME_HOURS_FIELD.getValue(),
+                    UI_MAX_NONDET_ORDERTIME_MINUTES_FIELD.getValue(),
+                    UI_MAX_NONDET_ORDERTIME_SECONDS_FIELD.getValue()));
+            setMean_Instantiate_Time(new Workingtime(UI_MEAN_NONDET_ORDERTIME_HOURS_FIELD.getValue(),
+                    UI_MEAN_NONDET_ORDERTIME_MINUTES_FIELD.getValue(),
+                    UI_MEAN_NONDET_ORDERTIME_SECONDS_FIELD.getValue()));
+            setDeviation_Instantiate_Time(new Workingtime(UI_DEVIATION_NONDET_ORDERTIME_HOURS_FIELD.getValue(),
+                    UI_DEVIATION_NONDET_ORDERTIME_MINUTES_FIELD.getValue(),
+                    UI_DEVIATION_NONDET_ORDERTIME_SECONDS_FIELD.getValue()));
+        }
+
     }
 }

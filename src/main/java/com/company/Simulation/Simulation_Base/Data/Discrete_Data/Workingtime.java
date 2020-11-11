@@ -21,7 +21,7 @@ public class Workingtime {
     public Workingtime(int Seconds) {
         Hours = Seconds / 3600;
         Minutes = (Seconds % 3600) / 60;
-        Seconds = Seconds % 60;
+        this.Seconds = Seconds % 60;
     }
 
     public int getHours() {

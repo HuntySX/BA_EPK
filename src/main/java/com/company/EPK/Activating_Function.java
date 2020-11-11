@@ -23,6 +23,7 @@ public class Activating_Function extends Function implements Printable_Node, Is_
     private Workingtime Max_Instantiate_Time;
     private Workingtime Mean_Instantiate_Time;
     private Workingtime Deviation_Instantiate_Time;
+    private boolean is_Deterministic_Ordertime;
     private int chance_for_instantiation;
     private int waiting_Ticket;
     private List<Instance_Workflow> Waiting_For_Activation_Instances;
@@ -41,7 +42,7 @@ public class Activating_Function extends Function implements Printable_Node, Is_
         this.Waiting_For_Activation_Instances = new ArrayList<>();
         this.calendar = calendar;
         this.DecisionType = decision;
-
+        is_Deterministic_Ordertime = true;
         waiting_Ticket = 0;
     }
 
@@ -65,13 +66,14 @@ public class Activating_Function extends Function implements Printable_Node, Is_
         this.Waiting_For_Activation_Instances = new ArrayList<>();
         this.calendar = calendar;
         this.DecisionType = decision;
+        is_Deterministic_Ordertime = true;
 
         waiting_Ticket = 0;
     }
 
     public void Instantiate_Activation(Instance_Workflow instance) {
         Workingtime to_Instantiate = null;
-        if (isDeterministic()) {
+        if (is_Deterministic_Ordertime()) {
             to_Instantiate = Instantiate_Time;
         } else {
             NormalDistribution Distribution = new NormalDistribution(Mean_Instantiate_Time.get_Duration_to_Seconds(), Deviation_Instantiate_Time.get_Duration_to_Seconds());
@@ -211,6 +213,14 @@ public class Activating_Function extends Function implements Printable_Node, Is_
 
     public Workingtime getInstantiate_Time() {
         return Instantiate_Time;
+    }
+
+    public boolean is_Deterministic_Ordertime() {
+        return is_Deterministic_Ordertime;
+    }
+
+    public void set_Deterministic_Ordertime(boolean is_Deterministic_Ordertime) {
+        this.is_Deterministic_Ordertime = is_Deterministic_Ordertime;
     }
 
     public void setInstantiate_Time(Workingtime InstantiateTime) {
