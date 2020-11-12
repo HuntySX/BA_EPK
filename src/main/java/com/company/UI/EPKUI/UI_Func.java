@@ -84,7 +84,7 @@ public class UI_Func extends Function implements UI_Instantiable {
 
 
     public UI_Func(int ID, UI_EPK EPK, VBox Rightbox) {
-        super(null, ID, null, false, null, null, 0, 0, 10);
+        super(null, ID, null, false, null, null, 0, 0, 0);
         self = this;
         this.Box = new VBox();
         this.Rightbox = Rightbox;

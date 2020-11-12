@@ -164,6 +164,22 @@ public class Model {
                 getEPK().getAll_Elems().add(Event_Activating_Starter);
                 getEPK().getAll_Activating_Start_Events().add(Event_Activating_Starter);
                 break;
+
+            case EXTERNAL_FUNCTION:
+                UI_External_Function External_Function = new UI_External_Function(id, EPK, graph.getBorderpanecontroller().getRightbox());
+                UI_Elem = new UI_View_Gen(id, External_Function);
+                getEPK().getAll_Elems().add(External_Function);
+                getEPK().getAll_External_Functions().add(External_Function);
+                break;
+
+            case EXTERNAL_XOR:
+
+                UI_External_XOR External_XOR = new UI_External_XOR(id, EPK, graph.getBorderpanecontroller().getRightbox());
+                UI_Elem = new UI_View_Gen(id, External_XOR);
+                getEPK().getAll_Elems().add(External_XOR);
+                getEPK().getAll_External_XORs().add(External_XOR);
+                break;
+
         }
         addCell(UI_Elem);
 

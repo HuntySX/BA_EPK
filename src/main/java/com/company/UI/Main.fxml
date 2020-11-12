@@ -7,7 +7,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.TextFlow?>
 <AnchorPane xmlns:fx="http://javafx.com/fxml/1" minHeight="459.0" minWidth="809.0"
-            xmlns="http://javafx.com/javafx/8.0.111" fx:controller="com.company.UI.Borderpanecon">
+            xmlns="http://javafx.com/javafx/11.0.1" fx:controller="com.company.UI.Borderpanecon">
     <children>
         <BorderPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="520.0"
                     minWidth="809.0" prefHeight="520.0" prefWidth="809.0" AnchorPane.bottomAnchor="0.0"
@@ -210,6 +210,28 @@
                                 <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
                                     <image>
                                         <Image url="@../../../../../Icons/icons8-sechseck-50.png"/>
+                                    </image>
+                                </ImageView>
+                            </graphic>
+                        </Button>
+                        <Button fx:id="External_Function" alignment="TOP_CENTER" layoutX="10.0" layoutY="344.0"
+                                maxHeight="30.0" maxWidth="30.0" minHeight="30.0" minWidth="30.0"
+                                mnemonicParsing="false" onAction="#actionPerformed" prefHeight="30.0" prefWidth="30.0">
+                            <graphic>
+                                <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                                    <image>
+                                        <Image url="@../../../../../Icons/icons8-rechteck-50.png"/>
+                                    </image>
+                                </ImageView>
+                            </graphic>
+                        </Button>
+                        <Button fx:id="External_XOR" alignment="TOP_CENTER" layoutX="10.0" layoutY="162.0"
+                                maxHeight="30.0" maxWidth="30.0" minHeight="30.0" minWidth="30.0"
+                                mnemonicParsing="false" onAction="#actionPerformed" prefHeight="30.0" prefWidth="30.0">
+                            <graphic>
+                                <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                                    <image>
+                                        <Image url="@../../../../../Icons/icons8-gabelung-50.png"/>
                                     </image>
                                 </ImageView>
                             </graphic>

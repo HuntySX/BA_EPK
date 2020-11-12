@@ -88,6 +88,10 @@ public class Borderpanecon implements Initializable {
     @FXML
     Button Activating_Function;
     @FXML
+    Button External_Function;
+    @FXML
+    Button External_XOR;
+    @FXML
     Button Delete;
     @FXML
     Button Save_Node;
@@ -187,6 +191,12 @@ public class Borderpanecon implements Initializable {
         } else if (e.getSource() == Activating_Function) {
             Btn_Type = ACTIVATING_FUNCTION;
             System.out.println("Activating_Function");
+        } else if (e.getSource() == External_Function) {
+            Btn_Type = EXTERNAL_FUNCTION;
+            System.out.println("External_Function");
+        } else if (e.getSource() == External_XOR) {
+            Btn_Type = EXTERNAL_XOR;
+            System.out.println("External_XOR");
         } else if (e.getSource() == Connect) {
             Btn_Type = CONNECT;
             System.out.println("Connect");
@@ -571,9 +581,9 @@ public class Borderpanecon implements Initializable {
                                 }
                             }
                         }
-                            if (!newMap.isEmpty()) {
-                                ((Event_Con_Join) newNode).setPrevious_Elements(newMap);
-                            }
+                        if (!newMap.isEmpty()) {
+                            ((Event_Con_Join) newNode).setPrevious_Elements(newMap);
+                        }
                     }
                 }
             }

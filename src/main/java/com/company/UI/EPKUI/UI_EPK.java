@@ -29,6 +29,8 @@ public class UI_EPK {
     private List<UI_Event_Ending> End_Events;
     private List<UI_Event_Activating_Starter> Activating_Start_Events;
     private List<UI_Activate_Function> Activate_Functions;
+    private List<UI_External_Function> External_Functions;
+    private List<UI_External_XOR> External_XORs;
     private List<UI_Func> Functions;
     private List<UI_XOR_Split> XOR_Splits;
     private List<UI_OR_Split> OR_Splits;
@@ -63,6 +65,8 @@ public class UI_EPK {
         Activate_Functions = new ArrayList<>();
         Functions = new ArrayList<>();
         External_Events_by_Day = new ArrayList<>();
+        External_Functions = new ArrayList<>();
+        External_XORs = new ArrayList<>();
         List<External_Event> Events_Day_0 = new ArrayList<>();
         External_Events_by_Day.add(Events_Day_0);
         this.XOR_Splits = new ArrayList<>();
@@ -156,6 +160,14 @@ public class UI_EPK {
 
     public List<UI_Event_Activating_Starter> getAll_Activating_Start_Events() {
         return Activating_Start_Events;
+    }
+
+    public List<UI_External_Function> getAll_External_Functions() {
+        return External_Functions;
+    }
+
+    public List<UI_External_XOR> getAll_External_XORs() {
+        return External_XORs;
     }
 
     public UI_View_Gen getActive_Elem() {
@@ -313,4 +325,5 @@ public class UI_EPK {
     public void addNewDayForExternalEvent(List<External_Event> new_event_list) {
         External_Events_by_Day.add((new_event_list));
     }
+
 }
