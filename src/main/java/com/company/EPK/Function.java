@@ -220,7 +220,7 @@ public class Function extends EPK_Node implements Printable_Node, Is_Tagged {
             if (Min_Workingtime.isBefore(ResultingNonDetWorkingtime)) {
                 ResultingNonDetWorkingtime = Min_Workingtime;
             }
-            if (Max_Workingtime.isAfter(ResultingNonDetWorkingtime)) {
+            if (Max_Workingtime.isAfter_Equal(ResultingNonDetWorkingtime)) {
                 ResultingNonDetWorkingtime = Max_Workingtime;
             }
 

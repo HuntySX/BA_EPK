@@ -350,17 +350,26 @@ public class Borderpanecon implements Initializable {
                 if (node instanceof Activating_Function) {
                     if (((Activating_Function) node).getStart_Event() != null && ((Activating_Function) node).getStart_Event().equals(Active_Elem.getEPKNode())) {
                         ((Activating_Function) node).setStart_Event(null);
-                        EPK.getAll_Activating_Functions().remove(node);
                     }
                 } else if (node instanceof Activating_Start_Event) {
                     if (((Activating_Start_Event) node).getActivating_Function() != null &&
                             ((Activating_Start_Event) node).getActivating_Function().equals(Active_Elem.getEPKNode())) {
                         ((Activating_Start_Event) node).setFunction(null);
-                        EPK.getAll_Activating_Start_Events().remove(node);
                     }
                 } else if (node instanceof Event_Con_Join) {
                     ((Event_Con_Join) node).getPrevious_Elements().remove(Active_Elem.getEPKNode());
-
+                } else if (node instanceof External_Function) {
+                    if (((External_Function) node).getExternal_XOR() != null && ((External_Function) node).getExternal_XOR().equals(Active_Elem.getEPKNode())) {
+                        ((External_Function) node).setExternal_XOR(null);
+                    }
+                } else if (node instanceof External_XOR_Split) {
+                    if (((External_XOR_Split) node).getTimeout().equals(Active_Elem.getEPKNode())) {
+                        ((External_XOR_Split) node).setTimeout(null);
+                    } else if (((External_XOR_Split) node).getPositive().equals(Active_Elem.getEPKNode())) {
+                        ((External_XOR_Split) node).setPositive(null);
+                    } else if (((External_XOR_Split) node).getNegative().equals(Active_Elem.getEPKNode())) {
+                        ((External_XOR_Split) node).setNegative(null);
+                    }
                 }
             }
 
@@ -422,7 +431,7 @@ public class Borderpanecon implements Initializable {
             //INSTANTIATE ALL NODES WITHOUT BINDINGS
             for (EPK_Node Node : UI_All_Nodes) {
 
-                if (Node instanceof Function && !(Node instanceof Activating_Function)) {
+                if (Node instanceof Function && !(Node instanceof Activating_Function) && !(Node instanceof External_Function)) {
                     if (((Function) Node).isDeterministic()) {
                         Function newFunc = new Function(null, Node.getID(), ((Function) Node).getFunction_tag(),
                                 ((Function) Node).isConcurrently(), ((Function) Node).getNeeded_Resources(), null,
@@ -485,6 +494,14 @@ public class Borderpanecon implements Initializable {
                             null, ((Start_Event) Node).getEvent_Tag(), ((Start_Event) Node).is_Start_Event());
                     Final_List.add(newStart);
                     Final_Start_Events.add(newStart);
+                } else if (Node instanceof External_Function) {
+                    External_Function newFunction = new External_Function(null, Node.getID(), ((External_Function) Node).getFunction_tag(),
+                            ((External_Function) Node).getMin_External_Time(), ((External_Function) Node).getMax_External_Time(),
+                            ((External_Function) Node).getMean_External_Time(), ((External_Function) Node).getDeviation_External_Time());
+                    Final_List.add(newFunction);
+                } else if (Node instanceof External_XOR_Split) {
+                    External_XOR_Split newXORSplit = new External_XOR_Split(Node.getID(), ((External_XOR_Split) Node).getChance_Pos_Neg());
+                    Final_List.add(newXORSplit);
                 }
             }
 
@@ -584,6 +601,25 @@ public class Borderpanecon implements Initializable {
                         if (!newMap.isEmpty()) {
                             ((Event_Con_Join) newNode).setPrevious_Elements(newMap);
                         }
+                    } else if (newNode instanceof External_Function) {
+                        for (EPK_Node Node_in_UI : Final_List) {
+                            if (Node_in_UI.getID() == ((External_Function) UI_Node).getExternal_XOR().getID()) {
+                                ((External_Function) newNode).setExternal_XOR((External_XOR_Split) Node_in_UI);
+                            }
+                            ;
+                        }
+                    } else if (newNode instanceof External_XOR_Split) {
+                        for (EPK_Node Node_in_UI : Final_List) {
+                            if (Node_in_UI.getID() == ((External_XOR_Split) UI_Node).getPositive().getID()) {
+                                ((External_XOR_Split) newNode).setPositive(Node_in_UI);
+                            }
+                            if (Node_in_UI.getID() == ((External_XOR_Split) UI_Node).getNegative().getID()) {
+                                ((External_XOR_Split) newNode).setNegative(Node_in_UI);
+                            }
+                            if (Node_in_UI.getID() == ((External_XOR_Split) UI_Node).getTimeout().getID()) {
+                                ((External_XOR_Split) newNode).setTimeout(Node_in_UI);
+                            }
+                        }
                     }
                 }
             }
@@ -593,7 +629,7 @@ public class Borderpanecon implements Initializable {
                         List<Function> UI_Res_Func = UI_Res.getUsed_In();
                         for (Function f : UI_Res_Func) {
                             for (EPK_Node newfunc : Final_List) {
-                                if ((newfunc instanceof Function && newfunc.getID() == f.getID())) {
+                                if ((newfunc instanceof Function && !(newfunc instanceof External_Function) && newfunc.getID() == f.getID())) {
                                     Res.add_Used_In((Function) newfunc);
                                 }
                             }
@@ -641,7 +677,7 @@ public class Borderpanecon implements Initializable {
 
                     Print_End_Event Ev = new Print_End_Event(Node.getID(), Next_elems, ((Event) Node).getEvent_Tag());
                     PrinterList.add(Ev);
-                } else if (Node instanceof Event && (Node instanceof Start_Event)) {
+                } else if (Node instanceof Start_Event) {
                     Print_Start_Event Ev = new Print_Start_Event(Node.getID(), Next_elems,
                             ((Start_Event) Node).getEvent_Tag(),
                             ((Start_Event) Node).getStart_event_type(),

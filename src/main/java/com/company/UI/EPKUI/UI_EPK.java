@@ -178,6 +178,22 @@ public class UI_EPK {
         Active_Elem_For_Connection = active_Elem_For_Connection;
     }
 
+    public List<UI_External_Function> getExternal_Functions() {
+        return External_Functions;
+    }
+
+    public void setExternal_Functions(List<UI_External_Function> external_Functions) {
+        External_Functions = external_Functions;
+    }
+
+    public List<UI_External_XOR> getExternal_XORs() {
+        return External_XORs;
+    }
+
+    public void setExternal_XORs(List<UI_External_XOR> external_XORs) {
+        External_XORs = external_XORs;
+    }
+
     public List<UI_Event> getEvents() {
         return Events;
     }

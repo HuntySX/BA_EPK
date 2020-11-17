@@ -76,7 +76,7 @@ public class Discrete_Event_Generator {
         this.Simulation = new Discrete_Event_Simulator(this);
     }
 
-    public void run() throws Exception {
+    public void run() {
         event_Calendar.fillCalendar();
         System.out.println("Calendar filled");
         List<Simulation_Event_List> Events = event_Calendar.getUpcoming_List();

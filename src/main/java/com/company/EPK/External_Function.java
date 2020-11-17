@@ -1,6 +1,11 @@
 package com.company.EPK;
 
+import com.company.Simulation.Simulation_Base.Data.Discrete_Data.Event_Instance;
+import com.company.Simulation.Simulation_Base.Data.Discrete_Data.External_XOR_Instance_Lock;
 import com.company.Simulation.Simulation_Base.Data.Discrete_Data.Workingtime;
+import org.apache.commons.math3.distribution.NormalDistribution;
+
+import java.util.List;
 
 public class External_Function extends Function implements Printable_Node {
 
@@ -9,7 +14,6 @@ public class External_Function extends Function implements Printable_Node {
     private Workingtime Max_External_Time;
     private Workingtime Mean_External_Time;
     private Workingtime Deviation_External_Time;
-    private Workingtime Timeout_External_Time;
 
     public External_Function(int ID) {
         super(null, ID, null, false, null, null, 0, 0, 0);
@@ -18,11 +22,31 @@ public class External_Function extends Function implements Printable_Node {
         Max_External_Time = new Workingtime();
         Mean_External_Time = new Workingtime();
         Deviation_External_Time = new Workingtime();
-        Timeout_External_Time = new Workingtime();
     }
 
-    private void calculate_External_Event() {
-        
+    public External_Function(List<EPK_Node> next_Elem, int id, String function_tag,
+                             Workingtime min_external_time, Workingtime max_external_time, Workingtime mean_external_time,
+                             Workingtime deviation_external_time) {
+
+        super(next_Elem, id, function_tag, false, null, null, 0, 0, 0);
+        External_XOR = null;
+        Min_External_Time = min_external_time;
+        Max_External_Time = max_external_time;
+        Mean_External_Time = mean_external_time;
+        Deviation_External_Time = deviation_external_time;
+    }
+
+    public External_XOR_Instance_Lock calculate_External_Event(Event_Instance instance) {
+        NormalDistribution Distribution = new NormalDistribution(Mean_External_Time.get_Duration_to_Seconds(), Deviation_External_Time.get_Duration_to_Seconds());
+        Workingtime sample = new Workingtime((int) Distribution.sample());
+        if (sample.isBefore(Min_External_Time)) {
+            sample = Min_External_Time;
+        }
+        if (sample.isAfter_Equal(Max_External_Time)) {
+            sample = Max_External_Time;
+        }
+
+        return External_XOR.newExternal_Event(instance, sample);
     }
 
     public External_XOR_Split getExternal_XOR() {
@@ -63,13 +87,5 @@ public class External_Function extends Function implements Printable_Node {
 
     public void setDeviation_External_Time(Workingtime deviation_External_Time) {
         Deviation_External_Time = deviation_External_Time;
-    }
-
-    public Workingtime getTimeout_External_Time() {
-        return Timeout_External_Time;
-    }
-
-    public void setTimeout_External_Time(Workingtime timeout_External_Time) {
-        Timeout_External_Time = timeout_External_Time;
     }
 }

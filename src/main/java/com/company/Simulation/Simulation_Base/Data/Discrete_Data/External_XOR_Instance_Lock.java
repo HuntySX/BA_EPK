@@ -5,10 +5,10 @@ public class External_XOR_Instance_Lock {
     private Workingtime time;
     private Object XOR_Lock;
 
-    public External_XOR_Instance_Lock(Event_Instance instance, Object XOR_Lock, Workingtime time) {
+    public External_XOR_Instance_Lock(Event_Instance instance, Workingtime time) {
         Instance = instance;
         this.time = time;
-        this.XOR_Lock = XOR_Lock;
+        this.XOR_Lock = new Object();
     }
 
     public Workingtime getTime() {

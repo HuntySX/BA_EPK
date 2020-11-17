@@ -81,7 +81,7 @@ public class Activating_Function extends Function implements Printable_Node, Is_
             to_Instantiate = new Workingtime(Seconds_to_Instantiate);
             if (Min_Instantiate_Time.isBefore(to_Instantiate)) {
                 to_Instantiate = Min_Instantiate_Time;
-            } else if (Max_Instantiate_Time.isAfter(to_Instantiate)) {
+            } else if (Max_Instantiate_Time.isAfter_Equal(to_Instantiate)) {
                 to_Instantiate = Max_Instantiate_Time;
             }
         }

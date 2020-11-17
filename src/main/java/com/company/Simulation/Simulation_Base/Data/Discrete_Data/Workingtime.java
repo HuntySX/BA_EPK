@@ -56,8 +56,8 @@ public class Workingtime {
         return to_check.get_Duration_to_Seconds() < this.get_Duration_to_Seconds();
     }
 
-    public boolean isAfter(Workingtime to_check) {
-        return to_check.get_Duration_to_Seconds() > this.get_Duration_to_Seconds();
+    public boolean isAfter_Equal(Workingtime to_check) {
+        return to_check.get_Duration_to_Seconds() >= this.get_Duration_to_Seconds();
     }
 
     @Override
