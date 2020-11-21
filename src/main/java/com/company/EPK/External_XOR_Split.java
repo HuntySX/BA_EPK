@@ -21,11 +21,23 @@ public class External_XOR_Split extends EPK_Node implements Printable_Node {
 
     public External_XOR_Split(int ID, EPK_Node timeout, EPK_Node positive, EPK_Node negative, int chance_Pos_Neg) {
         super(ID);
+
         external_XOR_InstanceLocks = new ArrayList<>();
         Timeout = timeout;
         Positive = positive;
         Negative = negative;
         Chance_Pos_Neg = chance_Pos_Neg;
+        Timeout_Time = new Workingtime();
+    }
+
+    public External_XOR_Split(int id, EPK_Node timeout, EPK_Node positive, EPK_Node negative, int chance_Pos_Neg, Workingtime timeout_Time) {
+        super(id);
+        external_XOR_InstanceLocks = new ArrayList<>();
+        Timeout = timeout;
+        Positive = positive;
+        Negative = negative;
+        Chance_Pos_Neg = chance_Pos_Neg;
+        Timeout_Time = timeout_Time;
     }
 
     public External_XOR_Split(int ID) {
@@ -64,7 +76,7 @@ public class External_XOR_Split extends EPK_Node implements Printable_Node {
     }
 
     private EPK_Node decideNextElem(Instance_Workflow_XOR instance, External_XOR_Instance_Lock to_unlock) {
-        if (Timeout_Time.isAfter_Equal(to_unlock.getTime())) {
+        if (to_unlock.getTime().isAfter_Equal(Timeout_Time)) {
             return Timeout;
         } else {
             Random rand = new Random();
@@ -107,5 +119,17 @@ public class External_XOR_Split extends EPK_Node implements Printable_Node {
 
     public void setChance_Pos_Neg(int chance_Pos_Neg) {
         Chance_Pos_Neg = chance_Pos_Neg;
+    }
+
+    public Workingtime getTimeout_Time() {
+        return Timeout_Time;
+    }
+
+    public void setTimeout_Time(Workingtime timeout_Time) {
+        Timeout_Time = timeout_Time;
+    }
+
+    public External_XOR_Split returnUpperClass() {
+        return this;
     }
 }

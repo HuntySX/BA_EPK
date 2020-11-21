@@ -64,8 +64,15 @@ public class UI_View_Gen extends Cell {
             File file = new File("src/Icons/Activating_Event.png");
             Image image = new Image(file.toURI().toString());
             view = new ImageView(image);
+        } else if (EPKNode instanceof UI_External_Function) {
+            File file = new File("src/Icons/External_Function.png");
+            Image image = new Image(file.toURI().toString());
+            view = new ImageView(image);
+        } else if (EPKNode instanceof UI_External_XOR) {
+            File file = new File("src/Icons/External_XOR.png");
+            Image image = new Image(file.toURI().toString());
+            view = new ImageView(image);
         }
-
 
         Label label = new Label(Integer.toString(EPKNode.getID()));
         setView(view, label);

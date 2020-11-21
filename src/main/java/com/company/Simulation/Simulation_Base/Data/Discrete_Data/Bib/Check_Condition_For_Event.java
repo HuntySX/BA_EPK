@@ -29,7 +29,8 @@ public class Check_Condition_For_Event {
     public static boolean Check_For_Condition(List<User> Users, List<Resource> Resources, Instance_Workflow Instance, Event_Calendar calendar, Settings settings) {
         boolean rescheck = true;
         if (Instance.getEPKNode() instanceof Event || Instance.getEPKNode() instanceof Event_Con_Join || Instance.getEPKNode() instanceof Event_Con_Split
-                || (Instance.getEPKNode() instanceof Function && Instance.isWorking() && !(Instance.getEPKNode() instanceof Activating_Function))) {
+                || (Instance.getEPKNode() instanceof Function && Instance.isWorking() || Instance.getEPKNode() instanceof External_XOR_Split || Instance.getEPKNode() instanceof External_Function
+                && !(Instance.getEPKNode() instanceof Activating_Function))) {
             return true;
         } else {
             for (Resource needing : ((Function) Instance.getEPKNode()).getNeeded_Resources()) {

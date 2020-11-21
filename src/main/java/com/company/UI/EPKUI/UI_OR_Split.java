@@ -67,13 +67,10 @@ public class UI_OR_Split extends Event_Con_Split implements UI_Instantiable {
 
     @Override
     public VBox Get_UI() {
-        Box.getChildren().clear();
-        Box.getChildren().add(ID_UI);
-        Box.getChildren().add(new Separator());
+
         UI_NEXT_ELEMENTS_FIELD = Field.ofSingleSelectionType(nodelist).label("Nachfolger");
         NEXT_ELEMS_UI = new FormRenderer(Form.of(Group.of(UI_NEXT_ELEMENTS_FIELD)));
-        Box.getChildren().add(NEXT_ELEMS_UI);
-        Box.getChildren().add(new Separator());
+
         Button btn = new Button("Verbindung entfernen");
         btn.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -87,9 +84,6 @@ public class UI_OR_Split extends Event_Con_Split implements UI_Instantiable {
                 }
             }
         });
-
-        Box.getChildren().add(btn);
-        Box.getChildren().add(new Separator());
         UI_Chance_List = new ArrayList<>();
         CleanupChances();
         if (!getChances_List().isEmpty()) {
@@ -119,6 +113,13 @@ public class UI_OR_Split extends Event_Con_Split implements UI_Instantiable {
             }
         }
 
+        Box.getChildren().clear();
+        Box.getChildren().add(ID_UI);
+        Box.getChildren().add(new Separator());
+        Box.getChildren().add(NEXT_ELEMS_UI);
+        Box.getChildren().add(new Separator());
+        Box.getChildren().add(btn);
+        Box.getChildren().add(new Separator());
         Box.getChildren().add(new Separator());
         Box.getChildren().add(DECIDE_UI);
 

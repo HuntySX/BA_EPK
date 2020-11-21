@@ -11,6 +11,7 @@ public class Instance_Workflow_XOR extends Instance_Workflow {
 
     public Instance_Workflow_XOR(Event_Instance instance, LocalTime to_Start, EPK_Node EPKNode, Object XOR_ID) {
         super(instance, to_Start, EPKNode);
+        this.XOR_ID = XOR_ID;
     }
 
     public Object getXOR_ID() {

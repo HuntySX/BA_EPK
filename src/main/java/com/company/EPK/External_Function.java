@@ -30,19 +30,36 @@ public class External_Function extends Function implements Printable_Node {
 
         super(next_Elem, id, function_tag, false, null, null, 0, 0, 0);
         External_XOR = null;
-        Min_External_Time = min_external_time;
-        Max_External_Time = max_external_time;
-        Mean_External_Time = mean_external_time;
-        Deviation_External_Time = deviation_external_time;
+        if (min_external_time == null) {
+            Min_External_Time = new Workingtime();
+        } else {
+            Min_External_Time = min_external_time;
+        }
+        if (max_external_time == null) {
+            Max_External_Time = new Workingtime();
+        } else {
+            Max_External_Time = max_external_time;
+        }
+        if (mean_external_time == null) {
+            Mean_External_Time = new Workingtime();
+        } else {
+            Mean_External_Time = mean_external_time;
+        }
+        if (deviation_external_time == null) {
+            Deviation_External_Time = new Workingtime();
+        } else {
+            Deviation_External_Time = deviation_external_time;
+        }
+
     }
 
     public External_XOR_Instance_Lock calculate_External_Event(Event_Instance instance) {
         NormalDistribution Distribution = new NormalDistribution(Mean_External_Time.get_Duration_to_Seconds(), Deviation_External_Time.get_Duration_to_Seconds());
         Workingtime sample = new Workingtime((int) Distribution.sample());
-        if (sample.isBefore(Min_External_Time)) {
+        if (Min_External_Time.isBefore(sample)) {
             sample = Min_External_Time;
         }
-        if (sample.isAfter_Equal(Max_External_Time)) {
+        if (Max_External_Time.isAfter_Equal(sample)) {
             sample = Max_External_Time;
         }
 

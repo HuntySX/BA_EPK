@@ -39,6 +39,7 @@ public class UI_OR_Join extends Event_Con_Join implements UI_Instantiable {
     private FormRenderer IS_EAGER_UI;
     private List<EPK_Node> Chosen_Previous_List;
 
+
     public UI_OR_Join(int ID, UI_EPK EPK, VBox Rightbox) {
         super(null, ID, Contype.EAGER_OR);
         this.Box = new VBox();
