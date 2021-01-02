@@ -20,19 +20,20 @@ public class Process_Mining_JSON_Read {
     private List<Mining_Resource> ResourceList;
     private List<Mining_Instance> InstanceList;
     private List<Mining_Activity> ActivityList;
+    private List<List<Mining_Instance>> Sorted_Instance_List;
 
     public Process_Mining_JSON_Read() {
 
     }
 
-    public List<List<Mining_Instance>> Read_From_File() {
+    public void Read_From_File() {
 
         JSONParser Functionparser = new JSONParser();
 
         try (FileReader reader = new FileReader("./InstanceLog/Line.json")) {
             Object obj = Functionparser.parse(reader);
 
-            Userlist = new ArrayList<Mining_User>();
+            Userlist = new ArrayList<>();
             ResourceList = new ArrayList<>();
             InstanceList = new ArrayList<>();
             ActivityList = new ArrayList<>();
@@ -56,7 +57,7 @@ public class Process_Mining_JSON_Read {
             e.printStackTrace();
         }
 
-        return generateSortedInstanceList();
+        Sorted_Instance_List = generateSortedInstanceList();
     }
 
     private List<List<Mining_Instance>> generateSortedInstanceList() {
@@ -86,6 +87,7 @@ public class Process_Mining_JSON_Read {
         String Activity_Name = (String) inst.get("Nodename");
         String Activity_Type = (String) inst.get("Type_of_act_Node");
         long Activity_ID = (long) inst.get("Node_ID");
+        long Activity_Day = (long) inst.get("Day");
 
         Mining_Activity newActivity = CreateOrLoadActivity(Activity_Name, (int) Activity_ID, Activity_Type);
 
@@ -95,7 +97,7 @@ public class Process_Mining_JSON_Read {
         long Minute = (long) Timestamp.get("minute");
         long Second = (long) Timestamp.get("second");
 
-        Mining_Instance newInstance = new Mining_Instance(LocalTime.of((int) Hour, (int) Minute, (int) Second),
+        Mining_Instance newInstance = new Mining_Instance(LocalTime.of((int) Hour, (int) Minute, (int) Second), (int) Activity_Day,
                 (int) Instance_ID, Activity_Status, newActivity);
 
         if (Activity_Status.equals("Working") || Activity_Status.equals("Finished")) {
@@ -111,6 +113,9 @@ public class Process_Mining_JSON_Read {
             RessourceArray.forEach(Value -> {
                 String Resname = (String) ((JSONObject) Value).get("name");
                 long count = (long) ((JSONObject) Value).get("count");
+                if (Activity_Status.equals("Finished")) {
+                    count = -count;
+                }
                 long R_ID = (long) ((JSONObject) Value).get("Resource_ID");
                 Mining_Resource newResource = CreateOrLoadResource(Resname, (int) R_ID);
                 addResourceToInstance(newInstance, newResource, (int) count);
@@ -177,6 +182,14 @@ public class Process_Mining_JSON_Read {
 
     public List<Mining_Instance> getInstanceList() {
         return InstanceList;
+    }
+
+    public List<List<Mining_Instance>> getSorted_Instance_List() {
+        return Sorted_Instance_List;
+    }
+
+    public void setSorted_Instance_List(List<List<Mining_Instance>> sorted_Instance_List) {
+        Sorted_Instance_List = sorted_Instance_List;
     }
 
     public List<Mining_Activity> getActivityList() {

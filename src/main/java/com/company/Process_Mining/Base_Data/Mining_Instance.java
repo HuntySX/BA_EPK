@@ -7,6 +7,7 @@ import java.util.List;
 public class Mining_Instance {
 
     String Activity_Status;
+    private int Activity_Day;
     private LocalTime Duration;
     private int Instance_ID;
     private List<Mining_Resource_Count> Used_Resources;
@@ -24,7 +25,8 @@ public class Mining_Instance {
         Activity = activity;
     }
 
-    public Mining_Instance(LocalTime duration, int instance_ID, String activity_Status, Mining_Activity activity) {
+    public Mining_Instance(LocalTime duration, int Activity_Day, int instance_ID, String activity_Status, Mining_Activity activity) {
+        this.Activity_Day = Activity_Day;
         Duration = duration;
         Instance_ID = instance_ID;
         Activity_Status = activity_Status;
