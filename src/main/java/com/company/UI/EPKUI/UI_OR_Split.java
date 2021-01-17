@@ -23,18 +23,18 @@ import static com.company.Enums.Split_Decide_Type.SINGLE_RANDOM;
 
 public class UI_OR_Split extends Event_Con_Split implements UI_Instantiable {
 
-    private VBox Box;
-    private VBox Rightbox;
-    private List<EPK_Node> nodelist;
-    private UI_EPK EPK;
-    private IntegerProperty UI_ID;
-    private List<Split_Decide_Type> Decide_Types;
-    private IntegerField UI_ID_FIELD;
-    private SingleSelectionField<Split_Decide_Type> Decide_Type;
+    private final VBox Box;
+    private final VBox Rightbox;
+    private final List<EPK_Node> nodelist;
+    private final UI_EPK EPK;
+    private final IntegerProperty UI_ID;
+    private final List<Split_Decide_Type> Decide_Types;
+    private final IntegerField UI_ID_FIELD;
+    private final SingleSelectionField<Split_Decide_Type> Decide_Type;
     private SingleSelectionField<EPK_Node> UI_NEXT_ELEMENTS_FIELD;
-    private FormRenderer ID_UI;
+    private final FormRenderer ID_UI;
     private FormRenderer NEXT_ELEMS_UI;
-    private FormRenderer DECIDE_UI;
+    private final FormRenderer DECIDE_UI;
     private List<UI_Split_Node_Chances> UI_Chance_List;
 
 

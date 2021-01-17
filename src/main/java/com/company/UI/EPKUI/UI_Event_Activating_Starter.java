@@ -29,9 +29,9 @@ public class UI_Event_Activating_Starter extends Activating_Start_Event implemen
     private IntegerProperty INSTANTIATE_COUNT;
     private StringProperty tag;
     private IntegerField UI_ID_FIELD;
-    private Label Activating_Event_Label = new Label("Ausgewählte Aktivierende Funktion: ");
-    private BooleanProperty is_Start = new SimpleBooleanProperty(true);
-    private BooleanProperty is_End = new SimpleBooleanProperty(false);
+    private final Label Activating_Event_Label = new Label("Ausgewählte Aktivierende Funktion: ");
+    private final BooleanProperty is_Start = new SimpleBooleanProperty(true);
+    private final BooleanProperty is_End = new SimpleBooleanProperty(false);
     private SingleSelectionField<EPK_Node> Next_Elems;
     private UI_EPK EPK;
     private UI_Activate_Function Chosen_Starter;
@@ -43,7 +43,7 @@ public class UI_Event_Activating_Starter extends Activating_Start_Event implemen
     private SingleSelectionField<Start_Event_Type> Start_Event_Type;
     private FormRenderer UI_EVENT_TYPE_INSTANTIATE;
     private List<Start_Event_Type> Event_Types;
-    private IntegerProperty to_Instantiate = new SimpleIntegerProperty();
+    private final IntegerProperty to_Instantiate = new SimpleIntegerProperty();
     private SingleSelectionField<UI_Activate_Function> Activating_Function;
     private List<UI_Activate_Function> Activating_Functions;
 

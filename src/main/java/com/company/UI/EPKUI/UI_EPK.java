@@ -23,30 +23,30 @@ import static com.company.Enums.Start_Event_Type.*;
 
 public class UI_EPK {
     private UI_View_Gen Active_Elem_For_Connection;
-    private List<EPK_Node> All_Elems;
-    private List<UI_Event> Events;
-    private List<UI_Event_Starter> Start_Events;
-    private List<UI_Event_Ending> End_Events;
-    private List<UI_Event_Activating_Starter> Activating_Start_Events;
-    private List<UI_Activate_Function> Activate_Functions;
+    private final List<EPK_Node> All_Elems;
+    private final List<UI_Event> Events;
+    private final List<UI_Event_Starter> Start_Events;
+    private final List<UI_Event_Ending> End_Events;
+    private final List<UI_Event_Activating_Starter> Activating_Start_Events;
+    private final List<UI_Activate_Function> Activate_Functions;
     private List<UI_External_Function> External_Functions;
     private List<UI_External_XOR> External_XORs;
-    private List<UI_Func> Functions;
-    private List<UI_XOR_Split> XOR_Splits;
-    private List<UI_OR_Split> OR_Splits;
-    private List<UI_AND_Split> AND_Splits;
-    private List<UI_XOR_Join> XOR_Joins;
-    private List<UI_OR_Join> OR_Joins;
-    private List<UI_AND_Join> AND_Joins;
-    private List<Start_Event_Type> Start_Event_Types;
-    private List<Decide_Activation_Type> Decide_Activation_Types;
+    private final List<UI_Func> Functions;
+    private final List<UI_XOR_Split> XOR_Splits;
+    private final List<UI_OR_Split> OR_Splits;
+    private final List<UI_AND_Split> AND_Splits;
+    private final List<UI_XOR_Join> XOR_Joins;
+    private final List<UI_OR_Join> OR_Joins;
+    private final List<UI_AND_Join> AND_Joins;
+    private final List<Start_Event_Type> Start_Event_Types;
+    private final List<Decide_Activation_Type> Decide_Activation_Types;
     private List<Resource> All_Resources;
     private List<Workforce> All_Workforces;
-    private List<User> All_Users;
+    private final List<User> All_Users;
     private List<List<External_Event>> External_Events_by_Day;
-    private Model model;
+    private final Model model;
     private VBox Box;
-    private Graph graph;
+    private final Graph graph;
     private int UniqueUserID;
     private int UniqueResourceID;
     private int UniqueWorkforceID;
@@ -114,9 +114,7 @@ public class UI_EPK {
     }
 
     public void RemoveUser(User user) {
-        if (All_Users.contains(user)) {
-            All_Users.remove(user);
-        }
+        All_Users.remove(user);
     }
 
     public void AddResource(Resource resource) {
@@ -126,9 +124,7 @@ public class UI_EPK {
     }
 
     public void RemoveResource(Resource resource) {
-        if (All_Resources.contains(resource)) {
-            All_Resources.remove(resource);
-        }
+        All_Resources.remove(resource);
     }
 
     public void AddWorkforce(Workforce workforce) {
@@ -138,9 +134,7 @@ public class UI_EPK {
     }
 
     public void RemoveWorkforce(Workforce workforce) {
-        if (All_Workforces.contains(workforce)) {
-            All_Workforces.remove(workforce);
-        }
+        All_Workforces.remove(workforce);
     }
 
     public List<Workforce> getAll_Workforces() {

@@ -3,6 +3,7 @@ package com.company.UI;
 import com.company.EPK.*;
 import com.company.Print.EventDriven.*;
 import com.company.Process_Mining.Process_Mining_Main;
+import com.company.Process_Mining.Process_Mining_Settings;
 import com.company.Run.Discrete_Event_Generator;
 import com.company.Simulation.Simulation_Base.Data.Discrete_Data.External_Event;
 import com.company.Simulation.Simulation_Base.Data.Discrete_Data.Resource;
@@ -209,7 +210,7 @@ public class Borderpanecon implements Initializable {
             Parent root = loader.load();
             Scene scene = new Scene(root, 700, 500);
 
-            UI_TEST_EPK Testing_UI = (UI_TEST_EPK) loader.getController();
+            UI_TEST_EPK Testing_UI = loader.getController();
 
 
             Stage newWindow = new Stage();
@@ -231,7 +232,7 @@ public class Borderpanecon implements Initializable {
             Parent root = loader.load();
             Scene scene = new Scene(root, 800, 500);
 
-            UI_USER_MANAGEMENT USER_UI = (UI_USER_MANAGEMENT) loader.getController();
+            UI_USER_MANAGEMENT USER_UI = loader.getController();
 
 
             Stage newWindow = new Stage();
@@ -255,7 +256,7 @@ public class Borderpanecon implements Initializable {
             Parent root = loader.load();
             Scene scene = new Scene(root, 800, 500);
 
-            UI_RESOURCE_MANAGEMENT RESOURCE_UI = (UI_RESOURCE_MANAGEMENT) loader.getController();
+            UI_RESOURCE_MANAGEMENT RESOURCE_UI = loader.getController();
             Stage newWindow = new Stage();
             RESOURCE_UI.setEPK(EPK);
             RESOURCE_UI.setMainStage(ThisStage);
@@ -276,7 +277,7 @@ public class Borderpanecon implements Initializable {
             Parent root = loader.load();
             Scene scene = new Scene(root, 800, 500);
 
-            UI_WORKFORCE_MANAGEMENT WORKFORCE_UI = (UI_WORKFORCE_MANAGEMENT) loader.getController();
+            UI_WORKFORCE_MANAGEMENT WORKFORCE_UI = loader.getController();
             Stage newWindow = new Stage();
             WORKFORCE_UI.setEPK(EPK);
             WORKFORCE_UI.setMainStage(ThisStage);
@@ -304,7 +305,7 @@ public class Borderpanecon implements Initializable {
                 EPK.setUI_Settings(Settings);
             }
 
-            UI_SIMULATION_MANAGEMENT SIMULATION_UI = (UI_SIMULATION_MANAGEMENT) loader.getController();
+            UI_SIMULATION_MANAGEMENT SIMULATION_UI = loader.getController();
             Stage newWindow = new Stage();
             SIMULATION_UI.setEPK(EPK);
             SIMULATION_UI.setSettings(Settings);
@@ -326,7 +327,7 @@ public class Borderpanecon implements Initializable {
             Parent root = loader.load();
             Scene scene = new Scene(root, 1200, 900);
 
-            UI_EXTERNAL_EVENT_MANAGER Manager_UI = (UI_EXTERNAL_EVENT_MANAGER) loader.getController();
+            UI_EXTERNAL_EVENT_MANAGER Manager_UI = loader.getController();
 
 
             Stage newWindow = new Stage();
@@ -649,7 +650,6 @@ public class Borderpanecon implements Initializable {
                             if (Node_in_UI.getID() == ((External_Function) UI_Node).getExternal_XOR().getID()) {
                                 ((External_Function) newNode).setExternal_XOR((External_XOR_Split) Node_in_UI);
                             }
-                            ;
                         }
                     } else if (newNode instanceof External_XOR_Split) {
                         for (EPK_Node Node_in_UI : Final_List) {
@@ -869,8 +869,16 @@ public class Borderpanecon implements Initializable {
             Print_File.run();
             //I_Pq_T.start();
 
+            Process_Mining_Settings Miner_Settings = new Process_Mining_Settings();
 
-            Process_Mining_Main Miner_Main = new Process_Mining_Main();
+            Miner_Settings.setDays(settings.getMax_RuntimeDays());
+            Miner_Settings.setBeginTime(settings.getBeginTime());
+            Miner_Settings.setEndTime(settings.getEndTime());
+            Miner_Settings.setMining_Resolution_in_Seconds(300);
+            Miner_Settings.setOriginal_Resource_List(EPK.getAll_Resources());
+            Miner_Settings.setOriginal_User_List(EPK.getAll_Users());
+
+            Process_Mining_Main Miner_Main = new Process_Mining_Main(Miner_Settings);
 
             Miner_Main.run();
         }

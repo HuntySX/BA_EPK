@@ -1,12 +1,12 @@
 package com.company.Simulation.Simulation_Base.Data.Threading_Data;
 
-import com.company.EPK.Function;
 import com.company.EPK.EPK_Node;
+import com.company.EPK.Function;
 import com.company.Enums.Function_Type;
 import com.company.Enums.Process_Status;
+import com.company.Simulation.Simulation_Base.Data.Printer_Gate;
 import com.company.Simulation.Simulation_Base.Data.Shared_Data.Simulation_Instance;
 import com.company.Simulation.Simulation_Base.Data.Shared_Data.User;
-import com.company.Simulation.Simulation_Base.Data.Printer_Gate;
 import com.company.Simulation.Simulation_Threading.Warehouse_Gate;
 
 import java.time.LocalTime;
@@ -16,18 +16,18 @@ import java.util.function.Consumer;
 
 public class Process_instance implements Runnable {
 
-    private EPK_Node process;
-    private Function_Type type;
+    private final EPK_Node process;
+    private final Function_Type type;
     private Thread t;
-    private Lock mother;
+    private final Lock mother;
     private boolean order_fullfilled;
     private boolean finished;
-    private boolean concurrency;
-    private Warehouse_Gate warehouse;
+    private final boolean concurrency;
+    private final Warehouse_Gate warehouse;
     private Simulation_Instance instance;
     private User user;
     private Consumer<Process_instance> consumable;
-    private Lock lock;
+    private final Lock lock;
 
     public Process_instance(Lock mother, Function_Type type, Simulation_Instance instance, User user, Consumer<Process_instance> consumable, boolean concurrency, EPK_Node process) {
         this.t = null;

@@ -21,10 +21,10 @@ public class Process_Queue implements Runnable {
     private final Process_Gate process_gate;
     private final User_Gate user_gate;
     private Thread Process_Queue;
-    private EPK epk;
-    private List<Process_instance> active_Processes;
+    private final EPK epk;
+    private final List<Process_instance> active_Processes;
     private boolean not_killed = true;
-    private Lock lock;
+    private final Lock lock;
 
     public Process_Queue(EPK epk) {
         process_gate = Process_Gate.getProcess_gate();

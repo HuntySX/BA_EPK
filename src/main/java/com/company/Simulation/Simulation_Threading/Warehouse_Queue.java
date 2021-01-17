@@ -1,12 +1,7 @@
 package com.company.Simulation.Simulation_Threading;
 
 import com.company.Enums.Order_Status;
-import com.company.Simulation.Simulation_Base.Data.Threading_Data.Item;
-import com.company.Simulation.Simulation_Base.Data.Threading_Data.Order_Monitor;
-import com.company.Simulation.Simulation_Base.Data.Threading_Data.Warehouse;
-import com.company.Simulation.Simulation_Base.Data.Threading_Data.Buy_Instance;
-import com.company.Simulation.Simulation_Base.Data.Threading_Data.Order_Instance;
-import com.company.Simulation.Simulation_Base.Data.Threading_Data.Process_instance;
+import com.company.Simulation.Simulation_Base.Data.Threading_Data.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,9 +10,9 @@ import static com.company.Enums.Order_Status.*;
 
 public class Warehouse_Queue implements Runnable {
 
-    private Warehouse_Gate warehouse_gate;
+    private final Warehouse_Gate warehouse_gate;
     private Thread t;
-    private boolean not_killed;
+    private final boolean not_killed;
 
     public Warehouse_Queue() {
         this.warehouse_gate = Warehouse_Gate.get_Warehouse_Gate();

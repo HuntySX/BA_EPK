@@ -25,8 +25,8 @@ public class Discrete_Event_Generator {
     private Settings_Loader Settings_loader;
     private Resource_Loader Resource_loader;
     private User_Loader User_loader;
-    private Printer_Gate printer_Gate;
-    private Printer_Queue printer_Queue;
+    private final Printer_Gate printer_Gate;
+    private final Printer_Queue printer_Queue;
     private List<User> Users;
     private List<Resource> Resources;
     private Discrete_Event_Simulator Simulation;

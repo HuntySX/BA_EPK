@@ -5,7 +5,7 @@ import com.company.EPK.EPK_Node;
 import java.util.List;
 
 public class ReachableTest_ListObject {
-    private EPK_Node node;
+    private final EPK_Node node;
     private boolean found;
 
     public ReachableTest_ListObject(EPK_Node node, boolean found) {

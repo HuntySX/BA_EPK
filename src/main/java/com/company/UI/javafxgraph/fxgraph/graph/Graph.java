@@ -16,12 +16,12 @@ public class Graph {
      * top child down, the entire scrollpane would move down
      */
     CellLayer cellLayer;
-    private Model model;
+    private final Model model;
     private Node Active_Element;
-    private VBox VBox;
-    private Group canvas;
-    private Borderpanecon controller;
-    private ZoomableScrollPane scrollPane;
+    private final VBox VBox;
+    private final Group canvas;
+    private final Borderpanecon controller;
+    private final ZoomableScrollPane scrollPane;
 
     public Graph(VBox Box, Borderpanecon controller) {
 

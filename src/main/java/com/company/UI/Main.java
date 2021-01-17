@@ -33,7 +33,7 @@ public class Main extends Application {
         Parent root = loader.load();
         Scene scene = new Scene(root, 1600, 900);
 
-        Borderpanecon borderpanecon = (Borderpanecon) loader.getController();
+        Borderpanecon borderpanecon = loader.getController();
         BorderPane pane = borderpanecon.getCanvaspane();
         VBox Box = borderpanecon.getRightbox();
 

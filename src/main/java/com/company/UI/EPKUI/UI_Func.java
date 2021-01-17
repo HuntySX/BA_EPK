@@ -19,67 +19,67 @@ import javafx.scene.layout.VBox;
 import java.util.List;
 
 public class UI_Func extends Function implements UI_Instantiable {
-    private VBox Box;
-    private VBox Rightbox;
+    private final VBox Box;
+    private final VBox Rightbox;
 
-    private UI_EPK EPK;
-    private List<EPK_Node> nodelist;
-    private List<Workforce> Workforces;
-    private List<Resource> Resources;
-    private List<Resource> needed_resource_List;
-    private List<Workforce> needed_workforces_List;
+    private final UI_EPK EPK;
+    private final List<EPK_Node> nodelist;
+    private final List<Workforce> Workforces;
+    private final List<Resource> Resources;
+    private final List<Resource> needed_resource_List;
+    private final List<Workforce> needed_workforces_List;
 
-    private IntegerProperty UI_ID;
-    private StringProperty tag;
-    private BooleanProperty concurrently = new SimpleBooleanProperty(true);
-    private IntegerProperty Workingtime_Hours = new SimpleIntegerProperty();
-    private IntegerProperty Workingtime_Minutes = new SimpleIntegerProperty();
-    private IntegerProperty Workingtime_Seconds = new SimpleIntegerProperty();
-    private BooleanProperty isDeterministic = new SimpleBooleanProperty(true);
+    private final IntegerProperty UI_ID;
+    private final StringProperty tag;
+    private final BooleanProperty concurrently = new SimpleBooleanProperty(true);
+    private final IntegerProperty Workingtime_Hours = new SimpleIntegerProperty();
+    private final IntegerProperty Workingtime_Minutes = new SimpleIntegerProperty();
+    private final IntegerProperty Workingtime_Seconds = new SimpleIntegerProperty();
+    private final BooleanProperty isDeterministic = new SimpleBooleanProperty(true);
     private boolean ISDet_UI = true;
 
 
-    private StringField UI_TAG_FIELD;
-    private IntegerField UI_ID_FIELD;
-    private IntegerField UI_WORKINGTIME_HOURS_FIELD;
-    private IntegerField UI_WORKINGTIME_MINUTES_FIELD;
-    private IntegerField UI_WORKINGTIME_SECONDS_FIELD;
-    private IntegerProperty MIN_NONDET_Workingtime_Hours = new SimpleIntegerProperty();
-    private IntegerProperty MIN_NONDET_Workingtime_Minutes = new SimpleIntegerProperty();
-    private IntegerProperty MIN_NONDET_Workingtime_Seconds = new SimpleIntegerProperty();
-    private IntegerProperty MAX_NONDET_Workingtime_Hours = new SimpleIntegerProperty();
-    private IntegerProperty MAX_NONDET_Workingtime_Minutes = new SimpleIntegerProperty();
-    private IntegerProperty MAX_NONDET_Workingtime_Seconds = new SimpleIntegerProperty();
-    private IntegerProperty MEAN_NONDET_Workingtime_Hours = new SimpleIntegerProperty();
-    private IntegerProperty MEAN_NONDET_Workingtime_Minutes = new SimpleIntegerProperty();
-    private IntegerProperty MEAN_NONDET_Workingtime_Seconds = new SimpleIntegerProperty();
-    private IntegerProperty DEVIATION_NONDET_Workingtime_Hours = new SimpleIntegerProperty();
-    private IntegerProperty DEVIATION_NONDET_Workingtime_Minutes = new SimpleIntegerProperty();
-    private IntegerProperty DEVIATION_NONDET_Workingtime_Seconds = new SimpleIntegerProperty();
-    private IntegerField UI_MIN_NONDET_WORKINGTIME_HOURS_FIELD;
-    private IntegerField UI_MIN_NONDET_WORKINGTIME_MINUTES_FIELD;
-    private IntegerField UI_MIN_NONDET_WORKINGTIME_SECONDS_FIELD;
-    private IntegerField UI_MAX_NONDET_WORKINGTIME_HOURS_FIELD;
-    private IntegerField UI_MAX_NONDET_WORKINGTIME_MINUTES_FIELD;
-    private IntegerField UI_MAX_NONDET_WORKINGTIME_SECONDS_FIELD;
-    private IntegerField UI_MEAN_NONDET_WORKINGTIME_HOURS_FIELD;
-    private IntegerField UI_MEAN_NONDET_WORKINGTIME_MINUTES_FIELD;
-    private IntegerField UI_MEAN_NONDET_WORKINGTIME_SECONDS_FIELD;
-    private IntegerField UI_DEVIATION_NONDET_WORKINGTIME_HOURS_FIELD;
-    private IntegerField UI_DEVIATION_NONDET_WORKINGTIME_MINUTES_FIELD;
-    private IntegerField UI_DEVIATION_NONDET_WORKINGTIME_SECONDS_FIELD;
-    private FormRenderer NONDET_WORKINGTIME_UI;
-    private FormRenderer DETERMINISTIC_UI;
-    private BooleanField UI_IS_DETERMINISTIC;
+    private final StringField UI_TAG_FIELD;
+    private final IntegerField UI_ID_FIELD;
+    private final IntegerField UI_WORKINGTIME_HOURS_FIELD;
+    private final IntegerField UI_WORKINGTIME_MINUTES_FIELD;
+    private final IntegerField UI_WORKINGTIME_SECONDS_FIELD;
+    private final IntegerProperty MIN_NONDET_Workingtime_Hours = new SimpleIntegerProperty();
+    private final IntegerProperty MIN_NONDET_Workingtime_Minutes = new SimpleIntegerProperty();
+    private final IntegerProperty MIN_NONDET_Workingtime_Seconds = new SimpleIntegerProperty();
+    private final IntegerProperty MAX_NONDET_Workingtime_Hours = new SimpleIntegerProperty();
+    private final IntegerProperty MAX_NONDET_Workingtime_Minutes = new SimpleIntegerProperty();
+    private final IntegerProperty MAX_NONDET_Workingtime_Seconds = new SimpleIntegerProperty();
+    private final IntegerProperty MEAN_NONDET_Workingtime_Hours = new SimpleIntegerProperty();
+    private final IntegerProperty MEAN_NONDET_Workingtime_Minutes = new SimpleIntegerProperty();
+    private final IntegerProperty MEAN_NONDET_Workingtime_Seconds = new SimpleIntegerProperty();
+    private final IntegerProperty DEVIATION_NONDET_Workingtime_Hours = new SimpleIntegerProperty();
+    private final IntegerProperty DEVIATION_NONDET_Workingtime_Minutes = new SimpleIntegerProperty();
+    private final IntegerProperty DEVIATION_NONDET_Workingtime_Seconds = new SimpleIntegerProperty();
+    private final IntegerField UI_MIN_NONDET_WORKINGTIME_HOURS_FIELD;
+    private final IntegerField UI_MIN_NONDET_WORKINGTIME_MINUTES_FIELD;
+    private final IntegerField UI_MIN_NONDET_WORKINGTIME_SECONDS_FIELD;
+    private final IntegerField UI_MAX_NONDET_WORKINGTIME_HOURS_FIELD;
+    private final IntegerField UI_MAX_NONDET_WORKINGTIME_MINUTES_FIELD;
+    private final IntegerField UI_MAX_NONDET_WORKINGTIME_SECONDS_FIELD;
+    private final IntegerField UI_MEAN_NONDET_WORKINGTIME_HOURS_FIELD;
+    private final IntegerField UI_MEAN_NONDET_WORKINGTIME_MINUTES_FIELD;
+    private final IntegerField UI_MEAN_NONDET_WORKINGTIME_SECONDS_FIELD;
+    private final IntegerField UI_DEVIATION_NONDET_WORKINGTIME_HOURS_FIELD;
+    private final IntegerField UI_DEVIATION_NONDET_WORKINGTIME_MINUTES_FIELD;
+    private final IntegerField UI_DEVIATION_NONDET_WORKINGTIME_SECONDS_FIELD;
+    private final FormRenderer NONDET_WORKINGTIME_UI;
+    private final FormRenderer DETERMINISTIC_UI;
+    private final BooleanField UI_IS_DETERMINISTIC;
     private IntegerField UI_RESOURCE_COUNT;
     private SingleSelectionField<Resource> UI_NEEDED_RESOURCES_FIELD;
     private SingleSelectionField<Workforce> UI_NEEDED_WORKFORCES_FIELD;
     private SingleSelectionField<EPK_Node> UI_NEXT_ELEMENTS;
-    private Function self;
+    private final Function self;
     private FormRenderer RESOURCES_UI;
     private FormRenderer WORKFORCES_UI;
-    private FormRenderer WORKINGTIME_UI;
-    private FormRenderer ID_TAG_UI;
+    private final FormRenderer WORKINGTIME_UI;
+    private final FormRenderer ID_TAG_UI;
     private FormRenderer NEXT_ELEMS_UI;
 
 
@@ -113,27 +113,16 @@ public class UI_Func extends Function implements UI_Instantiable {
 
         UI_MIN_NONDET_WORKINGTIME_HOURS_FIELD = Field.ofIntegerType(MIN_NONDET_Workingtime_Hours).label("Min - Hours").placeholder("0").tooltip("Minimal Workingtime(Hours)");
         UI_MIN_NONDET_WORKINGTIME_MINUTES_FIELD = Field.ofIntegerType(MIN_NONDET_Workingtime_Minutes).label("Min - Minutes").placeholder("0").tooltip("Minimal Workingtime(Minutes)");
-        ;
         UI_MIN_NONDET_WORKINGTIME_SECONDS_FIELD = Field.ofIntegerType(MIN_NONDET_Workingtime_Seconds).label("Min - Seconds").placeholder("0").tooltip("Minimal Workingtime(Seconds)");
-        ;
         UI_MAX_NONDET_WORKINGTIME_HOURS_FIELD = Field.ofIntegerType(MAX_NONDET_Workingtime_Hours).label("Max - Hours").placeholder("0").tooltip("Maximum Workingtime(Hours)");
-        ;
         UI_MAX_NONDET_WORKINGTIME_MINUTES_FIELD = Field.ofIntegerType(MAX_NONDET_Workingtime_Minutes).label("Max - Minutes").placeholder("0").tooltip("Maximum Workingtime(Minutes)");
-        ;
         UI_MAX_NONDET_WORKINGTIME_SECONDS_FIELD = Field.ofIntegerType(MAX_NONDET_Workingtime_Seconds).label("Max - Seconds").placeholder("0").tooltip("Maximum Workingtime(Seconds)");
-        ;
         UI_MEAN_NONDET_WORKINGTIME_HOURS_FIELD = Field.ofIntegerType(MEAN_NONDET_Workingtime_Hours).label("Mean - Hours").placeholder("0").tooltip("Mean Workingtime(Hours)");
-        ;
         UI_MEAN_NONDET_WORKINGTIME_MINUTES_FIELD = Field.ofIntegerType(MEAN_NONDET_Workingtime_Minutes).label("Mean - Minutes").placeholder("0").tooltip("Mean Workingtime(Minutes)");
-        ;
         UI_MEAN_NONDET_WORKINGTIME_SECONDS_FIELD = Field.ofIntegerType(MEAN_NONDET_Workingtime_Seconds).label("Mean - Seconds").placeholder("0").tooltip("Mean Workingtime(Seconds)");
-        ;
         UI_DEVIATION_NONDET_WORKINGTIME_HOURS_FIELD = Field.ofIntegerType(DEVIATION_NONDET_Workingtime_Hours).label("Deviation - Stunden").placeholder("0").tooltip("Deviation Workingtime(Hours)");
-        ;
         UI_DEVIATION_NONDET_WORKINGTIME_MINUTES_FIELD = Field.ofIntegerType(DEVIATION_NONDET_Workingtime_Minutes).label("Deviation - Minutes").placeholder("0").tooltip("Deviation Workingtime(Minutes)");
-        ;
         UI_DEVIATION_NONDET_WORKINGTIME_SECONDS_FIELD = Field.ofIntegerType(DEVIATION_NONDET_Workingtime_Seconds).label("Deviation - Seconds").placeholder("0").tooltip("Deviation Workingtime(Seconds)");
-        ;
 
         NONDET_WORKINGTIME_UI = new FormRenderer(Form.of(Group.of(
                 UI_MIN_NONDET_WORKINGTIME_HOURS_FIELD, UI_MIN_NONDET_WORKINGTIME_MINUTES_FIELD, UI_MIN_NONDET_WORKINGTIME_SECONDS_FIELD,
@@ -284,7 +273,7 @@ public class UI_Func extends Function implements UI_Instantiable {
                     if (needed_workforces_List.contains(force)) {
                         needed_workforces_List.remove(force);
                         force.removeUsedIn(self);
-                        String Workforcelabel = new String("Added Workforces: [ ");
+                        String Workforcelabel = "Added Workforces: [ ";
                         for (Workforce added_force : needed_workforces_List) {
                             Workforcelabel = Workforcelabel.concat("; " + added_force.toString());
                         }

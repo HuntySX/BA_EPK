@@ -4,7 +4,7 @@ import com.company.Simulation.Simulation_Base.Data.Shared_Data.Simulation_Instan
 
 public class Activate_Instance extends Simulation_Instance {
 
-    private int for_case;
+    private final int for_case;
 
     public Activate_Instance(int case_ID, int for_case) {
         super(case_ID);

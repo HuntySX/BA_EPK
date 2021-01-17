@@ -4,7 +4,7 @@ import java.util.List;
 
 public class Event extends EPK_Node implements Printable_Node, Is_Tagged {
     private String Event_Tag;
-    private int successor = 1;
+    private final int successor = 1;
     private boolean is_Start_Event;
     private boolean is_End_Event;
 

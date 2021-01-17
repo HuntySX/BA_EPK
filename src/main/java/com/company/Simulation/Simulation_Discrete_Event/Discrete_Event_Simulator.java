@@ -20,16 +20,16 @@ import java.util.List;
 import static com.company.Enums.Gate_Check_Status.*;
 
 public class Discrete_Event_Simulator {
-    private EPK EPK;
-    private Settings Settings;
-    private Printer_Gate printer_gate;
-    private Printer_Queue printer_queue;
-    private Instance_Printer_Gate instance_printer_gate;
-    private Event_Calendar event_Calendar;
-    private Event_Decider event_Decider;
-    private List<Resource> resources;
-    private List<User> users;
-    private int runtimeDays;
+    private final EPK EPK;
+    private final Settings Settings;
+    private final Printer_Gate printer_gate;
+    private final Printer_Queue printer_queue;
+    private final Instance_Printer_Gate instance_printer_gate;
+    private final Event_Calendar event_Calendar;
+    private final Event_Decider event_Decider;
+    private final List<Resource> resources;
+    private final List<User> users;
+    private final int runtimeDays;
 
     public Discrete_Event_Simulator(Discrete_Event_Generator Generator) {
 

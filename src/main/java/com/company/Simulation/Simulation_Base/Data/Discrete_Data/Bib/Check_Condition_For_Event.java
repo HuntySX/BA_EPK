@@ -87,12 +87,9 @@ public class Check_Condition_For_Event {
                         Workingtime_in_Seconds = Workingtime_in_Seconds - Shifttime_in_Seconds;
                         advanceday++;
                     }
-                    if (advanceday >= calendar.getRuntimeDays() - calendar.getAct_runtimeDay()) {
-                        return false;
-                    }
+                    return advanceday < calendar.getRuntimeDays() - calendar.getAct_runtimeDay();
                 }
             }
-            return true;
         }
     }
 }

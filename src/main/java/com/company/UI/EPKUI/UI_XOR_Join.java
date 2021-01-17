@@ -31,9 +31,9 @@ public class UI_XOR_Join extends Event_Con_Join implements UI_Instantiable {
     private IntegerProperty UI_ID;
     private SingleSelectionField<EPK_Node> UI_NEXT_ELEMENTS_FIELD;
     private SingleSelectionField<EPK_Node> UI_PREVIOUS_ELEMS;
-    private BooleanProperty IS_EAGER = new SimpleBooleanProperty(true);
+    private final BooleanProperty IS_EAGER = new SimpleBooleanProperty(true);
     private BooleanField UI_IS_EAGER;
-    private Label SelectionLabel = new Label();
+    private final Label SelectionLabel = new Label();
     private FormRenderer ID_TAG_UI;
     private FormRenderer NEXT_ELEMS_UI;
     private FormRenderer IS_EAGER_UI;
@@ -107,7 +107,7 @@ public class UI_XOR_Join extends Event_Con_Join implements UI_Instantiable {
                     Chosen_Previous_List.add(Chosen_Previous);
 
                 }
-                StringBuilder LabelString = new StringBuilder("");
+                StringBuilder LabelString = new StringBuilder();
                 for (EPK_Node node : Chosen_Previous_List) {
                     LabelString.append(node.toString());
                     LabelString.append("\n");
@@ -124,7 +124,7 @@ public class UI_XOR_Join extends Event_Con_Join implements UI_Instantiable {
                 EPK_Node Chosen_to_Delete = UI_PREVIOUS_ELEMS.getSelection();
                 if (Chosen_to_Delete != null) {
                     Chosen_Previous_List.remove(Chosen_to_Delete);
-                    StringBuilder LabelString = new StringBuilder("");
+                    StringBuilder LabelString = new StringBuilder();
                     for (EPK_Node node : Chosen_Previous_List) {
                         LabelString.append(node.toString());
                         LabelString.append("\n");

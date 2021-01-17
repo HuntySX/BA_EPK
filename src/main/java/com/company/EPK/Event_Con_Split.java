@@ -55,10 +55,14 @@ public class Event_Con_Split extends Connector implements Printable_Node {
                 }
             }
         } else if (Decide_Type == Split_Decide_Type.FULL) {
-            return Next_Elem;
+            List<EPK_Node> ResultList = new ArrayList<>(Next_Elem);
+            ResultList = MixResultList(ResultList);
+            return ResultList;
         } else if (Decide_Type == Split_Decide_Type.CUSTOM) {
             if (getContype() == Contype.AND) {
-                return Next_Elem;
+                List<EPK_Node> ResultList = new ArrayList<>(Next_Elem);
+                ResultList = MixResultList(ResultList);
+                return ResultList;
             } else if (getContype() == Contype.EAGER_OR || getContype() == Contype.LAZY_OR) {
                 List<EPK_Node> working_On_EPK_Nodes = new ArrayList<>();
                 while (working_On_EPK_Nodes.isEmpty()) {
@@ -76,7 +80,10 @@ public class Event_Con_Split extends Connector implements Printable_Node {
                         }
                     }
                 }
-                return working_On_EPK_Nodes;
+
+                List<EPK_Node> ResultList = new ArrayList<>(working_On_EPK_Nodes);
+                ResultList = MixResultList(ResultList);
+                return ResultList;
             } else if (getContype() == Contype.EAGER_XOR || getContype() == Contype.LAZY_XOR) {
 
                 List<EPK_Node> working_On_EPK_Nodes = new ArrayList<>();
@@ -103,10 +110,31 @@ public class Event_Con_Split extends Connector implements Printable_Node {
                         calculatefirstbound = calculatelastbound;
                     }
                 }
-                return working_On_EPK_Nodes;
+                List<EPK_Node> ResultList = new ArrayList<>(working_On_EPK_Nodes);
+                ResultList = MixResultList(ResultList);
+                return ResultList;
             }
         }
-        return Result;
+        List<EPK_Node> ResultList = new ArrayList<>(Result);
+        ResultList = MixResultList(ResultList);
+        return ResultList;
+    }
+
+    private List<EPK_Node> MixResultList(List<EPK_Node> result) {
+        if (result.size() == 1) {
+            return result;
+        }
+        List<EPK_Node> mixed_Result_List = new ArrayList<>();
+        while (!result.isEmpty()) {
+            Random rand = new Random(result.size());
+            EPK_Node node_to_Mix = result.get(rand.nextInt());
+            result.remove(node_to_Mix);
+            mixed_Result_List.add(node_to_Mix);
+        }
+        if (!mixed_Result_List.isEmpty()) {
+            return mixed_Result_List;
+        }
+        return result;
     }
 
     public Split_Decide_Type getDecide_Type() {

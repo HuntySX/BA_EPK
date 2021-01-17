@@ -7,10 +7,10 @@ import java.util.List;
 
 public class UI_Error_Message {
     private String ErrorText;
-    private EPK_Node Error_Node;
+    private final EPK_Node Error_Node;
     private List<EPK_Node> Affiliated_Error_Nodes;
     private Error_Rating Rating;
-    private Type_Of_Error Errortype;
+    private final Type_Of_Error Errortype;
 
 
     public UI_Error_Message(Type_Of_Error Type, EPK_Node Source, List<EPK_Node> Affiliated) {

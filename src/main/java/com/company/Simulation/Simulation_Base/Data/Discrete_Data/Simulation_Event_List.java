@@ -7,7 +7,7 @@ import java.util.ListIterator;
 
 public class Simulation_Event_List {
 
-    private List<Instance_Workflow> Workflows;
+    private final List<Instance_Workflow> Workflows;
 
     public Simulation_Event_List() {
         Workflows = new ArrayList<>();

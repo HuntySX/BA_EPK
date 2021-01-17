@@ -101,7 +101,7 @@ public class UI_WORKFORCE_MANAGEMENT implements Initializable {
         });
         Save.getButtons().add(Save_Button);
         Label ManageUserFunctionLabel = new Label();
-        String Managementlabel = new String("Users: [ ");
+        String Managementlabel = "Users: [ ";
         for (User granted_User : workforce.getGranted_to()) {
             Managementlabel.concat("; " + granted_User.toString());
         }
@@ -163,7 +163,7 @@ public class UI_WORKFORCE_MANAGEMENT implements Initializable {
         });
         Save.getButtons().add(Save_Button);
         Label ManageUserFunctionLabel = new Label();
-        String Managementlabel = new String("Users: [ ");
+        String Managementlabel = "Users: [ ";
         for (User granted_User : workforce.getGranted_to()) {
             Managementlabel = Managementlabel.concat("; " + granted_User.toString());
         }
@@ -224,7 +224,7 @@ public class UI_WORKFORCE_MANAGEMENT implements Initializable {
         Save.getButtons().add(Save_Button);
         Save_Button.setDisable(true);
         Label ManageUserFunctionLabel = new Label();
-        String Managementlabel = new String("Users: [ ");
+        String Managementlabel = "Users: [ ";
         Managementlabel.concat("] / Functions: [ ");
         Managementlabel.concat("]");
         ManageUserFunctionLabel.setText(Managementlabel);

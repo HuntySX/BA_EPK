@@ -24,6 +24,7 @@ public class Mining_Activity {
         return Type_of_Activity;
     }
 
+
     public void setType_of_Activity(String type_of_Activity) {
         Type_of_Activity = type_of_Activity;
     }

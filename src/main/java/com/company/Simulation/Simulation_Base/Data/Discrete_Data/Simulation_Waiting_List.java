@@ -6,7 +6,7 @@ import java.util.ListIterator;
 
 public class Simulation_Waiting_List {
 
-    private List<Instance_Workflow> Workflows;
+    private final List<Instance_Workflow> Workflows;
 
     public Simulation_Waiting_List() {
         Workflows = new ArrayList<>();

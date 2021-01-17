@@ -20,29 +20,29 @@ import java.util.List;
 
 public class UI_External_XOR extends External_XOR_Split implements UI_Instantiable {
 
-    private VBox Box;
-    private VBox Rightbox;
+    private final VBox Box;
+    private final VBox Rightbox;
 
-    private UI_EPK EPK;
-    private List<EPK_Node> nodelist;
+    private final UI_EPK EPK;
+    private final List<EPK_Node> nodelist;
     private EPK_Node UI_Timeout;
     private EPK_Node UI_Positive;
     private EPK_Node UI_Negative;
-    private IntegerProperty TIMEOUT_Workingtime_Hours = new SimpleIntegerProperty();
-    private IntegerProperty TIMEOUT_Workingtime_Minutes = new SimpleIntegerProperty();
-    private IntegerProperty TIMEOUT_Workingtime_Seconds = new SimpleIntegerProperty();
-    private IntegerField TIMEOUT_NONDET_WORKINGTIME_HOURS_FIELD;
-    private IntegerField TIMEOUT_NONDET_WORKINGTIME_MINUTES_FIELD;
-    private IntegerField TIMEOUT_NONDET_WORKINGTIME_SECONDS_FIELD;
-    private IntegerProperty UI_ID;
-    private IntegerField UI_ID_FIELD;
-    private IntegerProperty Chance_Pos_Neg;
+    private final IntegerProperty TIMEOUT_Workingtime_Hours = new SimpleIntegerProperty();
+    private final IntegerProperty TIMEOUT_Workingtime_Minutes = new SimpleIntegerProperty();
+    private final IntegerProperty TIMEOUT_Workingtime_Seconds = new SimpleIntegerProperty();
+    private final IntegerField TIMEOUT_NONDET_WORKINGTIME_HOURS_FIELD;
+    private final IntegerField TIMEOUT_NONDET_WORKINGTIME_MINUTES_FIELD;
+    private final IntegerField TIMEOUT_NONDET_WORKINGTIME_SECONDS_FIELD;
+    private final IntegerProperty UI_ID;
+    private final IntegerField UI_ID_FIELD;
+    private final IntegerProperty Chance_Pos_Neg;
     private SingleSelectionField<EPK_Node> UI_NEXT_ELEMENTS;
-    private FormRenderer ID_UI;
+    private final FormRenderer ID_UI;
     private FormRenderer NEXT_ELEMS_UI;
-    private FormRenderer TIMEOUT_UI;
-    private IntegerField UI_CHANCE;
-    private FormRenderer CHANCE_UI;
+    private final FormRenderer TIMEOUT_UI;
+    private final IntegerField UI_CHANCE;
+    private final FormRenderer CHANCE_UI;
     private SingleSelectionField<EPK_Node> UI_NEXT_ELEMENTS_FIELD;
 
 

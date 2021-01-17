@@ -127,7 +127,7 @@ public class UI_RESOURCE_MANAGEMENT implements Initializable {
 
         Remove_Resource.setDisable(true);
         Label AddedFunctions = new Label();
-        String Functionlabel = new String("Added functions: [");
+        String Functionlabel = "Added functions: [";
         for (Function added_function : resource.getUsed_In()) {
             Functionlabel = Functionlabel.concat("; " + added_function.toString());
         }
@@ -223,7 +223,7 @@ public class UI_RESOURCE_MANAGEMENT implements Initializable {
         Save.getButtons().add(Cancel_Changes);
 
         Label AddedFunctions = new Label();
-        String Functionlabel = new String("Added functions: [");
+        String Functionlabel = "Added functions: [";
         for (Function added_function : resource.getUsed_In()) {
             Functionlabel.concat("; " + added_function.toString());
         }
@@ -261,7 +261,7 @@ public class UI_RESOURCE_MANAGEMENT implements Initializable {
                         }
                     }
 
-                    String Functionlabel = new String("Added functions: [");
+                    String Functionlabel = "Added functions: [";
                     for (Function added_function : resource.getUsed_In()) {
                         if (!to_Remove.contains(added_function)) {
                             Functionlabel = Functionlabel.concat("; " + added_function.toString());
@@ -323,7 +323,7 @@ public class UI_RESOURCE_MANAGEMENT implements Initializable {
         Save_Button.setDisable(true);
 
         Label AddedFunctions = new Label();
-        String Functionlabel = new String("Added functions: [ ");
+        String Functionlabel = "Added functions: [ ";
         Functionlabel.concat("]");
         AddedFunctions.setText(Functionlabel);
         List<Function> emptylist = new ArrayList<>();

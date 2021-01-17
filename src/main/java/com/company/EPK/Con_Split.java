@@ -18,7 +18,7 @@ public class Con_Split extends Connector {
     private List<EPK_Node> Single_Elem;
     private Split_Status Status;
     private Split_Decide_Type Decide_Type;
-    private boolean is_Event_Driven;
+    private final boolean is_Event_Driven;
 
     public Con_Split(List<EPK_Node> Next_Elem, int ID, Contype contype, Split_Status status, Supplier<List<EPK_Node>> Pathfi, BiFunction<Simulation_Instance, List<EPK_Node>, List<EPK_Node>> Pathfinder, boolean is_Event_Driven) {
         super(Next_Elem, ID, contype);

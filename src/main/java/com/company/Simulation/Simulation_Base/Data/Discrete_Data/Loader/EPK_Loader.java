@@ -4,7 +4,7 @@ import com.company.EPK.EPK;
 
 public class EPK_Loader {
 
-    private String EPK_File_Adress;
+    private final String EPK_File_Adress;
 
     public EPK_Loader(String EPK_File_Adress) {
         this.EPK_File_Adress = EPK_File_Adress;

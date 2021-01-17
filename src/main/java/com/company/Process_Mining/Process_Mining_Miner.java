@@ -1,27 +1,30 @@
 package com.company.Process_Mining;
 
-import com.company.Process_Mining.Base_Data.Mining_Instance;
-import com.company.Process_Mining.Base_Data.Mining_Resource;
-import com.company.Process_Mining.Base_Data.Mining_Resource_Count;
-import com.company.Process_Mining.Base_Data.Mining_User;
+import com.company.Exceptions.PM_Instance_Relation_Error;
+import com.company.Process_Mining.Base_Data.*;
 
+import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.ListIterator;
 
 public class Process_Mining_Miner {
 
+
+    private final Process_Mining_Settings Mining_Settings;
     private Process_Mining_JSON_Read Reader;
     private List<List<List<Mining_User>>> Used_Users_Filtered_List;
     private List<List<List<Mining_Resource_Count>>> Used_Resource_Count_Filtered_List;
+    private List<List<Mining_Activity>> Used_Activity_Filtered_List;
 
 
-    public Process_Mining_Miner() {
-    }
-
-    public Process_Mining_Miner(Process_Mining_JSON_Read Reader) {
-        this.Reader = Reader;
+    public Process_Mining_Miner(Process_Mining_JSON_Read Reader, Process_Mining_Settings Settings) {
         Used_Users_Filtered_List = new ArrayList<>();
-
+        this.Reader = Reader;
+        Used_Resource_Count_Filtered_List = new ArrayList<>();
+        Used_Activity_Filtered_List = new ArrayList<>();
+        Mining_Settings = Settings;
     }
 
 
@@ -45,11 +48,160 @@ public class Process_Mining_Miner {
         FilterByResource();
         FilterByActivity();
         FilterByActivityWorkingTime();
-        FilterByUserWorkingTime();
-        FilterByResourceWorkingTime();
+        //FilterByUserWorkingTime();
+        //FilterByResourceWorkingTime();
+    }
+
+    private void FilterByActivityWorkingTime() {
+
+        List<List<Mining_Activity_Event>> Activity_Resolution_List_per_Day = new ArrayList<>();
+
+
+        Mining_Activity Empty_Activity = new Mining_Activity("Null", "Function", 0);
+        List<List<Mining_Instance>> sorted_Instance_List = Reader.getSorted_Instance_List();
+        List<List<Mining_Activity>> used_Activity_per_Instance = new ArrayList<>();
+        for (List<Mining_Instance> single_Instance_List : sorted_Instance_List) {
+            List<Mining_Activity> used_Activity_By_Single_Instance = new ArrayList<>();
+            for (Mining_Instance single_Activity : single_Instance_List) {
+                if (single_Activity.getActivity_Status().equals("Working") && single_Activity.getActivity().getType_of_Activity().equals("Function")) {
+                    used_Activity_By_Single_Instance.add(single_Activity.getActivity());
+                }
+            }
+            used_Activity_per_Instance.add(used_Activity_By_Single_Instance);
+        }
+        Used_Activity_Filtered_List = used_Activity_per_Instance;
+
     }
 
     private void FilterByActivity() {
+        Mining_Activity Empty_Activity = new Mining_Activity("Null", "Function", 0);
+        List<List<Mining_Instance>> sorted_Instance_List = Reader.getSorted_Instance_List();
+        List<List<Mining_Activity>> used_Activity_per_Instance = new ArrayList<>();
+        for (List<Mining_Instance> single_Instance_List : sorted_Instance_List) {
+            List<Mining_Activity> used_Activity_By_Single_Instance = new ArrayList<>();
+            for (Mining_Instance single_Activity : single_Instance_List) {
+                if (single_Activity.getActivity_Status().equals("Working") && single_Activity.getActivity().getType_of_Activity().equals("Function")) {
+                    used_Activity_By_Single_Instance.add(single_Activity.getActivity());
+                }
+            }
+            used_Activity_per_Instance.add(used_Activity_By_Single_Instance);
+        }
+        Used_Activity_Filtered_List = used_Activity_per_Instance;
+
+    }
+
+    private void generate_Activity_Standart_Relation() {
+
+        HashMap<Integer, HashMap<Integer, Relation_Count>> Relation_Hashmap = new HashMap<>();
+
+        Initialize_Relation_Hashmap(Relation_Hashmap);
+
+        for (List<Mining_Instance> Single_Mining_Instance : Reader.getSorted_Instance_List()) {
+            check_For_Activity_Relation(Relation_Hashmap, Single_Mining_Instance);
+        }
+    }
+
+    private void generate_Activity_Parallel_Execution() {
+
+    }
+
+    private void generate_one_Step_Execution() {
+
+    }
+
+    private void generate_two_Step_Execution() {
+
+    }
+
+    private void Initialize_Relation_Hashmap(HashMap<Integer, HashMap<Integer, Relation_Count>> relation_hashmap) {
+        List<Mining_Activity> ActivityList = Reader.getActivityList();
+        for (Mining_Activity Y_Activity : ActivityList) {
+            if (!relation_hashmap.containsKey(Y_Activity)) {
+                HashMap<Integer, Relation_Count> newRow = new HashMap<>();
+                for (Mining_Activity X_Activity : ActivityList) {
+                    newRow.put(X_Activity.getNode_ID(), new Relation_Count());
+                }
+                relation_hashmap.put(Y_Activity.getNode_ID(), newRow);
+            }
+        }
+    }
+
+    private void check_For_Activity_Relation(HashMap<Integer, HashMap<Integer, Relation_Count>> relation_hashmap,
+                                             List<Mining_Instance> single_mining_instance) {
+
+        List<Mining_Instance> Working_List = new ArrayList<>(single_mining_instance);
+        List<Integer> to_Work_On = new ArrayList<>();
+        to_Work_On.add(0);
+        while (!to_Work_On.isEmpty()) {
+            int index = to_Work_On.get(0);
+            Mining_Instance Instance_to_Get_Related_Elements = Working_List.get(to_Work_On.get(0));
+            to_Work_On.remove(0);
+            ListIterator<Mining_Instance> iter = Working_List.listIterator();
+
+            //get Start iterator index
+            while (iter.hasNext()) {
+                if (iter.nextIndex() == index) {
+                    //start from index to search for related activities
+                    List<Mining_Instance> possible_Relations = new ArrayList<>();
+                    iter.next();
+                    boolean Relation_Found = false;
+                    boolean Error = false;
+                    while (iter.hasNext() && !Relation_Found) {
+                        //search for working and finishing instance
+                        Mining_Instance possible_Relation = iter.next();
+                        if (possible_Relation.getActivity().equals(Instance_to_Get_Related_Elements.getActivity())
+                                && possible_Relation.getActivity_Status().equals("Working")) {
+                            //TODO Hier Verspätung eintragen (get_Related_Element Time + possible Relation Time)
+                        } else if (possible_Relation.getActivity().equals(Instance_to_Get_Related_Elements.getActivity())
+                                && possible_Relation.getActivity_Status().equals("Finished")) {
+                            try {
+                                LocalTime Timestamp = possible_Relation.getDuration();
+                                boolean finished_find_Scheduled = false;
+
+                                while (iter.hasNext() && !finished_find_Scheduled) {
+                                    Mining_Instance to_Check_Relation = iter.next();
+
+                                    if (to_Check_Relation.getDuration().isAfter(Timestamp)) {
+                                        finished_find_Scheduled = true;
+                                    } else if (to_Check_Relation.getActivity_Status().equals("Finished")) {
+                                        throw new PM_Instance_Relation_Error("Instance relations can´t be resolved correctly");
+                                    } else if (to_Check_Relation.getActivity_Status().equals("Scheduled")) {
+                                        possible_Relations.add(to_Check_Relation);
+                                    }
+                                }
+                                Relation_Found = true;
+                            } catch (PM_Instance_Relation_Error e) {
+                                Relation_Found = true;
+                                Error = true;
+                            }
+                        }
+                        if (Error) {
+                            possible_Relations.clear();
+                        }
+                    }
+                    for (Mining_Instance Relation : possible_Relations) {
+                        to_Work_On.add(Working_List.indexOf(Relation));
+
+                        if (relation_hashmap.containsKey(Instance_to_Get_Related_Elements.getActivity().getNode_ID())) {
+                            HashMap<Integer, Relation_Count> related_to_Activity_Hashmap
+                                    = relation_hashmap.get(Instance_to_Get_Related_Elements.getActivity().getNode_ID());
+
+                            if (related_to_Activity_Hashmap.containsKey(Relation.getActivity().getNode_ID())) {
+                                related_to_Activity_Hashmap.get(Relation.getActivity().getNode_ID()).incrementCount();
+                                related_to_Activity_Hashmap.get(Relation.getActivity().getNode_ID()).setRelation_type(Relation_Type.Followed_by);
+                            }
+
+                        } else {
+
+                        }
+                    }
+                } else if (iter.nextIndex() > index) {
+                    throw new RuntimeException("Error in Handling Iterator for Process Mining!");
+                } else {
+                    iter.next();
+                }
+            }
+        }
     }
 
     private void FilterByResource() {

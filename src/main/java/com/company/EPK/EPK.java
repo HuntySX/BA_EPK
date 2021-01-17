@@ -7,14 +7,14 @@ import java.util.List;
 
 public class EPK {
 
-    private List<EPK_Node> elements;
-    private List<Event> events;
-    private List<Function> functions;
-    private List<Con_Join> connector_Join;
-    private List<Con_Split> connector_Split;
+    private final List<EPK_Node> elements;
+    private final List<Event> events;
+    private final List<Function> functions;
+    private final List<Con_Join> connector_Join;
+    private final List<Con_Split> connector_Split;
     private List<Event> start_Event;
     private List<Event> end_Event;
-    private List<Simulation_Instance> Instances;
+    private final List<Simulation_Instance> Instances;
     private List<Start_Event> discrete_start_Events;
 
     public EPK(List<EPK_Node> elements, List<Event> events, List<Function> functions, List<Con_Join> connector_Join, List<Con_Split> connector_Split) {
@@ -143,9 +143,7 @@ public class EPK {
     }
 
     public void remove_Start_Event(Event ev) {
-        if (start_Event.contains(ev)) {
-            start_Event.remove(ev);
-        }
+        start_Event.remove(ev);
     }
 
     public void add_End_Event(Event ev) {

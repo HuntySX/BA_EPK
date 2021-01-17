@@ -10,11 +10,11 @@ import java.util.List;
 
 public class Instance_Workflow {
 
-    private Event_Instance Instance;
+    private final Event_Instance Instance;
     private LocalTime to_Start;
-    private EPK_Node EPKNode;
-    private List<User> Active_User;
-    private List<Resource> Active_Resource;
+    private final EPK_Node EPKNode;
+    private final List<User> Active_User;
+    private final List<Resource> Active_Resource;
     private boolean Working;
     private boolean Waiting;
     private int waiting_Ticket;

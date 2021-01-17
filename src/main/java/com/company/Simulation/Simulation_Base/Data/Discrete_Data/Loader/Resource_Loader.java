@@ -5,7 +5,7 @@ import com.company.Simulation.Simulation_Base.Data.Discrete_Data.Resource;
 import java.util.List;
 
 public class Resource_Loader {
-    private String Res_File;
+    private final String Res_File;
 
     public Resource_Loader(String res_File) {
         Res_File = res_File;

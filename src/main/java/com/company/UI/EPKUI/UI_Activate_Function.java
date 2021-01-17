@@ -34,38 +34,38 @@ public class UI_Activate_Function extends Activating_Function implements UI_Inst
     private List<Workforce> needed_workforces_List;
     private List<UI_Event_Activating_Starter> Activating_Start_Events;
     private List<Decide_Activation_Type> Activation_Types;
-    private Label Activating_Event_Label = new Label("Ausgewähltes Start Event: ");
+    private final Label Activating_Event_Label = new Label("Ausgewähltes Start Event: ");
     private StringProperty tag;
-    private BooleanProperty concurrently = new SimpleBooleanProperty(true);
-    private IntegerProperty Workingtime_Hours = new SimpleIntegerProperty();
-    private IntegerProperty Workingtime_Minutes = new SimpleIntegerProperty();
-    private IntegerProperty Workingtime_Seconds = new SimpleIntegerProperty();
+    private final BooleanProperty concurrently = new SimpleBooleanProperty(true);
+    private final IntegerProperty Workingtime_Hours = new SimpleIntegerProperty();
+    private final IntegerProperty Workingtime_Minutes = new SimpleIntegerProperty();
+    private final IntegerProperty Workingtime_Seconds = new SimpleIntegerProperty();
     private IntegerProperty UI_ID;
     private IntegerProperty Chance;
-    private IntegerProperty Ordertime_Hours = new SimpleIntegerProperty();
-    private IntegerProperty Ordertime_Minutes = new SimpleIntegerProperty();
-    private IntegerProperty Ordertime_Seconds = new SimpleIntegerProperty();
+    private final IntegerProperty Ordertime_Hours = new SimpleIntegerProperty();
+    private final IntegerProperty Ordertime_Minutes = new SimpleIntegerProperty();
+    private final IntegerProperty Ordertime_Seconds = new SimpleIntegerProperty();
 
-    private BooleanProperty isDeterministic_Workingtime = new SimpleBooleanProperty(true);
+    private final BooleanProperty isDeterministic_Workingtime = new SimpleBooleanProperty(true);
     private boolean ISDet_Workingtime_UI = true;
     private BooleanField UI_IS_DETERMINISTIC_WORKINGTIME;
 
-    private BooleanProperty isDeterministic_Ordertime = new SimpleBooleanProperty(true);
+    private final BooleanProperty isDeterministic_Ordertime = new SimpleBooleanProperty(true);
     private boolean ISDet_Ordertime_UI = true;
     private BooleanField UI_IS_DETERMINISTIC_ORDERTIME;
 
-    private IntegerProperty MIN_NONDET_Workingtime_Hours = new SimpleIntegerProperty();
-    private IntegerProperty MIN_NONDET_Workingtime_Minutes = new SimpleIntegerProperty();
-    private IntegerProperty MIN_NONDET_Workingtime_Seconds = new SimpleIntegerProperty();
-    private IntegerProperty MAX_NONDET_Workingtime_Hours = new SimpleIntegerProperty();
-    private IntegerProperty MAX_NONDET_Workingtime_Minutes = new SimpleIntegerProperty();
-    private IntegerProperty MAX_NONDET_Workingtime_Seconds = new SimpleIntegerProperty();
-    private IntegerProperty MEAN_NONDET_Workingtime_Hours = new SimpleIntegerProperty();
-    private IntegerProperty MEAN_NONDET_Workingtime_Minutes = new SimpleIntegerProperty();
-    private IntegerProperty MEAN_NONDET_Workingtime_Seconds = new SimpleIntegerProperty();
-    private IntegerProperty DEVIATION_NONDET_Workingtime_Hours = new SimpleIntegerProperty();
-    private IntegerProperty DEVIATION_NONDET_Workingtime_Minutes = new SimpleIntegerProperty();
-    private IntegerProperty DEVIATION_NONDET_Workingtime_Seconds = new SimpleIntegerProperty();
+    private final IntegerProperty MIN_NONDET_Workingtime_Hours = new SimpleIntegerProperty();
+    private final IntegerProperty MIN_NONDET_Workingtime_Minutes = new SimpleIntegerProperty();
+    private final IntegerProperty MIN_NONDET_Workingtime_Seconds = new SimpleIntegerProperty();
+    private final IntegerProperty MAX_NONDET_Workingtime_Hours = new SimpleIntegerProperty();
+    private final IntegerProperty MAX_NONDET_Workingtime_Minutes = new SimpleIntegerProperty();
+    private final IntegerProperty MAX_NONDET_Workingtime_Seconds = new SimpleIntegerProperty();
+    private final IntegerProperty MEAN_NONDET_Workingtime_Hours = new SimpleIntegerProperty();
+    private final IntegerProperty MEAN_NONDET_Workingtime_Minutes = new SimpleIntegerProperty();
+    private final IntegerProperty MEAN_NONDET_Workingtime_Seconds = new SimpleIntegerProperty();
+    private final IntegerProperty DEVIATION_NONDET_Workingtime_Hours = new SimpleIntegerProperty();
+    private final IntegerProperty DEVIATION_NONDET_Workingtime_Minutes = new SimpleIntegerProperty();
+    private final IntegerProperty DEVIATION_NONDET_Workingtime_Seconds = new SimpleIntegerProperty();
     private IntegerField UI_MIN_NONDET_WORKINGTIME_HOURS_FIELD;
     private IntegerField UI_MIN_NONDET_WORKINGTIME_MINUTES_FIELD;
     private IntegerField UI_MIN_NONDET_WORKINGTIME_SECONDS_FIELD;
@@ -79,18 +79,18 @@ public class UI_Activate_Function extends Activating_Function implements UI_Inst
     private IntegerField UI_DEVIATION_NONDET_WORKINGTIME_MINUTES_FIELD;
     private IntegerField UI_DEVIATION_NONDET_WORKINGTIME_SECONDS_FIELD;
 
-    private IntegerProperty MIN_NONDET_Ordertime_Hours = new SimpleIntegerProperty();
-    private IntegerProperty MIN_NONDET_Ordertime_Minutes = new SimpleIntegerProperty();
-    private IntegerProperty MIN_NONDET_Ordertime_Seconds = new SimpleIntegerProperty();
-    private IntegerProperty MAX_NONDET_Ordertime_Hours = new SimpleIntegerProperty();
-    private IntegerProperty MAX_NONDET_Ordertime_Minutes = new SimpleIntegerProperty();
-    private IntegerProperty MAX_NONDET_Ordertime_Seconds = new SimpleIntegerProperty();
-    private IntegerProperty MEAN_NONDET_Ordertime_Hours = new SimpleIntegerProperty();
-    private IntegerProperty MEAN_NONDET_Ordertime_Minutes = new SimpleIntegerProperty();
-    private IntegerProperty MEAN_NONDET_Ordertime_Seconds = new SimpleIntegerProperty();
-    private IntegerProperty DEVIATION_NONDET_Ordertime_Hours = new SimpleIntegerProperty();
-    private IntegerProperty DEVIATION_NONDET_Ordertime_Minutes = new SimpleIntegerProperty();
-    private IntegerProperty DEVIATION_NONDET_Ordertime_Seconds = new SimpleIntegerProperty();
+    private final IntegerProperty MIN_NONDET_Ordertime_Hours = new SimpleIntegerProperty();
+    private final IntegerProperty MIN_NONDET_Ordertime_Minutes = new SimpleIntegerProperty();
+    private final IntegerProperty MIN_NONDET_Ordertime_Seconds = new SimpleIntegerProperty();
+    private final IntegerProperty MAX_NONDET_Ordertime_Hours = new SimpleIntegerProperty();
+    private final IntegerProperty MAX_NONDET_Ordertime_Minutes = new SimpleIntegerProperty();
+    private final IntegerProperty MAX_NONDET_Ordertime_Seconds = new SimpleIntegerProperty();
+    private final IntegerProperty MEAN_NONDET_Ordertime_Hours = new SimpleIntegerProperty();
+    private final IntegerProperty MEAN_NONDET_Ordertime_Minutes = new SimpleIntegerProperty();
+    private final IntegerProperty MEAN_NONDET_Ordertime_Seconds = new SimpleIntegerProperty();
+    private final IntegerProperty DEVIATION_NONDET_Ordertime_Hours = new SimpleIntegerProperty();
+    private final IntegerProperty DEVIATION_NONDET_Ordertime_Minutes = new SimpleIntegerProperty();
+    private final IntegerProperty DEVIATION_NONDET_Ordertime_Seconds = new SimpleIntegerProperty();
     private IntegerField UI_MIN_NONDET_ORDERTIME_HOURS_FIELD;
     private IntegerField UI_MIN_NONDET_ORDERTIME_MINUTES_FIELD;
     private IntegerField UI_MIN_NONDET_ORDERTIME_SECONDS_FIELD;
@@ -417,7 +417,7 @@ public class UI_Activate_Function extends Activating_Function implements UI_Inst
                     if (needed_workforces_List.contains(force)) {
                         needed_workforces_List.remove(force);
                         force.removeUsedIn(self);
-                        String Workforcelabel = new String("Added Workforces: [ ");
+                        String Workforcelabel = "Added Workforces: [ ";
                         for (Workforce added_force : needed_workforces_List) {
                             Workforcelabel = Workforcelabel.concat("; " + added_force.toString());
                         }

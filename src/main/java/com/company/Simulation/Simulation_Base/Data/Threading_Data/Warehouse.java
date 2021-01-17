@@ -2,20 +2,21 @@ package com.company.Simulation.Simulation_Base.Data.Threading_Data;
 
 import com.company.Enums.Order_Status;
 import com.company.Exceptions.ItemNotListedException;
-import com.company.Simulation.Simulation_Threading.Warehouse_Gate;
 import com.company.Simulation.Simulation_Threading.Threading_Simulator;
+import com.company.Simulation.Simulation_Threading.Warehouse_Gate;
 
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.company.Enums.Classification.*;
+import static com.company.Enums.Classification.Low;
+import static com.company.Enums.Classification.Middle;
 import static com.company.Enums.Order_Status.*;
 
 public class Warehouse {
 
     private List<Item> Stock;
-    private Threading_Simulator threadingSimulator;
+    private final Threading_Simulator threadingSimulator;
     private List<Item> min_Stock;
     private List<Order_Instance> Ordered;
     private Thread Resupply;

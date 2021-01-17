@@ -11,7 +11,7 @@ import java.util.List;
 
 public class Instance_Printer_FilePrinter {
 
-    private Instance_Printer_Gate instance_printer_gate;
+    private final Instance_Printer_Gate instance_printer_gate;
 
 
     public Instance_Printer_FilePrinter() {

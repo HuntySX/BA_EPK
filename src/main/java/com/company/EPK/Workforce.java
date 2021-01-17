@@ -8,8 +8,8 @@ import java.util.List;
 public class Workforce {
     private int W_ID;
     private String permission;
-    private List<User> granted_to;
-    private List<Function> used_In;
+    private final List<User> granted_to;
+    private final List<Function> used_In;
 
     public Workforce(int w_ID, String permission) {
         W_ID = w_ID;

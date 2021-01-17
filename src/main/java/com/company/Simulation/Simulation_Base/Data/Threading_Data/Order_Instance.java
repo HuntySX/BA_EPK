@@ -1,18 +1,17 @@
 package com.company.Simulation.Simulation_Base.Data.Threading_Data;
 
 import com.company.Simulation.Simulation_Base.Data.Shared_Data.Simulation_Instance;
-import com.company.Simulation.Simulation_Base.Data.Threading_Data.Item;
 
 import java.time.LocalTime;
 import java.util.List;
 
 public class Order_Instance extends Simulation_Instance {
 
-    private List<Item> ordered_Items;
+    private final List<Item> ordered_Items;
     private int Order_ID;
     private boolean started;
-    private boolean general_Stock;
-    private LocalTime time;
+    private final boolean general_Stock;
+    private final LocalTime time;
     private int for_caseID;
 
     public Order_Instance(int case_ID, List<Item> ordered_Items, LocalTime time, boolean general_Stock, int for_caseID) {

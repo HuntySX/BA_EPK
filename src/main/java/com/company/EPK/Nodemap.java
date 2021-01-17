@@ -15,10 +15,7 @@ public class Nodemap {
     }
 
     public boolean containsboth(EPK_Node start, EPK_Node end) {
-        if (Started_Elem.getID() == start.getID() && Finished_Elem.getID() == end.getID()) {
-            return true;
-        }
-        return false;
+        return Started_Elem.getID() == start.getID() && Finished_Elem.getID() == end.getID();
     }
 
     public EPK_Node getStarted_Elem() {

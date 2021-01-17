@@ -25,10 +25,10 @@ public class UI_Event_Starter extends Start_Event implements UI_Instantiable {
     private List<Start_Event_Type> Event_Types;
     private IntegerProperty UI_ID = new SimpleIntegerProperty();
     private IntegerProperty INSTANTIATE_COUNT = new SimpleIntegerProperty();
-    private IntegerProperty to_Instantiate = new SimpleIntegerProperty();
+    private final IntegerProperty to_Instantiate = new SimpleIntegerProperty();
     private StringProperty tag;
-    private BooleanProperty is_Start = new SimpleBooleanProperty(true);
-    private BooleanProperty is_End = new SimpleBooleanProperty(false);
+    private final BooleanProperty is_Start = new SimpleBooleanProperty(true);
+    private final BooleanProperty is_End = new SimpleBooleanProperty(false);
     private StringField UI_TAGFIELD;
     private IntegerField UI_ID_FIELD;
     private StringField UI_NAMESTRING_FIELD;

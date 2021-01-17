@@ -11,7 +11,7 @@ import java.util.Random;
 
 public class External_XOR_Split extends EPK_Node implements Printable_Node {
 
-    private List<External_XOR_Instance_Lock> external_XOR_InstanceLocks;
+    private final List<External_XOR_Instance_Lock> external_XOR_InstanceLocks;
     private Workingtime Timeout_Time;
     private EPK_Node Timeout;
     private EPK_Node Positive;

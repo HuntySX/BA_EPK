@@ -16,9 +16,9 @@ import static com.company.Enums.Process_Status.Pending;
 
 public class Starting_Queue implements Runnable {
 
-    private Starting_Gate starting_gate;
-    private Event_Gate event_gate;
-    private Random random;
+    private final Starting_Gate starting_gate;
+    private final Event_Gate event_gate;
+    private final Random random;
     private final Threading_Simulator threadingSimulator;
     private final EPK epk;
     private Thread SQ;

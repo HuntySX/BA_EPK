@@ -153,11 +153,7 @@ public class Activating_Function extends Function implements Printable_Node, Is_
         if (DecisionType == RANDOM) {
             Random rand = new Random();
             int randomcheck = rand.nextInt(2);
-            if (randomcheck == 0) {
-                return true;
-            } else {
-                return false;
-            }
+            return randomcheck == 0;
         } else if (DecisionType == CUSTOM) {
             System.out.println("Chance: " + chance_for_instantiation);
             Random rand = new Random();

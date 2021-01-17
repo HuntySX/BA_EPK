@@ -21,8 +21,8 @@ public class UI_Event extends Event implements UI_Instantiable {
 
     private IntegerProperty UI_ID;
     private StringProperty tag;
-    private BooleanProperty is_Start = new SimpleBooleanProperty(false);
-    private BooleanProperty is_End = new SimpleBooleanProperty(false);
+    private final BooleanProperty is_Start = new SimpleBooleanProperty(false);
+    private final BooleanProperty is_End = new SimpleBooleanProperty(false);
 
     private StringField UI_TAG_FIELD;
     private IntegerField UI_ID_FIELD;

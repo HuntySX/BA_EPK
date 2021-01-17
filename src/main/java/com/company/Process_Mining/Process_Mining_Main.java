@@ -11,10 +11,12 @@ public class Process_Mining_Main {
 
     Process_Mining_JSON_Read Reader;
     Process_Mining_Miner Miner;
+    Process_Mining_Settings Settings;
 
-    public Process_Mining_Main() {
+    public Process_Mining_Main(Process_Mining_Settings Settings) {
         Reader = new Process_Mining_JSON_Read();
-        Miner = new Process_Mining_Miner();
+        Miner = new Process_Mining_Miner(Reader, Settings);
+        this.Settings = Settings;
     }
 
     public void run() {
@@ -27,7 +29,6 @@ public class Process_Mining_Main {
                 System.out.println(Instance_By_ID.toString());
             }
         }
-        Miner.setReader(Reader);
         Miner.start_Mining();
     }
 }

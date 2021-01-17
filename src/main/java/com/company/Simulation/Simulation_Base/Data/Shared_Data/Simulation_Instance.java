@@ -1,7 +1,7 @@
 package com.company.Simulation.Simulation_Base.Data.Shared_Data;
 
-import com.company.EPK.Function;
 import com.company.EPK.EPK_Node;
+import com.company.EPK.Function;
 import com.company.Enums.Process_Status;
 
 import java.util.List;
@@ -18,7 +18,7 @@ public abstract class Simulation_Instance {
     private List<Function> scheduled_Processes;
     private List<EPK_Node> Next_Elem;
     private int case_ID;
-    private Lock Instance_lock;
+    private final Lock Instance_lock;
 
     public Simulation_Instance(int case_ID) {
         this.act_Process_Status = Starting;

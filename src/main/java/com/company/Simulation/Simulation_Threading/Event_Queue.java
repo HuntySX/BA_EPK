@@ -1,11 +1,13 @@
 package com.company.Simulation.Simulation_Threading;
 
-import com.company.EPK.*;
+import com.company.EPK.Con_Join;
+import com.company.EPK.Con_Split;
+import com.company.EPK.EPK_Node;
+import com.company.EPK.Function;
 import com.company.Enums.Process_Status;
 import com.company.Simulation.Simulation_Base.Data.Printer_Gate;
-import com.company.Simulation.Simulation_Base.Data.Shared_Data.Workflow_Monitor;
 import com.company.Simulation.Simulation_Base.Data.Shared_Data.Simulation_Instance;
-
+import com.company.Simulation.Simulation_Base.Data.Shared_Data.Workflow_Monitor;
 
 import java.time.LocalTime;
 import java.util.List;
@@ -14,8 +16,8 @@ import static com.company.Enums.Process_Status.*;
 
 public class Event_Queue implements Runnable {
 
-    private Event_Gate event_gate;
-    private Process_Gate process_gate;
+    private final Event_Gate event_gate;
+    private final Process_Gate process_gate;
     private Thread EQ;
     private boolean not_killed;
 

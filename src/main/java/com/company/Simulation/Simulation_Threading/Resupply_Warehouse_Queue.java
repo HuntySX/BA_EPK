@@ -1,8 +1,8 @@
 package com.company.Simulation.Simulation_Threading;
 
+import com.company.Simulation.Simulation_Base.Data.Shared_Data.Simulation_Instance;
 import com.company.Simulation.Simulation_Base.Data.Threading_Data.Item;
 import com.company.Simulation.Simulation_Base.Data.Threading_Data.Order_Instance;
-import com.company.Simulation.Simulation_Base.Data.Shared_Data.Simulation_Instance;
 
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -10,10 +10,10 @@ import java.util.List;
 
 public class Resupply_Warehouse_Queue implements Runnable {
 
-    private Warehouse_Gate warehouse_gate;
-    private Starting_Gate starting_gate;
-    private List<Item> min_stock;
-    private Threading_Simulator threadingSimulator;
+    private final Warehouse_Gate warehouse_gate;
+    private final Starting_Gate starting_gate;
+    private final List<Item> min_stock;
+    private final Threading_Simulator threadingSimulator;
     private Thread t;
 
     public Resupply_Warehouse_Queue(Threading_Simulator threadingSimulator) {

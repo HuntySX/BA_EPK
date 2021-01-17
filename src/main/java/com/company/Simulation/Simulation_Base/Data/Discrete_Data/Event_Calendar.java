@@ -17,16 +17,16 @@ public class Event_Calendar {
 
     private int RuntimeDays;
     private LocalTime runtime;
-    private LocalTime Begin_Time;
-    private LocalTime End_Time;
-    private List<Simulation_Event_List> Upcoming_List;
-    private Simulation_Waiting_List Waiting_List;
-    private Settings settings;
+    private final LocalTime Begin_Time;
+    private final LocalTime End_Time;
+    private final List<Simulation_Event_List> Upcoming_List;
+    private final Simulation_Waiting_List Waiting_List;
+    private final Settings settings;
     private int act_runtimeDay;
     private boolean finished_cycle;
-    private EPK epk;
-    private Discrete_Event_Generator Generator;
-    private List<Instance_Workflow> Activation_List;
+    private final EPK epk;
+    private final Discrete_Event_Generator Generator;
+    private final List<Instance_Workflow> Activation_List;
     private int Unique_Waiting_Ticket_ID;
     private List<List<External_Event>> External_Events;
 
@@ -343,9 +343,7 @@ public class Event_Calendar {
     }
 
     public void removeFromActivationList(Instance_Workflow workflow) {
-        if (Activation_List.contains(workflow)) {
-            Activation_List.remove(workflow);
-        }
+        Activation_List.remove(workflow);
     }
 
     public LocalTime getNextInstanceTime(Instance_Workflow to_run) {

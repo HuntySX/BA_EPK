@@ -12,10 +12,10 @@ import java.util.List;
 import static com.company.Enums.Option_Event_Choosing.*;
 
 public class Event_Decider {
-    private Settings settings;
-    private Event_Calendar calendar;
-    private List<User> Users;
-    private List<Resource> Resources;
+    private final Settings settings;
+    private final Event_Calendar calendar;
+    private final List<User> Users;
+    private final List<Resource> Resources;
 
     public Event_Decider(Settings settings, List<User> Users, List<Resource> Resources, Event_Calendar calendar) {
         this.settings = settings;

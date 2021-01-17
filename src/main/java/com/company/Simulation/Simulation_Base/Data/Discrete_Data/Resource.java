@@ -7,11 +7,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Resource {
-    private int r_ID;
+    private final int r_ID;
     private String name;
     private int count;
     private List<User> Allowed_Users;
-    private List<Function> Used_In;
+    private final List<Function> Used_In;
 
 
     public Resource(String name, int count, int r_ID) {

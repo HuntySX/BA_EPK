@@ -12,7 +12,7 @@ import java.util.Map;
 public class Model {
 
     Map<Integer, Cell> cellMap; // <id,cell>
-    private UI_EPK EPK;
+    private final UI_EPK EPK;
     Cell graphParent;
     Graph graph;
     List<Cell> allCells;

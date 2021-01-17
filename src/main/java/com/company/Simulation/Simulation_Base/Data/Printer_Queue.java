@@ -15,7 +15,7 @@ import java.util.List;
 
 public class Printer_Queue implements Runnable {
 
-    private Printer_Gate printer_gate;
+    private final Printer_Gate printer_gate;
     private Thread t;
     private XMLEncoder encoder;
     private FileOutputStream output;

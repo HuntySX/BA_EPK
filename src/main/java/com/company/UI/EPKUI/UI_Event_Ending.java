@@ -22,8 +22,8 @@ public class UI_Event_Ending extends Event implements UI_Instantiable {
 
     private IntegerProperty UI_ID;
     private StringProperty tag;
-    private BooleanProperty is_Start = new SimpleBooleanProperty(false);
-    private BooleanProperty is_End = new SimpleBooleanProperty(true);
+    private final BooleanProperty is_Start = new SimpleBooleanProperty(false);
+    private final BooleanProperty is_End = new SimpleBooleanProperty(true);
 
     private StringField UI_NAMESTRING_FIELD;
     private StringField UI_TAG_FIELD;

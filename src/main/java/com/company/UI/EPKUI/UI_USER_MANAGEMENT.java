@@ -121,9 +121,7 @@ public class UI_USER_MANAGEMENT implements Initializable {
 
                 List<Workforce> User_Workforce_List = user.getWorkforces();
                 for (Workforce w : Workforces) {
-                    if (w.getGranted_to().contains(user)) {
-                        w.getGranted_to().remove(user);
-                    }
+                    w.getGranted_to().remove(user);
                 }
                 user.getWorkforces().clear();
                 EPK.getAll_Users().remove(user);
@@ -135,7 +133,7 @@ public class UI_USER_MANAGEMENT implements Initializable {
         Save.getButtons().add(Save_Button);
 
         Label AddedWorkforces = new Label();
-        String Workforcelabel = new String("Added Workforces: [");
+        String Workforcelabel = "Added Workforces: [";
         for (Workforce added_force : user.getWorkforces()) {
             Workforcelabel = Workforcelabel.concat("; " + added_force.toString());
         }
@@ -169,7 +167,7 @@ public class UI_USER_MANAGEMENT implements Initializable {
                 if (force != null) {
                     if (Workforces_to_Add.contains(force)) {
                         Workforces_to_Add.remove(force);
-                        String Workforcelabel = new String("Added Workforces: [ ");
+                        String Workforcelabel = "Added Workforces: [ ";
                         for (Workforce added_force : Workforces_to_Add) {
                             Workforcelabel = Workforcelabel.concat("; " + added_force.toString());
                         }
@@ -233,9 +231,7 @@ public class UI_USER_MANAGEMENT implements Initializable {
 
                 List<Workforce> User_Workforce_List = user.getWorkforces();
                 for (Workforce w : Workforces) {
-                    if (w.getGranted_to().contains(user)) {
-                        w.getGranted_to().remove(user);
-                    }
+                    w.getGranted_to().remove(user);
                 }
                 user.getWorkforces().clear();
                 EPK.getAll_Users().remove(user);
@@ -247,7 +243,7 @@ public class UI_USER_MANAGEMENT implements Initializable {
         Save.getButtons().add(Save_Button);
 
         Label AddedWorkforces = new Label();
-        String Workforcelabel = new String("Added Workforces: [");
+        String Workforcelabel = "Added Workforces: [";
         for (Workforce added_force : user.getWorkforces()) {
             Workforcelabel = Workforcelabel.concat("; " + added_force.toString());
         }
@@ -287,7 +283,7 @@ public class UI_USER_MANAGEMENT implements Initializable {
                         Workforces_to_Remove.add(force);
                     }
 
-                    String Workforcelabel = new String("Added Workforces: [ ");
+                    String Workforcelabel = "Added Workforces: [ ";
                     for (Workforce added_force : user.getWorkforces()) {
                         if (!Workforces_to_Remove.contains(added_force)) {
                             Workforcelabel = Workforcelabel.concat("; " + added_force.toString());
@@ -315,8 +311,8 @@ public class UI_USER_MANAGEMENT implements Initializable {
     private void generateShowUI() {
         Editbox.getChildren().clear();
         StringField P_ID = Field.ofStringType("").label("ID: ").editable(false);
-        StringField FirstName = Field.ofStringType((String) "").label("Firstname: ");
-        StringField LastName = Field.ofStringType((String) "").label("Lastname: ");
+        StringField FirstName = Field.ofStringType("").label("Firstname: ");
+        StringField LastName = Field.ofStringType("").label("Lastname: ");
         StringField Efficiency = Field.ofStringType("").label("Efficiency: ");
 
         ButtonBar Save = new ButtonBar();

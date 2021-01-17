@@ -8,9 +8,9 @@ import javafx.beans.property.SimpleStringProperty;
 
 public class UI_Split_Node_Chances {
     private Split_Node_Chances Chance;
-    private IntegerProperty Chanceprop;
+    private final IntegerProperty Chanceprop;
     private IntegerField Chancefield;
-    private SimpleStringProperty Nameprop;
+    private final SimpleStringProperty Nameprop;
     private StringField Namefield;
 
     public UI_Split_Node_Chances(Split_Node_Chances chance, IntegerProperty chanceprop, IntegerField chancefield, SimpleStringProperty nameprop, StringField namefield) {

@@ -13,7 +13,7 @@ import static com.company.Enums.Classification.Middle;
 public class Threading_Simulator {
 
     private int case_ID;
-    private List<Item> all_Items;
+    private final List<Item> all_Items;
 
     public Threading_Simulator() {
         this.all_Items = new ArrayList<>();

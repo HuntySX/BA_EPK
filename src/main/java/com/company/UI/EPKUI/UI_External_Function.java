@@ -23,49 +23,49 @@ import java.util.List;
 
 public class UI_External_Function extends External_Function implements UI_Instantiable {
 
-    private VBox Box;
-    private VBox Rightbox;
+    private final VBox Box;
+    private final VBox Rightbox;
 
-    private UI_EPK EPK;
-    private List<EPK_Node> nodelist;
+    private final UI_EPK EPK;
+    private final List<EPK_Node> nodelist;
     private List<UI_External_XOR> XOR_Splits;
     private External_XOR_Split XOR_Split;
-    private Label SelectionLabel = new Label();
+    private final Label SelectionLabel = new Label();
 
-    private IntegerProperty UI_ID;
-    private StringProperty tag;
+    private final IntegerProperty UI_ID;
+    private final StringProperty tag;
 
 
-    private StringField UI_TAG_FIELD;
-    private IntegerField UI_ID_FIELD;
-    private IntegerProperty MIN_NONDET_Workingtime_Hours = new SimpleIntegerProperty();
-    private IntegerProperty MIN_NONDET_Workingtime_Minutes = new SimpleIntegerProperty();
-    private IntegerProperty MIN_NONDET_Workingtime_Seconds = new SimpleIntegerProperty();
-    private IntegerProperty MAX_NONDET_Workingtime_Hours = new SimpleIntegerProperty();
-    private IntegerProperty MAX_NONDET_Workingtime_Minutes = new SimpleIntegerProperty();
-    private IntegerProperty MAX_NONDET_Workingtime_Seconds = new SimpleIntegerProperty();
-    private IntegerProperty MEAN_NONDET_Workingtime_Hours = new SimpleIntegerProperty();
-    private IntegerProperty MEAN_NONDET_Workingtime_Minutes = new SimpleIntegerProperty();
-    private IntegerProperty MEAN_NONDET_Workingtime_Seconds = new SimpleIntegerProperty();
-    private IntegerProperty DEVIATION_NONDET_Workingtime_Hours = new SimpleIntegerProperty();
-    private IntegerProperty DEVIATION_NONDET_Workingtime_Minutes = new SimpleIntegerProperty();
-    private IntegerProperty DEVIATION_NONDET_Workingtime_Seconds = new SimpleIntegerProperty();
-    private IntegerField UI_MIN_NONDET_WORKINGTIME_HOURS_FIELD;
-    private IntegerField UI_MIN_NONDET_WORKINGTIME_MINUTES_FIELD;
-    private IntegerField UI_MIN_NONDET_WORKINGTIME_SECONDS_FIELD;
-    private IntegerField UI_MAX_NONDET_WORKINGTIME_HOURS_FIELD;
-    private IntegerField UI_MAX_NONDET_WORKINGTIME_MINUTES_FIELD;
-    private IntegerField UI_MAX_NONDET_WORKINGTIME_SECONDS_FIELD;
-    private IntegerField UI_MEAN_NONDET_WORKINGTIME_HOURS_FIELD;
-    private IntegerField UI_MEAN_NONDET_WORKINGTIME_MINUTES_FIELD;
-    private IntegerField UI_MEAN_NONDET_WORKINGTIME_SECONDS_FIELD;
-    private IntegerField UI_DEVIATION_NONDET_WORKINGTIME_HOURS_FIELD;
-    private IntegerField UI_DEVIATION_NONDET_WORKINGTIME_MINUTES_FIELD;
-    private IntegerField UI_DEVIATION_NONDET_WORKINGTIME_SECONDS_FIELD;
-    private FormRenderer NONDET_WORKINGTIME_UI;
+    private final StringField UI_TAG_FIELD;
+    private final IntegerField UI_ID_FIELD;
+    private final IntegerProperty MIN_NONDET_Workingtime_Hours = new SimpleIntegerProperty();
+    private final IntegerProperty MIN_NONDET_Workingtime_Minutes = new SimpleIntegerProperty();
+    private final IntegerProperty MIN_NONDET_Workingtime_Seconds = new SimpleIntegerProperty();
+    private final IntegerProperty MAX_NONDET_Workingtime_Hours = new SimpleIntegerProperty();
+    private final IntegerProperty MAX_NONDET_Workingtime_Minutes = new SimpleIntegerProperty();
+    private final IntegerProperty MAX_NONDET_Workingtime_Seconds = new SimpleIntegerProperty();
+    private final IntegerProperty MEAN_NONDET_Workingtime_Hours = new SimpleIntegerProperty();
+    private final IntegerProperty MEAN_NONDET_Workingtime_Minutes = new SimpleIntegerProperty();
+    private final IntegerProperty MEAN_NONDET_Workingtime_Seconds = new SimpleIntegerProperty();
+    private final IntegerProperty DEVIATION_NONDET_Workingtime_Hours = new SimpleIntegerProperty();
+    private final IntegerProperty DEVIATION_NONDET_Workingtime_Minutes = new SimpleIntegerProperty();
+    private final IntegerProperty DEVIATION_NONDET_Workingtime_Seconds = new SimpleIntegerProperty();
+    private final IntegerField UI_MIN_NONDET_WORKINGTIME_HOURS_FIELD;
+    private final IntegerField UI_MIN_NONDET_WORKINGTIME_MINUTES_FIELD;
+    private final IntegerField UI_MIN_NONDET_WORKINGTIME_SECONDS_FIELD;
+    private final IntegerField UI_MAX_NONDET_WORKINGTIME_HOURS_FIELD;
+    private final IntegerField UI_MAX_NONDET_WORKINGTIME_MINUTES_FIELD;
+    private final IntegerField UI_MAX_NONDET_WORKINGTIME_SECONDS_FIELD;
+    private final IntegerField UI_MEAN_NONDET_WORKINGTIME_HOURS_FIELD;
+    private final IntegerField UI_MEAN_NONDET_WORKINGTIME_MINUTES_FIELD;
+    private final IntegerField UI_MEAN_NONDET_WORKINGTIME_SECONDS_FIELD;
+    private final IntegerField UI_DEVIATION_NONDET_WORKINGTIME_HOURS_FIELD;
+    private final IntegerField UI_DEVIATION_NONDET_WORKINGTIME_MINUTES_FIELD;
+    private final IntegerField UI_DEVIATION_NONDET_WORKINGTIME_SECONDS_FIELD;
+    private final FormRenderer NONDET_WORKINGTIME_UI;
     private SingleSelectionField<EPK_Node> UI_NEXT_ELEMENTS;
     private SingleSelectionField<UI_External_XOR> UI_EXTERNAL_XOR_SPLIT;
-    private FormRenderer ID_TAG_UI;
+    private final FormRenderer ID_TAG_UI;
     private FormRenderer NEXT_ELEMS_UI;
 
 
@@ -153,7 +153,7 @@ public class UI_External_Function extends External_Function implements UI_Instan
                     setExternal_XOR(Chosen_XOR);
 
                 }
-                StringBuilder LabelString = new StringBuilder("");
+                StringBuilder LabelString = new StringBuilder();
                 LabelString.append(XOR_Split.toString());
                 if (!LabelString.equals("")) {
                     SelectionLabel.setText(LabelString.toString());
