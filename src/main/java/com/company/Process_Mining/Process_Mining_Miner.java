@@ -4,10 +4,7 @@ import com.company.Exceptions.PM_Instance_Relation_Error;
 import com.company.Process_Mining.Base_Data.*;
 
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.ListIterator;
+import java.util.*;
 
 public class Process_Mining_Miner {
 
@@ -99,17 +96,59 @@ public class Process_Mining_Miner {
         for (List<Mining_Instance> Single_Mining_Instance : Reader.getSorted_Instance_List()) {
             check_For_Activity_Relation(Relation_Hashmap, Single_Mining_Instance);
         }
-    }
-
-    private void generate_Activity_Parallel_Execution() {
-
-    }
-
-    private void generate_one_Step_Execution() {
+        generate_Direct_Dependency(Relation_Hashmap);
+        generate_Activity_Parallel_Execution(Relation_Hashmap);
+        generate_one_Step_Execution(Relation_Hashmap);
+        generate_two_Step_Execution(Relation_Hashmap);
 
     }
 
-    private void generate_two_Step_Execution() {
+    private void generate_Direct_Dependency(HashMap<Integer, HashMap<Integer, Relation_Count>> Relation_Hashmap) {
+
+        for (Map.Entry<Integer, HashMap<Integer, Relation_Count>> Relation_By_Single_Elem : Relation_Hashmap.entrySet()) {
+
+            for (Map.Entry<Integer, Relation_Count> Relation_From_Single_To_Single_Elem : Relation_By_Single_Elem.getValue().entrySet()) {
+
+                if (Relation_From_Single_To_Single_Elem.getValue().getRelation_type() == Relation_Type.Related) {
+                    if (Relation_Hashmap.get(Relation_From_Single_To_Single_Elem.getKey()).get(Relation_By_Single_Elem.getKey()).getRelation_type() != Relation_Type.Related) {
+                        Relation_From_Single_To_Single_Elem.getValue().setRelation_type(Relation_Type.Followed_by);
+                    }
+                }
+            }
+        }
+    }
+
+    private void generate_Activity_Parallel_Execution(HashMap<Integer, HashMap<Integer, Relation_Count>> Relation_Hashmap) {
+
+        for (Map.Entry<Integer, HashMap<Integer, Relation_Count>> Relation_By_Single_Elem : Relation_Hashmap.entrySet()) {
+
+            for (Map.Entry<Integer, Relation_Count> Relation_From_Single_To_Single_Elem : Relation_By_Single_Elem.getValue().entrySet()) {
+
+                if (Relation_From_Single_To_Single_Elem.getValue().getRelation_type() == Relation_Type.Related) {
+                    if (Relation_Hashmap.get(Relation_From_Single_To_Single_Elem.getKey()).get(Relation_By_Single_Elem.getKey()).getRelation_type() == Relation_Type.Related) {
+
+                        Relation_Count inverted_Value = Relation_Hashmap.get(Relation_From_Single_To_Single_Elem.getKey()).get(Relation_By_Single_Elem.getKey());
+
+                        Integer added_Count = Relation_From_Single_To_Single_Elem.getValue().getCount() + inverted_Value.getCount();
+
+                        Relation_From_Single_To_Single_Elem.getValue().setRelation_type(Relation_Type.Parallel);
+                        Relation_Hashmap.get(Relation_From_Single_To_Single_Elem.getKey()).get(Relation_By_Single_Elem.getKey()).setRelation_type(Relation_Type.Parallel);
+
+                    }
+                }
+            }
+        }
+    }
+
+    private void generate_one_Step_Execution(HashMap<Integer, HashMap<Integer, Relation_Count>> Relation_Hashmap) {
+        for (Map.Entry<Integer, HashMap<Integer, Relation_Count>> Relation_By_Single_Elem : Relation_Hashmap.entrySet()) {
+            if (Relation_By_Single_Elem.getValue().get(Relation_By_Single_Elem.getKey()).getRelation_type() == Relation_Type.Related) {
+                Relation_By_Single_Elem.getValue().get(Relation_By_Single_Elem.getKey()).setRelation_type(Relation_Type.Follow_by_one);
+            }
+        }
+    }
+
+    private void generate_two_Step_Execution(HashMap<Integer, HashMap<Integer, Relation_Count>> Relation_Hashmap) {
 
     }
 
@@ -188,7 +227,7 @@ public class Process_Mining_Miner {
 
                             if (related_to_Activity_Hashmap.containsKey(Relation.getActivity().getNode_ID())) {
                                 related_to_Activity_Hashmap.get(Relation.getActivity().getNode_ID()).incrementCount();
-                                related_to_Activity_Hashmap.get(Relation.getActivity().getNode_ID()).setRelation_type(Relation_Type.Followed_by);
+                                related_to_Activity_Hashmap.get(Relation.getActivity().getNode_ID()).setRelation_type(Relation_Type.Related);
                             }
 
                         } else {
@@ -252,5 +291,21 @@ public class Process_Mining_Miner {
             used_Users_per_Instance.add(used_Users_By_Single_Instance);
         }
         Used_Users_Filtered_List = used_Users_per_Instance;
+    }
+
+    public void generateMaxRelationSet(HashMap<Integer, HashMap<Integer, Relation_Count>> Relation_Hashmap) {
+        List<Relation_Places> Places = new ArrayList<>();
+        List<Relation_Places> WorkingList = new ArrayList<>();
+
+        for (Map.Entry<Integer, HashMap<Integer, Relation_Count>> Relation_By_Single_Elem : Relation_Hashmap.entrySet()) {
+
+            for (Map.Entry<Integer, Relation_Count> Relation_From_Single_To_Single_Elem : Relation_By_Single_Elem.getValue().entrySet()) {
+
+                Relation_By_Single_Elem.getValue();
+                Relation_From_Single_To_Single_Elem.getValue();
+            }
+        }
+
+
     }
 }
