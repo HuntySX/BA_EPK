@@ -100,6 +100,90 @@ public class Process_Mining_Miner {
         generate_Activity_Parallel_Execution(Relation_Hashmap);
         generate_one_Step_Execution(Relation_Hashmap);
         generate_two_Step_Execution(Relation_Hashmap);
+        List<Relation_Places> Min_Set = new ArrayList<>();
+        generate_Min_Places(Min_Set, Relation_Hashmap);
+        Clean_Min_Places(Min_Set, Relation_Hashmap);
+        generate_max_Set(Min_Set, Relation_Hashmap);
+
+    }
+
+    private void Clean_Min_Places(List<Relation_Places> min_set, HashMap<Integer, HashMap<Integer, Relation_Count>> relation_hashmap) {
+        List<Relation_Places> Mark_For_Deletion = new ArrayList<>();
+        for (Relation_Places relation : min_set) {
+            boolean delete_relation = false;
+            for (Mining_Activity from_Activity_A : relation.getFrom()) {
+                if (!delete_relation) {
+                    for (Mining_Activity from_Activity_B : relation.getFrom()) {
+                        if (relation_hashmap.get(from_Activity_A.getNode_ID()).get(from_Activity_B.getNode_ID()).getRelation_type() != Relation_Type.None) {
+                            Mark_For_Deletion.add(relation);
+                            delete_relation = true;
+                            break;
+                        }
+                    }
+                } else {
+                    break;
+                }
+            }
+
+            if (!delete_relation) {
+                for (Mining_Activity to_Activity_A : relation.getTo()) {
+                    if (!delete_relation) {
+                        for (Mining_Activity to_Activity_B : relation.getTo()) {
+                            if (relation_hashmap.get(to_Activity_A.getNode_ID()).get(to_Activity_B.getNode_ID()).getRelation_type() != Relation_Type.None) {
+                                Mark_For_Deletion.add(relation);
+                                delete_relation = true;
+                                break;
+                            }
+                        }
+                    } else {
+                        break;
+                    }
+                }
+            }
+        }
+        if (!Mark_For_Deletion.isEmpty()) {
+            min_set.removeAll(Mark_For_Deletion);
+        }
+    }
+
+    private void generate_Min_Places(List<Relation_Places> min_set, HashMap<Integer, HashMap<Integer, Relation_Count>> relation_Hashmap) {
+        HashMap<Integer, Mining_Activity> All_Activities = new HashMap<>();
+        for (Map.Entry<Integer, HashMap<Integer, Relation_Count>> Relation_By_Single_Elem : relation_Hashmap.entrySet()) {
+            for (Map.Entry<Integer, Relation_Count> Relation_From_Single_To_Single_Elem : Relation_By_Single_Elem.getValue().entrySet()) {
+                if (Relation_From_Single_To_Single_Elem.getValue().getRelation_type().equals(Relation_Type.Followed_by)) {
+                    Mining_Activity From = All_Activities.get(Relation_By_Single_Elem.getKey());
+                    if (From == null) {
+                        List<Mining_Activity> All_Activities_List = Reader.getActivityList();
+                        for (Mining_Activity Activity : All_Activities_List) {
+                            if (Activity.getNode_ID() == Relation_By_Single_Elem.getKey()) {
+                                All_Activities.put(Activity.getNode_ID(), Activity);
+                                From = Activity;
+                                break;
+                            }
+                        }
+                    }
+                    Mining_Activity To = All_Activities.get(Relation_From_Single_To_Single_Elem.getKey());
+                    if (To == null) {
+                        List<Mining_Activity> All_Activities_List = Reader.getActivityList();
+                        for (Mining_Activity Activity : All_Activities_List) {
+                            if (Activity.getNode_ID() == Relation_From_Single_To_Single_Elem.getKey()) {
+                                All_Activities.put(Activity.getNode_ID(), Activity);
+                                To = Activity;
+                                break;
+                            }
+                        }
+                    }
+                    Relation_Places new_Min_Place = new Relation_Places();
+                    new_Min_Place.getFrom().add(From);
+                    new_Min_Place.getTo().add(To);
+                    min_set.add(new_Min_Place);
+                }
+            }
+        }
+    }
+
+    private void generate_max_Set(List<Relation_Places> min_Set, HashMap<Integer, HashMap<Integer, Relation_Count>> relation_hashmap) {
+
 
     }
 
@@ -218,6 +302,9 @@ public class Process_Mining_Miner {
                             possible_Relations.clear();
                         }
                     }
+
+                    //TODO wenn possible Relations leer, dann existiert hier ein Knoten ohne Nachfolger -> Final Task
+
                     for (Mining_Instance Relation : possible_Relations) {
                         to_Work_On.add(Working_List.indexOf(Relation));
 

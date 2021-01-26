@@ -21,4 +21,32 @@ public class Relation_Places {
     public List<Mining_Activity> getTo() {
         return To;
     }
+
+    public boolean has_Same_From(Relation_Places other) {
+        for (Mining_Activity From_This : From) {
+            if (!other.getFrom().contains(From_This)) {
+                return false;
+            }
+        }
+        for (Mining_Activity From_Other : other.getFrom()) {
+            if (!From.contains(From_Other)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public boolean has_Same_to(Relation_Places other) {
+        for (Mining_Activity To_This : To) {
+            if (!other.getTo().contains(To_This)) {
+                return false;
+            }
+        }
+        for (Mining_Activity To_Other : other.getTo()) {
+            if (!To.contains(To_Other)) {
+                return false;
+            }
+        }
+        return true;
+    }
 }
