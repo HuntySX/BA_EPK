@@ -60,6 +60,8 @@ public class Process_Mining_JSON_Read {
         Sorted_Instance_List = generateSortedInstanceList();
     }
 
+
+    //TODO Schau hier rein du sack
     private List<List<Mining_Instance>> generateSortedInstanceList() {
         List<List<Mining_Instance>> sorted_Instance_List = new ArrayList<>();
         for (Mining_Instance mining_Instance : InstanceList) {
@@ -77,7 +79,6 @@ public class Process_Mining_JSON_Read {
                 sorted_Instance_List.add(newMining_Instance_List);
             }
         }
-
         return sorted_Instance_List;
     }
 
@@ -111,12 +112,12 @@ public class Process_Mining_JSON_Read {
                 newInstance.getUsed_Users().add(newUser);
             });
             RessourceArray.forEach(Value -> {
-                String Resname = (String) ((JSONObject) Value).get("name");
-                long count = (long) ((JSONObject) Value).get("count");
+                String Resname = (String) ((JSONObject) Value).get("Res_Name");
+                long count = (long) ((JSONObject) Value).get("Res_Count");
                 if (Activity_Status.equals("Finished")) {
                     count = -count;
                 }
-                long R_ID = (long) ((JSONObject) Value).get("Resource_ID");
+                long R_ID = (long) ((JSONObject) Value).get("Res_ID");
                 Mining_Resource newResource = CreateOrLoadResource(Resname, (int) R_ID);
                 addResourceToInstance(newInstance, newResource, (int) count);
             });

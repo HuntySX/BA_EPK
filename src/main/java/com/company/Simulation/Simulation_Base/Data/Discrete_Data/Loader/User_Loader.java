@@ -12,7 +12,6 @@ public class User_Loader {
     }
 
     public List<User> generate_User_List() {
-        //TODO generate Userlist from File;
         return null;
     }
 }

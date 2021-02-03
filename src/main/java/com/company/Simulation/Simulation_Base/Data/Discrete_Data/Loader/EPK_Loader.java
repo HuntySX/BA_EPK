@@ -11,7 +11,6 @@ public class EPK_Loader {
     }
 
     public EPK generate_EPK() {
-        //TODO EPK aus File Auslesen und instanzieren.
         return null;
     }
 }

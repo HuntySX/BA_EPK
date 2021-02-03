@@ -35,8 +35,6 @@ public class User {
         disabled = false;
     }
 
-    //TODO Set Get Workforce ( Add, Construct bla)
-
     public String getFirst_Name() {
         return first_Name;
     }

@@ -11,8 +11,6 @@ public class Settings_Loader {
     }
 
     public Settings generate_Settings() {
-        //TODO Hier Settings einlesen und generieren!
-        //siehe File.Reader Java Doc
         return null;
     }
 }

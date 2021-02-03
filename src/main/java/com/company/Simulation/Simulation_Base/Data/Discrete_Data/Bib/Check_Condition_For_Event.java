@@ -15,7 +15,6 @@ public class Check_Condition_For_Event {
     private List<User> Users;
     private List<Resource> Resources;
 
-    //TODO Very Late: Diese Klasse evtl Static machen und Settings übergeben (Wenn überhaupt nötig?)
 
     public Check_Condition_For_Event(Settings settings, List<User> users, List<Resource> resources) {
         this.settings = settings;

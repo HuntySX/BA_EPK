@@ -12,7 +12,6 @@ public class Resource_Loader {
     }
 
     public List<Resource> generate_Resources() {
-        //TODO gen Resources from File;
         return null;
     }
 }

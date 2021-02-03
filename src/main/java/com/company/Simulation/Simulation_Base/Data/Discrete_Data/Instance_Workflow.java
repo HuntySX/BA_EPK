@@ -122,7 +122,6 @@ public class Instance_Workflow {
     }
 
     public void removeActiveResource(Resource res) {
-        //TODO Stückzahl rückgeben.
         Active_Resource.remove(res);
     }
 

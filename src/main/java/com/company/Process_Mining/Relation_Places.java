@@ -8,10 +8,14 @@ import java.util.List;
 public class Relation_Places {
     List<Mining_Activity> From;
     List<Mining_Activity> To;
+    boolean isStart;
+    boolean isFinal;
 
     public Relation_Places() {
         From = new ArrayList<>();
         To = new ArrayList<>();
+        isStart = false;
+        isFinal = false;
     }
 
     public List<Mining_Activity> getFrom() {
@@ -48,5 +52,21 @@ public class Relation_Places {
             }
         }
         return true;
+    }
+
+    public boolean isStart() {
+        return isStart;
+    }
+
+    public void setStart(boolean start) {
+        isStart = start;
+    }
+
+    public boolean isFinal() {
+        return isFinal;
+    }
+
+    public void setFinal(boolean aFinal) {
+        isFinal = aFinal;
     }
 }

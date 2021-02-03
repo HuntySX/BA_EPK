@@ -364,7 +364,7 @@ public class Discrete_Event_Simulator {
                             } else if ((to_Run.getInstance() instanceof Event_Instance && !(to_Run.getInstance() instanceof Activating_Event_Instance)) && !(to_Run.getInstance() instanceof Activating_Event_Instance) && !to_Run.Is_Waiting()) {
 
                                 boolean decide = ((Activating_Function) to_Run.getEPKNode()).Decide();
-                                if (decide == false) {
+                                if (!decide) {
                                     ActivateFunction(to_Run, event_Calendar.getAct_runtimeDay());
                                     System.out.println("Starting Function for Instance without Instantiation: " + to_Run.getInstance().getCase_ID());
                                 } else {
@@ -840,9 +840,9 @@ public class Discrete_Event_Simulator {
         Instance_Workflow new_Instance = new Instance_Workflow(to_Run.getInstance(), event_Calendar.getRuntime(), n);
         event_Calendar.Add_To_Upcoming_List(new_Instance, event_Calendar.getAct_runtimeDay());
         if (Settings.getPrint_Only_Function() && n instanceof Function) {
-        //TODO Print Scheduled for n;
+        // Print Scheduled for n;
         } else {
-        //TODO Print every Node Scheduled;
+        // Print every Node Scheduled;
         }
         }
         }
