@@ -126,8 +126,8 @@ public class Event_Con_Split extends Connector implements Printable_Node {
         }
         List<EPK_Node> mixed_Result_List = new ArrayList<>();
         while (!result.isEmpty()) {
-            Random rand = new Random(result.size());
-            EPK_Node node_to_Mix = result.get(rand.nextInt());
+            Random rand = new Random();
+            EPK_Node node_to_Mix = result.get(rand.nextInt(result.size()));
             result.remove(node_to_Mix);
             mixed_Result_List.add(node_to_Mix);
         }

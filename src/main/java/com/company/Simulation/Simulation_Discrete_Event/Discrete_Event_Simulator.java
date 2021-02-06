@@ -272,6 +272,7 @@ public class Discrete_Event_Simulator {
                                     int days = event_Calendar.getNextInstanceDay(to_Run);
                                     if (days != -1) {
                                         to_Run.getInstance().add_To_Scheduled_Work(to_Run.getEPKNode());
+                                        //TODO +1sec
                                         Instance_Workflow new_Instance = new Instance_Workflow(to_Run.getInstance(), to_check.plusSeconds(1), to_Run.getEPKNode());
                                         new_Instance.setWaiting_At_Gate(to_Run.getWaiting_At_Gate());
                                         event_Calendar.Add_To_Upcoming_List(new_Instance, days);

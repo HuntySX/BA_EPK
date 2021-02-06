@@ -137,6 +137,11 @@ public class UI_XOR_Split extends Event_Con_Split implements UI_Instantiable {
     @Override
     public void save_Settings() {
         setDecide_Type(Decide_Type.getSelection());
+        for (UI_Split_Node_Chances to_Save_Chance : UI_Chance_List) {
+            if (!to_Save_Chance.getChancefield().getValue().equals(to_Save_Chance.getChance().getChance())) {
+                to_Save_Chance.getChance().setChance(to_Save_Chance.getChancefield().getValue());
+            }
+        }
     }
 
     @Override

@@ -638,7 +638,10 @@ public class Borderpanecon implements Initializable {
                         for (EPK_Node mapnode : MappedElems) {
                             for (EPK_Node Node : Final_List) {
                                 if (Node.getID() == mapnode.getID()) {
-                                    newMap.add(Node);
+
+                                    if (!newMap.contains(Node)) {
+                                        newMap.add(Node);
+                                    }
                                 }
                             }
                         }
