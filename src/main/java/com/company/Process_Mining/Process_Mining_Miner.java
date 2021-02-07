@@ -17,17 +17,18 @@ public class Process_Mining_Miner {
     private List<List<List<Mining_User>>> Used_Users_Filtered_List;
     private List<List<List<Mining_Resource_Count>>> Used_Resource_Count_Filtered_List;
     private List<List<Mining_Activity>> Used_Activity_Filtered_List;
-    private List<Relation_Places> Start_Places;
-    private List<Relation_Places> Final_Places;
-    private List<Relation_Places> All_Places;
+    HashMap<Mining_User, HashMap<Mining_User, Relation_Count>> User_Relation_Hashmap;
+    private List<Mining_Activity> Start_Activities;
+    private Relation_Places Final_Place;
     private HashMap<Integer, List<LocalTime>> Delay_per_Instance_On_Activity;
     private HashMap<Integer, List<LocalTime>> Workingtime_per_Instance_On_Activity;
     private HashMap<Integer, List<LocalTime>> Completetime_per_Instance_On_Activity;
     private HashMap<Mining_Instance, Log_Relation_Data> Complete_Log;
     private HashMap<Mining_Activity, Complete_Time_Activity> Time_Log_By_Activity;
-    private HashMap<Mining_User, HashMap<Mining_User, Integer>> User_Relation_Map;
+    private List<Transactional_Relation> All_Places;
     private HashMap<Mining_Resource, List<Resource_Usage_By_Time>> Timed_Resource_Usages;
     private Integer Total_User_Relation_Count;
+    private HashMap<Integer, Mining_Activity> Activity_Hashmap;
 
     public Process_Mining_Miner(Process_Mining_JSON_Read Reader, Process_Mining_Settings Settings) {
         Used_Users_Filtered_List = new ArrayList<>();
@@ -37,14 +38,15 @@ public class Process_Mining_Miner {
         Mining_Settings = Settings;
         Complete_Log = new HashMap<>();
         Time_Log_By_Activity = new HashMap<>();
-        User_Relation_Map = new HashMap<>();
+        User_Relation_Hashmap = new HashMap<>();
         Total_User_Relation_Count = 0;
-        Start_Places = new ArrayList<>();
-        Final_Places = new ArrayList<>();
+        Start_Activities = new ArrayList<>();
+        Final_Place = new Relation_Places();
         Delay_per_Instance_On_Activity = new HashMap<>();
         Workingtime_per_Instance_On_Activity = new HashMap<>();
         Completetime_per_Instance_On_Activity = new HashMap<>();
         All_Places = new ArrayList<>();
+        Activity_Hashmap = new HashMap<>();
     }
 
     public Process_Mining_JSON_Read getReader() {
@@ -74,6 +76,7 @@ public class Process_Mining_Miner {
         //FilterByUserWorkingTime();
         //FilterByResourceWorkingTime();
         generate_Extended_Alpha_Mapping();
+
     }
 
     private void Initialize_Activity_Relation_Hashmap(HashMap<Integer, HashMap<Integer, Relation_Count>> relation_hashmap) {
@@ -124,9 +127,9 @@ public class Process_Mining_Miner {
         HashMap<Integer, HashMap<Integer, Relation_Count>> Relation_Hashmap = new HashMap<>();
         HashMap<Integer, HashMap<Integer, Relation_Count>> Sequence_Hashmap = new HashMap<>();
         HashMap<Integer, HashMap<Integer, Relation_Count>> Parallel_Hashmap = new HashMap<>();
-        HashMap<Mining_User, HashMap<Mining_User, Relation_Count>> User_Relation_Hashmap = new HashMap<>();
         HashMap<Integer, HashMap<Integer, Relation_Count>> One_Loop_Map = new HashMap<>();
 
+        Initialize_Activity_HashMap();
         Initialize_Activity_Relation_Hashmap(Relation_Hashmap);
         Initialize_Activity_Relation_Hashmap(Sequence_Hashmap);
         Initialize_Activity_Relation_Hashmap(Parallel_Hashmap);
@@ -135,24 +138,139 @@ public class Process_Mining_Miner {
         for (List<Mining_Instance> Single_Mining_Instance : Reader.getSorted_Instance_List()) {
             check_For_Activity_Relation(Relation_Hashmap, Single_Mining_Instance);
         }
+        generate_Final_Places(Relation_Hashmap);
         Calculate_User_Relations(User_Relation_Hashmap);
         Calculate_Resource_Usage();
         Calculate_Times_At_Activities();
         generate_enhanced_Dependency(Relation_Hashmap);
+        List<Integer> Mark_For_One_Loops = Identify_One_Step_Loops(Relation_Hashmap);
+        Preprocess_One_Loops(Relation_Hashmap, Mark_For_One_Loops, One_Loop_Map);
+        Identify_Two_Step_Loops(Relation_Hashmap, Sequence_Hashmap);
         generate_Direct_Dependency(Relation_Hashmap, Sequence_Hashmap);
         generate_Activity_Parallel_Execution(Relation_Hashmap, Sequence_Hashmap, Parallel_Hashmap);
-        List<Integer> Mark_For_One_Loops = Identify_One_Step_Loops(Relation_Hashmap);
-        Identify_Two_Step_Loops(Sequence_Hashmap);
-        Preprocess_One_Loops(Relation_Hashmap, Mark_For_One_Loops, One_Loop_Map);
+        Identify_Two_Step_Loops(Relation_Hashmap, Sequence_Hashmap);
         List<Relation_Places> Min_Set = new ArrayList<>();
         generate_Min_Places(Min_Set, Relation_Hashmap);
         Clean_Min_Places(Min_Set, Relation_Hashmap);
         List<Relation_Places> Max_Set = generate_max_Set(Min_Set, Parallel_Hashmap, Relation_Hashmap);
-        Max_Set.addAll(Final_Places);
-        Max_Set.addAll(Start_Places);
-        All_Places = Max_Set;
+        List<Transactional_Relation> Transaction_Relations = getTransactional_Relations(Max_Set);
+        List<Transactional_Relation> possibleLoopTransitions = getPossibleLoopTransactional_Relations(Mark_For_One_Loops, Max_Set);
+        List<Transactional_Relation> LoopPlaces = PostProcess_One_Loops(possibleLoopTransitions, One_Loop_Map, Mark_For_One_Loops);
+        Transaction_Relations.addAll(LoopPlaces);
+        Transaction_Relations.addAll(GenerateTransactional_Relation_Final());
+        Transaction_Relations.addAll(GenerateTransactional_Relation_Start());
+        All_Places = Transaction_Relations;
+    }
+
+    private List<Transactional_Relation> GenerateTransactional_Relation_Start() {
+        Relation_Places Start = new Relation_Places();
+        List<Integer> Start_IDs = new ArrayList<>();
+        Start.setStart(true);
+        for (Mining_Activity Start_Activity : Start_Activities) {
+            if (!Start.getTo().contains(Start_Activity)) {
+                Start_IDs.add(Start_Activity.getNode_ID());
+                Start.getTo().add(Start_Activity);
+            }
+        }
+        List<Transactional_Relation> Resultlist = new ArrayList<>();
+        for (Integer Start_ID : Start_IDs) {
+            Transactional_Relation newStartRelation = new Transactional_Relation(Start_ID, Start, false);
+            Resultlist.add(newStartRelation);
+        }
+        return Resultlist;
+    }
+
+    private List<Transactional_Relation> GenerateTransactional_Relation_Final() {
+        List<Integer> Final_IDs = new ArrayList<>();
+        for (Mining_Activity Final_Activity : Final_Place.getFrom()) {
+            if (!Final_IDs.contains(Final_Activity.getNode_ID())) {
+                Final_IDs.add(Final_Activity.getNode_ID());
+            }
+        }
+        List<Transactional_Relation> Resultlist = new ArrayList<>();
+        for (Integer Final_ID : Final_IDs) {
+            Transactional_Relation FinalRelation = new Transactional_Relation(Final_ID, Final_Place, true);
+            Resultlist.add(FinalRelation);
+        }
+        return Resultlist;
+    }
+
+    private void Initialize_Activity_HashMap() {
+
+        List<Mining_Activity> All_Activities = Reader.getActivityList();
+        for (Mining_Activity Activity : All_Activities) {
+            if (!Activity_Hashmap.containsKey(Activity.getNode_ID())) {
+                Activity_Hashmap.put(Activity.getNode_ID(), Activity);
+            } else {
+                System.out.println("Error puting new Activity Key to ActivityHashmap (LoopTransaction.java)");
+            }
+        }
 
     }
+
+    private List<Transactional_Relation> getPossibleLoopTransactional_Relations(List<Integer> mark_for_one_loops,
+                                                                                List<Relation_Places> max_set) {
+        List<Transactional_Relation> Resultlist = new ArrayList<>();
+        for (Integer ID : mark_for_one_loops) {
+            for (Relation_Places place : max_set) {
+                Transactional_Relation newLeftRelation = new Transactional_Relation(ID, place, true);
+                Transactional_Relation newRightRelation = new Transactional_Relation(ID, place, false);
+                Resultlist.add(newLeftRelation);
+                Resultlist.add(newRightRelation);
+            }
+        }
+
+        List<Transactional_Relation> Mark_For_Deletion = new ArrayList<>();
+        for (Transactional_Relation first : Resultlist) {
+            for (Transactional_Relation second : Resultlist) {
+                if (!first.equals(second) && !Mark_For_Deletion.contains(first) && !Mark_For_Deletion.contains(second) && first.isSame(second)) {
+                    Mark_For_Deletion.add(second);
+                }
+            }
+        }
+        Resultlist.removeAll(Mark_For_Deletion);
+        return Resultlist;
+    }
+
+    private List<Transactional_Relation> getTransactional_Relations(List<Relation_Places> max_set) {
+        List<Transactional_Relation> Resultlist = new ArrayList<>();
+        for (Relation_Places Place : max_set) {
+            Resultlist.addAll(generateLeftTransaction(Place));
+            Resultlist.addAll(generateRightTransaction(Place));
+        }
+
+        //Clean Transactional_Relation_Place From Double Entries
+
+        List<Transactional_Relation> Mark_For_Deletion = new ArrayList<>();
+        for (Transactional_Relation first : Resultlist) {
+            for (Transactional_Relation second : Resultlist) {
+                if (!first.equals(second) && !Mark_For_Deletion.contains(first) && !Mark_For_Deletion.contains(second) && first.isSame(second)) {
+                    Mark_For_Deletion.add(second);
+                }
+            }
+        }
+        Resultlist.removeAll(Mark_For_Deletion);
+        return Resultlist;
+    }
+
+    private List<Transactional_Relation> generateLeftTransaction(Relation_Places place) {
+        List<Transactional_Relation> leftList = new ArrayList<>();
+        for (Mining_Activity Activity : place.getFrom()) {
+            Transactional_Relation newRelation = new Transactional_Relation(Activity.getNode_ID(), place, true);
+            leftList.add(newRelation);
+        }
+        return leftList;
+    }
+
+    private List<Transactional_Relation> generateRightTransaction(Relation_Places place) {
+        List<Transactional_Relation> rightList = new ArrayList<>();
+        for (Mining_Activity Activity : place.getTo()) {
+            Transactional_Relation newRelation = new Transactional_Relation(Activity.getNode_ID(), place, false);
+            rightList.add(newRelation);
+        }
+        return rightList;
+    }
+
 
     private void Calculate_Times_At_Activities() {
         for (Map.Entry<Mining_Instance, Log_Relation_Data> Log_Instance : Complete_Log.entrySet()) {
@@ -354,18 +472,19 @@ public class Process_Mining_Miner {
                 while (second_iterator_right.hasNext()) {
                     Relation_Places second_Relation_Place = second_iterator_right.next();
                     if (first_Relation_Place.has_Same_to(second_Relation_Place) && !first_Relation_Place.equals(second_Relation_Place)) {
-                        if (check_for_Relation_in_table(first_Relation_Place.getTo(), Parallel_Hashmap, Relation_Hashmap)) {
-                            has_right = true;
-                            Relation_Places bigger_Set = new Relation_Places();
-                            bigger_Set.getTo().addAll(first_Relation_Place.getTo());
-                            for (Mining_Activity Activity : second_Relation_Place.getTo()) {
-                                if (!bigger_Set.getTo().contains(Activity)) {
-                                    bigger_Set.getTo().add(Activity);
-                                }
+                        Relation_Places biggerSet = new Relation_Places();
+                        biggerSet.getFrom().addAll(first_Relation_Place.getFrom());
+                        for (Mining_Activity to_Add : second_Relation_Place.getFrom()) {
+                            if (!biggerSet.getFrom().contains(to_Add)) {
+                                biggerSet.getFrom().add(to_Add);
                             }
+                        }
+                        if (check_for_Relation_in_table(biggerSet.getFrom(), Parallel_Hashmap, Relation_Hashmap)) {
+                            has_right = true;
+                            biggerSet.getTo().addAll(first_Relation_Place.getTo());
                             Mark_For_Deletion.add(first_Relation_Place);
                             Mark_For_Deletion.add(second_Relation_Place);
-                            Working_List.add(bigger_Set);
+                            Working_List.add(biggerSet);
                         }
                     }
                 }
@@ -378,18 +497,21 @@ public class Process_Mining_Miner {
                 while (second_iterator_left.hasNext()) {
                     Relation_Places second_Relation_Place = second_iterator_left.next();
                     if (!first_Relation_Place.equals(second_Relation_Place) && first_Relation_Place.has_Same_From(second_Relation_Place)) {
-                        if (check_for_Relation_in_table(first_Relation_Place.getFrom(), Parallel_Hashmap, Relation_Hashmap)) {
-                            has_left = true;
-                            Relation_Places bigger_Set = new Relation_Places();
-                            bigger_Set.getFrom().addAll(first_Relation_Place.getFrom());
-                            for (Mining_Activity Activity : second_Relation_Place.getFrom()) {
-                                if (!bigger_Set.getFrom().contains(Activity)) {
-                                    bigger_Set.getFrom().add(Activity);
-                                }
+
+                        Relation_Places biggerSet = new Relation_Places();
+                        biggerSet.getTo().addAll(first_Relation_Place.getTo());
+                        for (Mining_Activity to_Add : second_Relation_Place.getTo()) {
+                            if (!biggerSet.getTo().contains(to_Add)) {
+                                biggerSet.getTo().add(to_Add);
                             }
+                        }
+
+                        if (check_for_Relation_in_table(biggerSet.getTo(), Parallel_Hashmap, Relation_Hashmap)) {
+                            has_left = true;
+                            biggerSet.getFrom().addAll(first_Relation_Place.getFrom());
                             Mark_For_Deletion.add(first_Relation_Place);
                             Mark_For_Deletion.add(second_Relation_Place);
-                            Working_List.add(bigger_Set);
+                            Working_List.add(biggerSet);
                         }
                     }
                 }
@@ -406,6 +528,34 @@ public class Process_Mining_Miner {
         }
         Clean_Up_Place_List(ResultList);
         return ResultList;
+    }
+
+    private void generate_Final_Places(HashMap<Integer, HashMap<Integer, Relation_Count>> Relation_Hashmap) {
+        List<Mining_Activity> Final_Activities = new ArrayList<>();
+        for (Map.Entry<Integer, HashMap<Integer, Relation_Count>> Relation_By_Single_Elem : Relation_Hashmap.entrySet()) {
+            boolean isEnding = true;
+            for (Map.Entry<Integer, Relation_Count> Relation_From_Single_To_Single_Elem : Relation_By_Single_Elem.getValue().entrySet()) {
+                if (Relation_From_Single_To_Single_Elem.getValue().getRelation_type() != None) {
+                    isEnding = false;
+                    break;
+                }
+            }
+            if (isEnding) {
+                Integer Final_ID = Relation_By_Single_Elem.getKey();
+                for (Mining_Activity Final : Reader.getActivityList()) {
+                    if (Final.getNode_ID() == Final_ID) {
+                        Final_Activities.add(Final);
+                    }
+                }
+            }
+        }
+        Relation_Places newFinal = new Relation_Places();
+        newFinal.setFinal(true);
+        for (Mining_Activity Final_Activity : Final_Activities) {
+            newFinal.getFrom().add(Final_Activity);
+
+        }
+        Final_Place = newFinal;
     }
 
     //Generates Relations through the relation log files in Complete Log
@@ -535,11 +685,65 @@ public class Process_Mining_Miner {
         }
     }
 
-    private void PostProcess_One_Loops() {
-
+    private List<Transactional_Relation> PostProcess_One_Loops(List<Transactional_Relation> possibleTransitions, HashMap<Integer, HashMap<Integer, Relation_Count>> one_Loop_Map, List<Integer> mark_For_One_Loops) {
+        List<Transactional_Relation> ResultingLoopPlaces = new ArrayList<>();
+        List<Transactional_Relation> possibleLoopPlaces = generateLoopSet(mark_For_One_Loops, one_Loop_Map);
+        for (Transactional_Relation TransitionPlace : possibleTransitions) {
+            for (Transactional_Relation LoopPlace : possibleLoopPlaces) {
+                if (TransitionPlace.isSame(LoopPlace) && !ResultingLoopPlaces.contains(TransitionPlace)) {
+                    ResultingLoopPlaces.add(TransitionPlace);
+                }
+            }
+        }
+        return ResultingLoopPlaces;
     }
 
-    private void Identify_Two_Step_Loops(HashMap<Integer, HashMap<Integer, Relation_Count>> Sequence_Hashmap) {
+    private List<Transactional_Relation> generateLoopSet(List<Integer> mark_for_one_loops, HashMap<Integer, HashMap<Integer, Relation_Count>> one_loop_map) {
+
+
+        List<LoopTransaction> allLoopTransactions = new ArrayList<>();
+        for (Integer LoopID : mark_for_one_loops) {
+            List<Integer> FromRelations = new ArrayList<>();
+            List<Integer> ToRelations = new ArrayList<>();
+
+            HashMap<Integer, Relation_Count> LoopRelatedTo = one_loop_map.get(LoopID);
+            for (Map.Entry<Integer, Relation_Count> Related : LoopRelatedTo.entrySet()) {
+                if (Related.getValue().getRelation_type() == Relation_Type.Related) {
+                    if (!ToRelations.contains(Related.getKey())) {
+                        ToRelations.add(Related.getKey());
+                    }
+                }
+            }
+            for (Map.Entry<Integer, HashMap<Integer, Relation_Count>> Related_From : one_loop_map.entrySet()) {
+                if (Related_From.getValue().get(LoopID).getRelation_type() == Related) {
+                    if (!FromRelations.contains(Related_From.getKey())) {
+                        FromRelations.add(Related_From.getKey());
+                    }
+                }
+            }
+            LoopTransaction newLoopTransaction = new LoopTransaction(LoopID, FromRelations, ToRelations);
+            allLoopTransactions.add(newLoopTransaction);
+        }
+        List<Transactional_Relation> ResultingList = new ArrayList<>();
+        for (LoopTransaction LoopTransaction : allLoopTransactions) {
+            ResultingList.addAll(LoopTransaction.generateMaxPlaceSet(Activity_Hashmap));
+        }
+        return ResultingList;
+    }
+
+    private void Identify_Two_Step_Loops(HashMap<Integer, HashMap<Integer, Relation_Count>> relation_Hashmap, HashMap<Integer, HashMap<Integer, Relation_Count>> Sequence_Hashmap) {
+
+        List<Mining_Activity> ActivityList = Reader.getActivityList();
+        for (Mining_Activity Y_Activity : ActivityList) {
+            if (!relation_Hashmap.containsKey(Y_Activity.getNode_ID())) {
+                HashMap<Integer, Relation_Count> newRow = new HashMap<>();
+                for (Mining_Activity X_Activity : ActivityList) {
+                    newRow.put(X_Activity.getNode_ID(), new Relation_Count());
+                }
+                relation_Hashmap.put(Y_Activity.getNode_ID(), newRow);
+            }
+        }
+
         for (Map.Entry<Mining_Instance, Log_Relation_Data> Instance_Log : Complete_Log.entrySet()) {
             HashMap<Mining_Instance, List<Mining_Instance>> Instance_Relation_Map = Instance_Log.getValue().getMining_Instances_Relations();
             for (Map.Entry<Mining_Instance, List<Mining_Instance>> Instance_Relations : Instance_Log.getValue().getMining_Instances_Relations().entrySet()) {
@@ -579,21 +783,19 @@ public class Process_Mining_Miner {
         List<Integer> to_Work_On = new ArrayList<>();
         to_Work_On.add(0);
 
-        Relation_Places new_Start = new Relation_Places();
-        new_Start.setStart(true);
-        new_Start.getTo().add(Working_List.get(0).getActivity());
-        if (Start_Places.isEmpty()) {
-            Start_Places.add(new_Start);
+        Mining_Activity new_Start = Working_List.get(0).getActivity();
+        if (Start_Activities.isEmpty()) {
+            Start_Activities.add(new_Start);
         } else {
             boolean found = false;
-            for (Relation_Places Start_Place : Start_Places) {
-                if (Start_Place.has_Same_to(new_Start)) {
+            for (Mining_Activity Start_Activity : Start_Activities) {
+                if (Start_Activity.equals(new_Start)) {
                     found = true;
                     break;
                 }
             }
             if (!found) {
-                Start_Places.add(new_Start);
+                Start_Activities.add(new_Start);
             }
         }
         while (!to_Work_On.isEmpty()) {
@@ -653,20 +855,7 @@ public class Process_Mining_Miner {
                         }
                     }
 
-                    if (possible_Relations.isEmpty() && !Error && Single_Mining_Instance_Map.get(Instance_to_Get_Related_Elements).size() > 2) {
-                        Relation_Places new_Final_Place = new Relation_Places();
-                        new_Final_Place.getFrom().add(Instance_to_Get_Related_Elements.getActivity());
-                        new_Final_Place.setFinal(true);
-                        boolean contained = false;
-                        for (Relation_Places Final_in_List : Final_Places) {
-                            if (Final_in_List.has_Same_From(new_Final_Place)) {
-                                contained = true;
-                            }
-                        }
-                        if (!contained) {
-                            Final_Places.add(new_Final_Place);
-                        }
-                    } else if (!Error && !possible_Relations.isEmpty()) {
+                    if (!Error && !possible_Relations.isEmpty()) {
                         for (Mining_Instance Relation : possible_Relations) {
                             to_Work_On.add(Working_List.indexOf(Relation));
 
@@ -775,10 +964,10 @@ public class Process_Mining_Miner {
         while (Place_Iterator_One.hasNext()) {
             Relation_Places place_one = Place_Iterator_One.next();
             ListIterator<Relation_Places> Place_Iterator_Two = place_list.listIterator();
-            while (Place_Iterator_Two.hasNext()) {
-                Relation_Places place_two = Place_Iterator_Two.next();
-                if (!place_one.equals(place_two) && place_one.has_Same_From(place_two) && place_one.has_Same_to(place_two)) {
-                    if (!Mark_For_Deletion.contains(place_two)) {
+            if (!Mark_For_Deletion.contains(place_one)) {
+                while (Place_Iterator_Two.hasNext()) {
+                    Relation_Places place_two = Place_Iterator_Two.next();
+                    if (!Mark_For_Deletion.contains(place_two) && !place_one.equals(place_two) && place_one.has_Same_From(place_two) && place_one.has_Same_to(place_two)) {
                         Mark_For_Deletion.add(place_two);
                     }
                 }

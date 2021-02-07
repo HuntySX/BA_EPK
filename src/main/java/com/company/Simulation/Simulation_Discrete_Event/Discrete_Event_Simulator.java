@@ -490,6 +490,49 @@ public class Discrete_Event_Simulator {
                                     new_Instance.setComing_From(next_Step.getEPKNode());
                                 }
                                 event_Calendar.Add_To_Upcoming_List(new_Instance, event_Calendar.getAct_runtimeDay());
+
+                                if (Settings.getPrint_Only_Function() && n instanceof Function) {
+                                    Instance_Print_File next_print = new Instance_Print_File(next_Step.getInstance().getCase_ID(), event_Calendar.getRuntime(), event_Calendar.getAct_runtimeDay(),
+                                            Workflow_Status.Scheduled, Node_Type.Function, n.getID(), ((Function) n).getFunction_tag(), null, null);
+
+                                    synchronized (instance_printer_gate.getI_printer_Lock()) {
+                                        instance_printer_gate.getInstancePrintList().add(next_print);
+                                    }
+                                } else if (!Settings.getPrint_Only_Function()) {
+
+                                    Instance_Print_File next_print = null;
+                                    if (n instanceof Function && !(n instanceof Activating_Function)) {
+                                        next_print = new Instance_Print_File(next_Step.getInstance().getCase_ID(), event_Calendar.getRuntime(), event_Calendar.getAct_runtimeDay(),
+                                                Workflow_Status.Scheduled, Node_Type.Function, n.getID(), ((Function) n).getFunction_tag(), null, null);
+                                    } else if (n instanceof Event && !(n instanceof Activating_Start_Event)) {
+                                        next_print = new Instance_Print_File(next_Step.getInstance().getCase_ID(), event_Calendar.getRuntime(), event_Calendar.getAct_runtimeDay(),
+                                                Workflow_Status.Scheduled, Node_Type.Event, n.getID(), ((Event) n).getEvent_Tag(), null, null);
+                                    } else if (n instanceof Event_Con_Split) {
+                                        next_print = new Instance_Print_File(next_Step.getInstance().getCase_ID(), event_Calendar.getRuntime(), event_Calendar.getAct_runtimeDay(),
+                                                Workflow_Status.Scheduled, Node_Type.E_Con_Split, n.getID(), ((Event_Con_Split) n).getContype() + "-Split-Gate" + n.getID(), null, null);
+                                    } else if (n instanceof Event_Con_Join) {
+                                        next_print = new Instance_Print_File(next_Step.getInstance().getCase_ID(), event_Calendar.getRuntime(), event_Calendar.getAct_runtimeDay(),
+                                                Workflow_Status.Scheduled, Node_Type.E_Con_Join, n.getID(), ((Event_Con_Join) n).getContype() + "-Join-Gate" + n.getID(), null, null);
+
+                                    } else if (n instanceof Activating_Function) {
+                                        next_print = new Instance_Print_File(next_Step.getInstance().getCase_ID(), event_Calendar.getRuntime(), event_Calendar.getAct_runtimeDay(),
+                                                Workflow_Status.Scheduled, Node_Type.Activating_Function, n.getID(), ((Activating_Function) n).getFunction_tag(), null, null);
+
+                                    } else if (n instanceof Activating_Start_Event) {
+                                        next_print = new Instance_Print_File(next_Step.getInstance().getCase_ID(), event_Calendar.getRuntime(), event_Calendar.getAct_runtimeDay(),
+                                                Workflow_Status.Scheduled, Node_Type.Activating_Start_Event, n.getID(), ((Activating_Start_Event) n).getEvent_Tag(), null, null);
+                                    } else if (n instanceof External_Function) {
+                                        next_print = new Instance_Print_File(next_Step.getInstance().getCase_ID(), event_Calendar.getRuntime(), event_Calendar.getAct_runtimeDay(),
+                                                Workflow_Status.Scheduled, Node_Type.External_Function, n.getID(), ((External_Function) n).getFunction_tag(), null, null);
+                                    } else if (n instanceof External_XOR_Split) {
+                                        next_print = new Instance_Print_File(next_Step.getInstance().getCase_ID(), event_Calendar.getRuntime(), event_Calendar.getAct_runtimeDay(),
+                                                Workflow_Status.Scheduled, Node_Type.External_XOR_Split, n.getID(), "External-XOR-Split " + n.getID(), null, null);
+                                    }
+                                    synchronized (instance_printer_gate.getI_printer_Lock()) {
+                                        instance_printer_gate.getInstancePrintList().add(next_print);
+                                    }
+                                }
+
                                 pushed = true;
                             }
                             to_Remove.add(Instance);
