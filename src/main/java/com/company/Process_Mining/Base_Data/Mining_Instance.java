@@ -83,6 +83,14 @@ public class Mining_Instance {
         Activity = activity;
     }
 
+    public int getActivity_Day() {
+        return Activity_Day;
+    }
+
+    public void setActivity_Day(int activity_Day) {
+        Activity_Day = activity_Day;
+    }
+
     @Override
     public String toString() {
         return "ID=" + Instance_ID +

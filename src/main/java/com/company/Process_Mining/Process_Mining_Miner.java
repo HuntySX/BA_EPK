@@ -26,9 +26,11 @@ public class Process_Mining_Miner {
     private HashMap<Mining_Instance, Log_Relation_Data> Complete_Log;
     private HashMap<Mining_Activity, Complete_Time_Activity> Time_Log_By_Activity;
     private List<Transactional_Relation> All_Places;
-    private HashMap<Mining_Resource, List<Resource_Usage_By_Time>> Timed_Resource_Usages;
     private Integer Total_User_Relation_Count;
     private HashMap<Integer, Mining_Activity> Activity_Hashmap;
+    private Mining_Logger Print_To_File;
+    private HashMap<Mining_Resource, List<Timed_Resource_Usage_By_Activity>> Timed_Mining_Activity_By_Resource;
+    private HashMap<Mining_User, List<Timed_User_Usage_By_Activity>> Timed_Mining_Activity_per_User;
 
     public Process_Mining_Miner(Process_Mining_JSON_Read Reader, Process_Mining_Settings Settings) {
         Used_Users_Filtered_List = new ArrayList<>();
@@ -47,6 +49,7 @@ public class Process_Mining_Miner {
         Completetime_per_Instance_On_Activity = new HashMap<>();
         All_Places = new ArrayList<>();
         Activity_Hashmap = new HashMap<>();
+        Timed_Mining_Activity_per_User = new HashMap<>();
     }
 
     public Process_Mining_JSON_Read getReader() {
@@ -76,7 +79,50 @@ public class Process_Mining_Miner {
         //FilterByUserWorkingTime();
         //FilterByResourceWorkingTime();
         generate_Extended_Alpha_Mapping();
+        Print_To_File = new Mining_Logger(Activity_Hashmap, User_Relation_Hashmap, Total_User_Relation_Count, Timed_Mining_Activity_per_User, Timed_Mining_Activity_By_Resource, Time_Log_By_Activity, All_Places);
+        Print_To_File.LogMining();
 
+    }
+
+    private void generate_Extended_Alpha_Mapping() {
+
+        HashMap<Integer, HashMap<Integer, Relation_Count>> Relation_Hashmap = new HashMap<>();
+        HashMap<Integer, HashMap<Integer, Relation_Count>> Sequence_Hashmap = new HashMap<>();
+        HashMap<Integer, HashMap<Integer, Relation_Count>> Parallel_Hashmap = new HashMap<>();
+        HashMap<Integer, HashMap<Integer, Relation_Count>> One_Loop_Map = new HashMap<>();
+
+        Initialize_Activity_HashMap();
+        Initialize_Activity_Relation_Hashmap(Relation_Hashmap);
+        Initialize_Activity_Relation_Hashmap(Sequence_Hashmap);
+        Initialize_Activity_Relation_Hashmap(Parallel_Hashmap);
+        Initialize_User_Relation_Map(User_Relation_Hashmap);
+
+        for (List<Mining_Instance> Single_Mining_Instance : Reader.getSorted_Instance_List()) {
+            check_For_Activity_Relation(Relation_Hashmap, Single_Mining_Instance);
+        }
+        Calculate_User_Relations();
+        Calculate_User_At_ActivityMap();
+        Calculate_Resource_Usage();
+        Calculate_Times_At_Activities();
+        generate_enhanced_Dependency(Relation_Hashmap);
+        generate_Final_Places(Relation_Hashmap);
+        List<Integer> Mark_For_One_Loops = Identify_One_Step_Loops(Relation_Hashmap);
+        Preprocess_One_Loops(Relation_Hashmap, Mark_For_One_Loops, One_Loop_Map);
+        Identify_Two_Step_Loops(Relation_Hashmap, Sequence_Hashmap);
+        generate_Direct_Dependency(Relation_Hashmap, Sequence_Hashmap);
+        generate_Activity_Parallel_Execution(Relation_Hashmap, Sequence_Hashmap, Parallel_Hashmap);
+        Identify_Two_Step_Loops(Relation_Hashmap, Sequence_Hashmap);
+        List<Relation_Places> Min_Set = new ArrayList<>();
+        generate_Min_Places(Min_Set, Relation_Hashmap);
+        Clean_Min_Places(Min_Set, Relation_Hashmap);
+        List<Relation_Places> Max_Set = generate_max_Set(Min_Set, Parallel_Hashmap, Relation_Hashmap);
+        List<Transactional_Relation> Transaction_Relations = getTransactional_Relations(Max_Set);
+        List<Transactional_Relation> possibleLoopTransitions = getPossibleLoopTransactional_Relations(Mark_For_One_Loops, Max_Set);
+        List<Transactional_Relation> LoopPlaces = PostProcess_One_Loops(possibleLoopTransitions, One_Loop_Map, Mark_For_One_Loops);
+        Transaction_Relations.addAll(LoopPlaces);
+        Transaction_Relations.addAll(GenerateTransactional_Relation_Final());
+        Transaction_Relations.addAll(GenerateTransactional_Relation_Start());
+        All_Places = Transaction_Relations;
     }
 
     private void Initialize_Activity_Relation_Hashmap(HashMap<Integer, HashMap<Integer, Relation_Count>> relation_hashmap) {
@@ -101,9 +147,9 @@ public class Process_Mining_Miner {
 
     private void Initialize_Resource_Usage_Map() {
         List<Mining_Resource> All_Resources = Reader.getResourceList();
-        Timed_Resource_Usages = new HashMap<>();
+        Timed_Mining_Activity_By_Resource = new HashMap<>();
         for (Mining_Resource Resource : All_Resources) {
-            Timed_Resource_Usages.put(Resource, new ArrayList<>());
+            Timed_Mining_Activity_By_Resource.put(Resource, new ArrayList<>());
         }
     }
 
@@ -122,44 +168,42 @@ public class Process_Mining_Miner {
         }
     }
 
-    private void generate_Extended_Alpha_Mapping() {
 
-        HashMap<Integer, HashMap<Integer, Relation_Count>> Relation_Hashmap = new HashMap<>();
-        HashMap<Integer, HashMap<Integer, Relation_Count>> Sequence_Hashmap = new HashMap<>();
-        HashMap<Integer, HashMap<Integer, Relation_Count>> Parallel_Hashmap = new HashMap<>();
-        HashMap<Integer, HashMap<Integer, Relation_Count>> One_Loop_Map = new HashMap<>();
-
-        Initialize_Activity_HashMap();
-        Initialize_Activity_Relation_Hashmap(Relation_Hashmap);
-        Initialize_Activity_Relation_Hashmap(Sequence_Hashmap);
-        Initialize_Activity_Relation_Hashmap(Parallel_Hashmap);
-        Initialize_User_Relation_Map(User_Relation_Hashmap);
-
-        for (List<Mining_Instance> Single_Mining_Instance : Reader.getSorted_Instance_List()) {
-            check_For_Activity_Relation(Relation_Hashmap, Single_Mining_Instance);
+    private void Calculate_User_At_ActivityMap() {
+        //Timed_Mining_Activity_per_User
+        for (Map.Entry<Mining_Instance, Log_Relation_Data> Complete_Instance_Log : Complete_Log.entrySet()) {
+            Log_Relation_Data Log = Complete_Instance_Log.getValue();
+            for (Map.Entry<Mining_Instance, List<Mining_Instance>> Single_Instance_Log : Log.getSingle_Mining_Instance_Map().entrySet()) {
+                if (Single_Instance_Log.getValue().size() >= 1) {
+                    if (!Single_Instance_Log.getValue().get(1).getUsed_Users().isEmpty()) {
+                        Mining_Instance Working = Single_Instance_Log.getValue().get(1);
+                        for (Mining_User User : Working.getUsed_Users()) {
+                            if (Timed_Mining_Activity_per_User.containsKey(User)) {
+                                Timed_Mining_Activity_per_User.get(User).add(new Timed_User_Usage_By_Activity(Working.getActivity(), Working.getActivity_Day(), Working.getDuration(), false));
+                            } else {
+                                List<Timed_User_Usage_By_Activity> Timed_activities = new ArrayList<>();
+                                Timed_activities.add(new Timed_User_Usage_By_Activity(Working.getActivity(), Working.getActivity_Day(), Working.getDuration(), false));
+                                Timed_Mining_Activity_per_User.put(User, Timed_activities);
+                            }
+                        }
+                    }
+                }
+                if (Single_Instance_Log.getValue().size() == 2) {
+                    Mining_Instance Finishing = Single_Instance_Log.getValue().get(2);
+                    for (Mining_User User : Finishing.getUsed_Users()) {
+                        if (Timed_Mining_Activity_per_User.containsKey(User)) {
+                            Timed_Mining_Activity_per_User.get(User).add(new Timed_User_Usage_By_Activity(Finishing.getActivity(), Finishing.getActivity_Day(), Finishing.getDuration(), true));
+                        } else {
+                            List<Timed_User_Usage_By_Activity> Timed_activities = new ArrayList();
+                            Timed_activities.add(new Timed_User_Usage_By_Activity(Finishing.getActivity(), Finishing.getActivity_Day(), Finishing.getDuration(), true));
+                            Timed_Mining_Activity_per_User.put(User, Timed_activities);
+                        }
+                    }
+                }
+            }
         }
-        generate_Final_Places(Relation_Hashmap);
-        Calculate_User_Relations(User_Relation_Hashmap);
-        Calculate_Resource_Usage();
-        Calculate_Times_At_Activities();
-        generate_enhanced_Dependency(Relation_Hashmap);
-        List<Integer> Mark_For_One_Loops = Identify_One_Step_Loops(Relation_Hashmap);
-        Preprocess_One_Loops(Relation_Hashmap, Mark_For_One_Loops, One_Loop_Map);
-        Identify_Two_Step_Loops(Relation_Hashmap, Sequence_Hashmap);
-        generate_Direct_Dependency(Relation_Hashmap, Sequence_Hashmap);
-        generate_Activity_Parallel_Execution(Relation_Hashmap, Sequence_Hashmap, Parallel_Hashmap);
-        Identify_Two_Step_Loops(Relation_Hashmap, Sequence_Hashmap);
-        List<Relation_Places> Min_Set = new ArrayList<>();
-        generate_Min_Places(Min_Set, Relation_Hashmap);
-        Clean_Min_Places(Min_Set, Relation_Hashmap);
-        List<Relation_Places> Max_Set = generate_max_Set(Min_Set, Parallel_Hashmap, Relation_Hashmap);
-        List<Transactional_Relation> Transaction_Relations = getTransactional_Relations(Max_Set);
-        List<Transactional_Relation> possibleLoopTransitions = getPossibleLoopTransactional_Relations(Mark_For_One_Loops, Max_Set);
-        List<Transactional_Relation> LoopPlaces = PostProcess_One_Loops(possibleLoopTransitions, One_Loop_Map, Mark_For_One_Loops);
-        Transaction_Relations.addAll(LoopPlaces);
-        Transaction_Relations.addAll(GenerateTransactional_Relation_Final());
-        Transaction_Relations.addAll(GenerateTransactional_Relation_Start());
-        All_Places = Transaction_Relations;
+
+
     }
 
     private List<Transactional_Relation> GenerateTransactional_Relation_Start() {
@@ -289,8 +333,21 @@ public class Process_Mining_Miner {
                     Mining_Instance Schedule = Complete_Instance_At_Activity.get(0);
                     Mining_Instance Working = Complete_Instance_At_Activity.get(1);
                     Mining_Instance Finished = Complete_Instance_At_Activity.get(2);
+                    int ScheduleDay = Schedule.getActivity_Day();
+                    int WorkingDay = Working.getActivity_Day();
+                    int FinishedDay = Finished.getActivity_Day();
                     Delay_To_Start = Duration.between(Schedule.getDuration(), Working.getDuration());
                     Working_Time = Duration.between(Working.getDuration(), Finished.getDuration());
+                    if (ScheduleDay < WorkingDay) {
+                        for (int i = ScheduleDay; i < WorkingDay; i++) {
+                            Delay_To_Start = Delay_To_Start.plus(Duration.ofHours(24));
+                        }
+                    }
+                    if (WorkingDay < FinishedDay) {
+                        for (int i = WorkingDay; i < FinishedDay; i++) {
+                            Working_Time = Working_Time.plus(Duration.ofHours(24));
+                        }
+                    }
                     Duration CompleteTime = Delay_To_Start.plus(Working_Time);
                     Time_At_Activity.setComplete_Delay(Time_At_Activity.getComplete_Delay().plus(Delay_To_Start));
                     Time_At_Activity.setComplete_WorkingTime(Time_At_Activity.getComplete_WorkingTime().plus(Working_Time));
@@ -298,7 +355,14 @@ public class Process_Mining_Miner {
                 } else if (Complete_Instance_At_Activity.size() == 2) {
                     Mining_Instance Schedule = Complete_Instance_At_Activity.get(0);
                     Mining_Instance Working = Complete_Instance_At_Activity.get(1);
+                    int ScheduleDay = Schedule.getActivity_Day();
+                    int WorkingDay = Working.getActivity_Day();
                     Delay_To_Start = Duration.between(Schedule.getDuration(), Working.getDuration());
+                    if (ScheduleDay < WorkingDay) {
+                        for (int i = ScheduleDay; i < WorkingDay; i++) {
+                            Delay_To_Start = Delay_To_Start.plus(Duration.ofHours(24));
+                        }
+                    }
                     Time_At_Activity.setComplete_Delay(Time_At_Activity.getComplete_Delay().plus(Delay_To_Start));
                     Time_At_Activity.setComplete_Time(Time_At_Activity.getComplete_Time().plus(Delay_To_Start));
                 }
@@ -315,22 +379,22 @@ public class Process_Mining_Miner {
                 if (!LifecycleList.isEmpty() && LifecycleList.size() > 1) {
                     List<Mining_Resource_Count> ResourceList = LifecycleList.get(1).getUsed_Resources();
                     for (Mining_Resource_Count Used_Resource : ResourceList) {
-                        Resource_Usage_By_Time new_Resource_Event = new Resource_Usage_By_Time(LifecycleList.get(1).getDuration(), Used_Resource.getCount());
-                        Timed_Resource_Usages.get(Used_Resource.getResource()).add(new_Resource_Event);
+                        Timed_Resource_Usage_By_Activity new_Resource_Event = new Timed_Resource_Usage_By_Activity(LifecycleList.get(1).getActivity(), LifecycleList.get(1).getActivity_Day(), LifecycleList.get(1).getDuration(), Used_Resource.getCount());
+                        Timed_Mining_Activity_By_Resource.get(Used_Resource.getResource()).add(new_Resource_Event);
                     }
                 }
                 if (!LifecycleList.isEmpty() && LifecycleList.size() > 2) {
                     List<Mining_Resource_Count> ResourceList = LifecycleList.get(2).getUsed_Resources();
                     for (Mining_Resource_Count Used_Resource : ResourceList) {
-                        Resource_Usage_By_Time new_Resource_Event = new Resource_Usage_By_Time(LifecycleList.get(2).getDuration(), Used_Resource.getCount());
-                        Timed_Resource_Usages.get(Used_Resource.getResource()).add(new_Resource_Event);
+                        Timed_Resource_Usage_By_Activity new_Resource_Event = new Timed_Resource_Usage_By_Activity(LifecycleList.get(2).getActivity(), LifecycleList.get(2).getActivity_Day(), LifecycleList.get(2).getDuration(), Used_Resource.getCount());
+                        Timed_Mining_Activity_By_Resource.get(Used_Resource.getResource()).add(new_Resource_Event);
                     }
                 }
             }
         }
     }
 
-    private void Calculate_User_Relations(HashMap<Mining_User, HashMap<Mining_User, Relation_Count>> User_Relation_Hashmap) {
+    private void Calculate_User_Relations() {
         for (Map.Entry<Mining_Instance, Log_Relation_Data> Instance_Log : Complete_Log.entrySet()) {
             HashMap<Mining_Instance, List<Mining_Instance>> Instance_Relation_Log = Instance_Log.getValue().getMining_Instances_Relations();
             HashMap<Mining_Instance, List<Mining_Instance>> Single_Instance_Activity_Map = Instance_Log.getValue().getSingle_Mining_Instance_Map();
@@ -821,7 +885,6 @@ public class Process_Mining_Miner {
                         if (possible_Relation.getActivity().equals(Instance_to_Get_Related_Elements.getActivity())
                                 && possible_Relation.getActivity_Status().equals("Working")) {
                             Single_Mining_Instance_Map.get(Instance_to_Get_Related_Elements).add(possible_Relation);
-                            //TODO Hier Verspätung eintragen (get_Related_Element Time + possible Relation Time)
                         } else if (possible_Relation.getActivity().equals(Instance_to_Get_Related_Elements.getActivity())
                                 && possible_Relation.getActivity_Status().equals("Finished")) {
                             Single_Mining_Instance_Map.get(Instance_to_Get_Related_Elements).add(possible_Relation);
