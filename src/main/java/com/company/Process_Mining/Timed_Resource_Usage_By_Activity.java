@@ -18,6 +18,14 @@ public class Timed_Resource_Usage_By_Activity {
         Count = count;
     }
 
+    public Integer getDay() {
+        return day;
+    }
+
+    public void setDay(Integer day) {
+        this.day = day;
+    }
+
     public Mining_Activity getActivity() {
         return Activity;
     }

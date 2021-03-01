@@ -95,6 +95,7 @@ public class Process_Mining_Miner {
         Initialize_Activity_Relation_Hashmap(Relation_Hashmap);
         Initialize_Activity_Relation_Hashmap(Sequence_Hashmap);
         Initialize_Activity_Relation_Hashmap(Parallel_Hashmap);
+        Initialize_Resource_Usage_Map();
         Initialize_User_Relation_Map(User_Relation_Hashmap);
 
         for (List<Mining_Instance> Single_Mining_Instance : Reader.getSorted_Instance_List()) {
@@ -174,7 +175,7 @@ public class Process_Mining_Miner {
         for (Map.Entry<Mining_Instance, Log_Relation_Data> Complete_Instance_Log : Complete_Log.entrySet()) {
             Log_Relation_Data Log = Complete_Instance_Log.getValue();
             for (Map.Entry<Mining_Instance, List<Mining_Instance>> Single_Instance_Log : Log.getSingle_Mining_Instance_Map().entrySet()) {
-                if (Single_Instance_Log.getValue().size() >= 1) {
+                if (Single_Instance_Log.getValue().size() == 2) {
                     if (!Single_Instance_Log.getValue().get(1).getUsed_Users().isEmpty()) {
                         Mining_Instance Working = Single_Instance_Log.getValue().get(1);
                         for (Mining_User User : Working.getUsed_Users()) {
@@ -188,7 +189,19 @@ public class Process_Mining_Miner {
                         }
                     }
                 }
-                if (Single_Instance_Log.getValue().size() == 2) {
+                if (Single_Instance_Log.getValue().size() == 3) {
+
+                    Mining_Instance Working = Single_Instance_Log.getValue().get(1);
+                    for (Mining_User User : Working.getUsed_Users()) {
+                        if (Timed_Mining_Activity_per_User.containsKey(User)) {
+                            Timed_Mining_Activity_per_User.get(User).add(new Timed_User_Usage_By_Activity(Working.getActivity(), Working.getActivity_Day(), Working.getDuration(), false));
+                        } else {
+                            List<Timed_User_Usage_By_Activity> Timed_activities = new ArrayList<>();
+                            Timed_activities.add(new Timed_User_Usage_By_Activity(Working.getActivity(), Working.getActivity_Day(), Working.getDuration(), false));
+                            Timed_Mining_Activity_per_User.put(User, Timed_activities);
+                        }
+                    }
+
                     Mining_Instance Finishing = Single_Instance_Log.getValue().get(2);
                     for (Mining_User User : Finishing.getUsed_Users()) {
                         if (Timed_Mining_Activity_per_User.containsKey(User)) {
@@ -516,7 +529,7 @@ public class Process_Mining_Miner {
         }
     }
 
-    //TODO Definitiv Anpassen! Auch auf One Step Execution
+
     private List<Relation_Places> generate_max_Set(List<Relation_Places> min_Set,
                                                    HashMap<Integer, HashMap<Integer, Relation_Count>> Relation_Hashmap,
                                                    HashMap<Integer, HashMap<Integer, Relation_Count>> Parallel_Hashmap) {
@@ -818,7 +831,7 @@ public class Process_Mining_Miner {
                     if (!Relations_From_Related_Element.isEmpty()) {
                         for (Mining_Instance Related_From_Related : Relations_From_Related_Element) {
                             if (Related_From_Related.getActivity().getNode_ID() == Source_Instance.getActivity().getNode_ID()) {
-                                Sequence_Hashmap.get(Source_Instance.getActivity().getNode_ID()).get(Related_From_Related.getActivity().getNode_ID()).setRelation_type(Unisequence);
+                                Sequence_Hashmap.get(Source_Instance.getActivity().getNode_ID()).get(Related.getActivity().getNode_ID()).setRelation_type(Unisequence);
                             }
                         }
                     }

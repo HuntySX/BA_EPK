@@ -15,11 +15,9 @@ import guru.nidi.graphviz.model.MutableNode;
 import guru.nidi.graphviz.model.Node;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.company.Process_Mining.Relation_Type.Related;
 import static guru.nidi.graphviz.attribute.Attributes.attr;
@@ -32,8 +30,6 @@ public class Mining_Logger {
     private HashMap<Mining_User, HashMap<Mining_User, Relation_Count>> user_relation_hashmap;
     private HashMap<Mining_Activity, Complete_Time_Activity> time_log_by_activity;
     private List<Transactional_Relation> All_Places;
-    private List<Print_Place> Print_Places;
-    private List<Print_Transition> Print_Transitions;
     private Integer PlaceID;
     private Integer Total_User_Relation_Count;
     private HashMap<Mining_Resource, List<Timed_Resource_Usage_By_Activity>> Timed_Mining_Activity_By_Resource;
@@ -59,8 +55,6 @@ public class Mining_Logger {
         this.All_Places = all_Places;
         this.Timed_Mining_Activity_By_Resource = Timed_Mining_Activity_By_Resource;
         this.Timed_Mining_Activity_per_User = Timed_Mining_Activity_per_User;
-        Print_Places = new ArrayList<>();
-        Print_Transitions = new ArrayList<>();
         PlaceID = 0;
 
         Transitions_To_Places = new HashMap<>();
@@ -72,12 +66,254 @@ public class Mining_Logger {
     public void LogMining() {
 
         GeneratePrintablePlaces();
-
+        Write_User_Activity_Log_To_File();
+        Write_Resource_Activity_Log_To_File();
+        Write_Delay_On_Activity_To_File();
+        Write_Workingtime_On_Activity_To_File();
+        Write_Completetime_On_Activity_To_File();
         try {
             createPetriNet();
             createUserRelationGraph();
         } catch (IOException e) {
+            System.out.println("Graphviz Error Detected. Possible File Problem.");
+        }
+    }
 
+    private void Write_Resource_Activity_Log_To_File() {
+
+        int maxDay = 0;
+        for (Map.Entry<Mining_Resource, List<Timed_Resource_Usage_By_Activity>> Resource_Activities : Timed_Mining_Activity_By_Resource.entrySet()) {
+            for (Timed_Resource_Usage_By_Activity Activity : Resource_Activities.getValue()) {
+                if (Activity.getDay() > maxDay) {
+                    maxDay = Activity.getDay();
+                }
+            }
+        }
+        HashMap<Mining_Resource, List<List<Timed_Resource_Usage_By_Activity>>> Print_HashMap = new HashMap<>();
+        for (Map.Entry<Mining_Resource, List<Timed_Resource_Usage_By_Activity>> Resource_Activities : Timed_Mining_Activity_By_Resource.entrySet()) {
+            List<Timed_Resource_Usage_By_Activity> ActivityList = Resource_Activities.getValue();
+            List<List<Timed_Resource_Usage_By_Activity>> Sorted_Resource_Activity_List = new ArrayList<>();
+            for (int i = 0; i <= maxDay; i++) {
+                List<Timed_Resource_Usage_By_Activity> newDayList = new ArrayList<>();
+                Sorted_Resource_Activity_List.add(newDayList);
+            }
+
+            for (Timed_Resource_Usage_By_Activity Timed_Activity : ActivityList) {
+                List<Timed_Resource_Usage_By_Activity> Daylist = Sorted_Resource_Activity_List.get(Timed_Activity.getDay());
+                if (Daylist.isEmpty()) {
+                    Daylist.add(Timed_Activity);
+                } else {
+                    ListIterator<Timed_Resource_Usage_By_Activity> Iter = Daylist.listIterator();
+                    boolean added = false;
+                    while (Iter.hasNext() && !added) {
+                        Timed_Resource_Usage_By_Activity next = Iter.next();
+                        if (Timed_Activity.getTime().isBefore(next.getTime())) {
+                            Iter.previous();
+                            Iter.add(Timed_Activity);
+                            added = true;
+                        }
+                    }
+                    if (!added) {
+                        Daylist.add(Timed_Activity);
+                    }
+                }
+            }
+            if (Print_HashMap.containsKey(Resource_Activities.getKey())) {
+                System.out.println("Error at puting Userlist to Print_HashMap in Write_User_Activity_Log_To_File");
+            } else {
+                Print_HashMap.put(Resource_Activities.getKey(), Sorted_Resource_Activity_List);
+            }
+        }
+        printResoureHashMapToFile(Print_HashMap);
+    }
+
+    private void printResoureHashMapToFile(HashMap<Mining_Resource, List<List<Timed_Resource_Usage_By_Activity>>> print_hashMap) {
+
+        try {
+            File ResourceUsage = new File("MiningResults/ResourceUsage.txt");
+            FileWriter Writer = new FileWriter(ResourceUsage);
+            File ResourceTime = new File("MiningResults/ResourceTime.txt");
+            FileWriter ResourceTimeWriter = new FileWriter(ResourceUsage);
+            for (Map.Entry<Mining_Resource, List<List<Timed_Resource_Usage_By_Activity>>> Resource_Log : print_hashMap.entrySet()) {
+                int Actvalue = 0;
+                int day = 0;
+                for (List<Timed_Resource_Usage_By_Activity> DayList : Resource_Log.getValue()) {
+                    for (Timed_Resource_Usage_By_Activity Single_Resource_Activity : DayList) {
+                        Actvalue = Actvalue + Single_Resource_Activity.getCount();
+                        Writer.write(Resource_Log.getKey().getName() + "|" + Single_Resource_Activity.getActivity().getActivity_Name() + "|" + day + "|" + Single_Resource_Activity.getTime().toString() + "|" + Actvalue);
+                        Writer.write(System.getProperty("line.separator"));
+                        ResourceTimeWriter.write(Resource_Log.getKey().getName() + "|" + day + "|" + Single_Resource_Activity.getTime().toString() + "|" + Actvalue);
+                        ResourceTimeWriter.write(System.getProperty("line.separator"));
+                    }
+                    day++;
+                }
+            }
+            Writer.close();
+            System.out.println("Wrote ResourceUsage to File ResourceUsage.txt");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void Write_User_Activity_Log_To_File() {
+        int maxDay = 0;
+        for (Map.Entry<Mining_User, List<Timed_User_Usage_By_Activity>> User_Activities : Timed_Mining_Activity_per_User.entrySet()) {
+            for (Timed_User_Usage_By_Activity Activity : User_Activities.getValue()) {
+                if (Activity.getDay() > maxDay) {
+                    maxDay = Activity.getDay();
+                }
+            }
+        }
+        HashMap<Mining_User, List<List<Timed_User_Usage_By_Activity>>> Print_HashMap = new HashMap<>();
+        for (Map.Entry<Mining_User, List<Timed_User_Usage_By_Activity>> User_Activities : Timed_Mining_Activity_per_User.entrySet()) {
+            List<Timed_User_Usage_By_Activity> ActivityList = User_Activities.getValue();
+            List<List<Timed_User_Usage_By_Activity>> Sorted_User_Activity_List = new ArrayList<>();
+            for (int i = 0; i <= maxDay; i++) {
+                List<Timed_User_Usage_By_Activity> newDayList = new ArrayList<>();
+                Sorted_User_Activity_List.add(newDayList);
+            }
+
+            for (Timed_User_Usage_By_Activity Timed_Activity : ActivityList) {
+                List<Timed_User_Usage_By_Activity> Daylist = Sorted_User_Activity_List.get(Timed_Activity.getDay());
+                if (Daylist.isEmpty()) {
+                    Daylist.add(Timed_Activity);
+                } else {
+                    ListIterator<Timed_User_Usage_By_Activity> Iter = Daylist.listIterator();
+                    boolean added = false;
+                    while (Iter.hasNext() && !added) {
+                        Timed_User_Usage_By_Activity next = Iter.next();
+                        if (Timed_Activity.getTime().isBefore(next.getTime())) {
+                            Iter.previous();
+                            Iter.add(Timed_Activity);
+                            added = true;
+                        }
+                    }
+                    if (!added) {
+                        Daylist.add(Timed_Activity);
+                    }
+                }
+            }
+            if (Print_HashMap.containsKey(User_Activities.getKey())) {
+                System.out.println("Error at puting Userlist to Print_HashMap in Write_User_Activity_Log_To_File");
+            } else {
+                Print_HashMap.put(User_Activities.getKey(), Sorted_User_Activity_List);
+            }
+        }
+        printUserHashMapToFile(Print_HashMap);
+    }
+
+    private void printUserHashMapToFile(HashMap<Mining_User, List<List<Timed_User_Usage_By_Activity>>> print_hashMap) {
+        try {
+            File UserUsage = new File("MiningResults/UserUsage.txt");
+            File UserTime = new File("MiningResults/UserAtActivity");
+            FileWriter UsageWriter = new FileWriter(UserUsage);
+            FileWriter UserTimeWriter = new FileWriter(UserTime);
+            for (Map.Entry<Mining_User, List<List<Timed_User_Usage_By_Activity>>> User_Log : print_hashMap.entrySet()) {
+                int day = 0;
+                for (List<Timed_User_Usage_By_Activity> DayList : User_Log.getValue()) {
+                    for (Timed_User_Usage_By_Activity Single_User_Activity : DayList) {
+                        if (Single_User_Activity.isFinishing()) {
+                            UsageWriter.write(User_Log.getKey().getName() + " " + Single_User_Activity.getActivity().getActivity_Name() + "|" + day + "|" + Single_User_Activity.getTime().toString() + "|" + "0");
+                            UsageWriter.write(System.getProperty("line.separator"));
+                            UserTimeWriter.write(User_Log.getKey().getName() + "|" + day + "|" + Single_User_Activity.getTime().toString() + "|" + "0");
+                            UserTimeWriter.write(System.getProperty("line.separator"));
+
+                        } else {
+                            UsageWriter.write(User_Log.getKey().getName() + "|" + Single_User_Activity.getActivity().getActivity_Name() + "|" + day + "|" + Single_User_Activity.getTime().toString() + "|" + "1");
+                            UsageWriter.write(System.getProperty("line.separator"));
+                            UserTimeWriter.write(User_Log.getKey().getName() + "|" + day + "|" + Single_User_Activity.getTime().toString() + "|" + "0");
+                            UserTimeWriter.write(System.getProperty("line.separator"));
+                        }
+                    }
+                    day++;
+                }
+            }
+            UsageWriter.close();
+            System.out.println("Wrote UserUsage to File UserUsage.txt");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    private void Write_Delay_On_Activity_To_File() {
+        try {
+            File Delay = new File("MiningResults/Delay.txt");
+            FileWriter Writer = new FileWriter(Delay);
+            for (Map.Entry<Mining_Activity, Complete_Time_Activity> activity_Times : time_log_by_activity.entrySet()) {
+                for (Time_Log_Data Single_Delay : activity_Times.getValue().getSingle_Instance_Activity_Time()) {
+
+
+                    String result = "" + Single_Delay.getDelay().getSeconds();
+
+                    /*int result = (int)Single_Delay.getDelay().getSeconds();
+                    int Dhours = (int) (Dseconds / 3600);
+                    Dseconds -= Dhours * 3600;
+                    int Dminutes = (int) (Dseconds / 60);
+                    Dseconds -= Dminutes * 60;
+                    String result = ""+ Dhours + ":" + Dminutes + ":" + Dseconds;*/
+
+                    Writer.write(activity_Times.getKey().getActivity_Name() + " " + result);
+                    Writer.write(System.getProperty("line.separator"));
+                }
+            }
+            Writer.close();
+            System.out.println("Wrote Delay to File Delay.txt");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void Write_Completetime_On_Activity_To_File() {
+        try {
+            File Delay = new File("MiningResults/Completetime.txt");
+            FileWriter Writer = new FileWriter(Delay);
+            for (Map.Entry<Mining_Activity, Complete_Time_Activity> activity_Times : time_log_by_activity.entrySet()) {
+                for (Time_Log_Data Single_Delay : activity_Times.getValue().getSingle_Instance_Activity_Time()) {
+
+                    String result = "" + (int) Single_Delay.getWorkingtime().plus(Single_Delay.getDelay()).getSeconds();
+
+                    /*int Cseconds = (int)Single_Delay.getWorkingtime().plus(Single_Delay.getDelay()).getSeconds();
+                    int Chours = (int) (Cseconds / 3600);
+                    Cseconds -= Chours * 3600;
+                    int Cminutes = (int) (Cseconds / 60);
+                    Cseconds -= Cminutes * 60;
+                    String result = ""+ Chours + ":" + Cminutes +":" + Cseconds;*/
+
+                    Writer.write(activity_Times.getKey().getActivity_Name() + " " + result);
+                    Writer.write(System.getProperty("line.separator"));
+                }
+            }
+            Writer.close();
+            System.out.println("Wrote Completetime to File Completetime.txt");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void Write_Workingtime_On_Activity_To_File() {
+        try {
+            File Delay = new File("MiningResults/Workingtime.txt");
+            FileWriter Writer = new FileWriter(Delay);
+            for (Map.Entry<Mining_Activity, Complete_Time_Activity> activity_Times : time_log_by_activity.entrySet()) {
+                for (Time_Log_Data Single_Delay : activity_Times.getValue().getSingle_Instance_Activity_Time()) {
+
+                    String result = "" + (int) Single_Delay.getWorkingtime().getSeconds();
+                        /*int Wseconds = (int)Single_Delay.getWorkingtime().getSeconds();
+                        int Whours = (int) (Wseconds / 3600);
+                        Wseconds -= Whours * 3600;
+                        int Wminutes = (int) (Wseconds / 60);
+                        Wseconds -= Wminutes * 60;
+                        String result = ""+ Whours + ":" + Wminutes +":" + Wseconds;*/
+
+                    Writer.write(activity_Times.getKey().getActivity_Name() + " " + result);
+                    Writer.write(System.getProperty("line.separator"));
+                }
+            }
+            Writer.close();
+            System.out.println("Wrote Workingtime to File Workingtime.txt");
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -143,8 +379,8 @@ public class Mining_Logger {
                 List<Attributes<? extends ForLink>> Attributes = new ArrayList<>();
                 List<Attributes<? extends ForLink>> Style = new ArrayList<>();
                 if (User_to.getValue().getRelation_type() == Related) {
-                    Attributes.add(attr("weight", User_to.getValue().getCount() / Total_User_Relation_Count));
-                    Attributes.add(attr("label", User_to.getValue().getCount() / Total_User_Relation_Count));
+                    Attributes.add(attr("weight", (float) User_to.getValue().getCount() / Total_User_Relation_Count));
+                    Attributes.add(attr("label", (float) User_to.getValue().getCount() / Total_User_Relation_Count));
                     Nodelist.add(node(User_From.getKey().getName())
                             .link(to(node(User_to.getKey().getName()))
                                     .with(Attributes)));

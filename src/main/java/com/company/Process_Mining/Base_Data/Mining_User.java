@@ -30,7 +30,7 @@ public class Mining_User {
     }
 
     public String getName() {
-        return name;
+        return name + " " + lastname;
     }
 
     public void setName(String name) {
