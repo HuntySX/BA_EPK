@@ -50,6 +50,14 @@ public class Discrete_Event_Simulator {
 
     }
 
+    //Main simulation Method. Checks the Goal of the instance_Workflow object and, decided by its type, handles the
+    //needed simulation for this Event.
+    //Runs as Long as there are Events to handle in a second, then it gives the calendar with the push() Method the order
+    //to Jump to the next Time.
+    //If there are no more Events to handle, the Simulator stops with the isFinishedCycle() boolean.
+    //The Simulator also pushes LazyGates, as soon as there are no more Events to Handle.
+    //For Functions, there are two outsourced Methods (activateFunction / deactivateFunction) wich both take/free Resources
+    //and users and instantiate a new Event in the calendar.
     public void run() {
         boolean pushed_new_Elements = false;
         while (!event_Calendar.isFinished_cycle()) {
@@ -62,6 +70,8 @@ public class Discrete_Event_Simulator {
                 Instance_Workflow to_Run = event_Decider.Decide_Event(latest_Instances, waiting_list);
                 while (to_Run != null) {
 
+                    //if Goal is an Event, Check if its an End Event. Else instantiate a new
+                    // instance_Workflow for the Successor of this Node
                     if (to_Run.getEPKNode() instanceof Event) {
 
                         to_Run.getInstance().add_To_Finished_Work(to_Run.getEPKNode());
@@ -154,6 +164,8 @@ public class Discrete_Event_Simulator {
                             }
                         }
                     }
+                    //if Goal is an Event_Con_Split, get with choose_Next(), based on Split Type, a list of successors.
+                    //instantiates a new instance_Workflow for each successor and adds them to the calendar.
                     if (to_Run.getEPKNode() instanceof Event_Con_Split) {
                         to_Run.getInstance().add_To_Finished_Work(to_Run.getEPKNode());
                         List<EPK_Node> Next_Elem = ((Event_Con_Split) to_Run.getEPKNode()).choose_Next();
@@ -203,6 +215,11 @@ public class Discrete_Event_Simulator {
                         }
 
                     }
+                    //If Goal is a Event_Con_Join, calculate the Status of the Gate for this Instance, i.e. if the Gate
+                    //says the instance can move on, it generates a new instance_Workflow for the successor.
+                    //if it is blocked (through wrong Requirements) the instance_Workflow is dropped. If it is Delayed
+                    //it checks if this Instance is already waiting at this gate and block it, or it is putting a new
+                    //Object on the Waiting List of the Gate.
                     if (to_Run.getEPKNode() instanceof Event_Con_Join) {
 
                         Gate_Check_Status check = ((Event_Con_Join) to_Run.getEPKNode()).check_Previous_Elem(to_Run);
@@ -272,7 +289,6 @@ public class Discrete_Event_Simulator {
                                     int days = event_Calendar.getNextInstanceDay(to_Run);
                                     if (days != -1) {
                                         to_Run.getInstance().add_To_Scheduled_Work(to_Run.getEPKNode());
-                                        //TODO +1sec
                                         Instance_Workflow new_Instance = new Instance_Workflow(to_Run.getInstance(), to_check.plusSeconds(1), to_Run.getEPKNode());
                                         new_Instance.setWaiting_At_Gate(to_Run.getWaiting_At_Gate());
                                         event_Calendar.Add_To_Upcoming_List(new_Instance, days);
@@ -286,6 +302,8 @@ public class Discrete_Event_Simulator {
                             System.out.println("Instancecopy killed at Gate, Check Error");
                         }
                     }
+                    //If the Goal is an External_XOR_Split, Calculate, based on the Runtime of the Previous Function, the
+                    //successor the new instance_Workflow should take (Yes,No,Timeout).
                     if (to_Run.getEPKNode() instanceof External_XOR_Split && to_Run instanceof Instance_Workflow_XOR) {
 
                         EPK_Node next = ((External_XOR_Split) to_Run.getEPKNode()).getPath((Instance_Workflow_XOR) to_Run);
@@ -340,6 +358,11 @@ public class Discrete_Event_Simulator {
                             }
                         }
                     }
+                    //If the Goal is an Activating Function, calculate Chance for new instance on the second EPK.
+                    //If it instantiates a new instance, the original one is put on a waiting_list until the arrival of
+                    //the new one. Else, if its a newly generated instance that visites this goal it reactives the original
+                    //instance_Workflow for the next successor. if the Chance didn´t roll for it, the original instance_Workflow
+                    // just gets pushed forward.
                     if (to_Run.getEPKNode() instanceof Activating_Function) {
                         if (to_Run.getInstance() instanceof Activating_Event_Instance && ((Activating_Event_Instance) to_Run.getInstance()).getEnd_Function() == to_Run.getEPKNode()) {
                             Instance_Workflow for_Workflow = ((Activating_Event_Instance) to_Run.getInstance()).getFor_case_ID();
@@ -386,6 +409,8 @@ public class Discrete_Event_Simulator {
                             }
                         }
                     }
+                    //If the Goal is a External Function, Calculate a Runtime for the instance and save it for the Simulation_Instance
+                    //on the External_XOR_Split.
                     if (to_Run.getEPKNode() instanceof External_Function) {
 
                         if (to_Run instanceof Instance_Workflow_XOR) {
@@ -416,6 +441,9 @@ public class Discrete_Event_Simulator {
                         }
 
                     }
+                    //If the Goal is a Basic Function, depending on the Transitiontype of the instance (isWorking()) if it
+                    //has to be activated or deactivated for this function. This Code uses the Methods
+                    // activateFunction() / deactivateFunction() described further down
                     if (to_Run.getEPKNode() instanceof Function && !(to_Run.getEPKNode() instanceof Activating_Function) && !(to_Run.getEPKNode() instanceof External_Function)) {
 
                         boolean firstactivation = false;
@@ -441,13 +469,14 @@ public class Discrete_Event_Simulator {
                     }
 
                     //Actualize new Working Upcoming and Working List for Every Type of Node
-                    //Get next torun, if empty, go back to while, end it, and start event_Calendar.jump()
+                    //Get next toRun, if empty, go back to while, end it, and start event_Calendar.jump()
                     upcoming_Events = event_Calendar.get_Single_Upcoming_List(event_Calendar.getAct_runtimeDay());
                     waiting_list = event_Calendar.getWaiting_List();
                     latest_Instances.addAll(upcoming_Events.getByTime(event_Calendar.getRuntime()));
                     to_Run = event_Decider.Decide_Event(latest_Instances, waiting_list);
 
                     if (to_Run == null) {
+                        //pushLazyGateInstances to generate possible new Simulation_events in this Second.
                         pushed_new_Elements = pushLazyGateInstances();
                         if (pushed_new_Elements) {
                             upcoming_Events = event_Calendar.get_Single_Upcoming_List(event_Calendar.getAct_runtimeDay());
@@ -459,6 +488,7 @@ public class Discrete_Event_Simulator {
                     }
                 }
                 if (to_Run == null) {
+                    //Add all unhandled instance_Workflow objects to the Waiting_list for Delayed Workflows
                     if (!latest_Instances.isEmpty()) {
                         for (Instance_Workflow Instance : latest_Instances) {
                             event_Calendar.Add_To_Waiting_List(Instance);
@@ -474,6 +504,9 @@ public class Discrete_Event_Simulator {
         }
     }
 
+
+    //Pushes Lazygates. This Method is called at the end of one Timeunit. This guarantees that all instance_Workflows
+    // that reach a Gate in the same second are handled in the Same gate Check.
     private boolean pushLazyGateInstances() {
         boolean pushed = false;
         for (EPK_Node Gate : EPK.getElements()) {
@@ -550,6 +583,7 @@ public class Discrete_Event_Simulator {
     //------------------------------------------------------------------------------------------------------------------
     //------------------------------------------------------------------------------------------------------------------
 
+    //Gets all Users and Resources from a Used Function an frees them.
     private void DeactivateFunction(Instance_Workflow to_Run, int day) {
         to_Run.setWorking(false);
         List<User> SetUsersFree = to_Run.getActive_User();
@@ -571,7 +605,6 @@ public class Discrete_Event_Simulator {
             }
         }
 
-        //Add Function as Finished and get next Elements
         List<EPK_Node> Next_Elem = to_Run.getEPKNode().getNext_Elem();
         to_Run.getInstance().add_To_Finished_Work(to_Run.getEPKNode());
 
@@ -610,7 +643,7 @@ public class Discrete_Event_Simulator {
         SetUsersFree.clear();
         SetResourceFree.clear();
 
-        //Instantiate new Workflow for each Element in GetNext_Elem
+        //Instantiate new Workflow for each sucessor of the deactivated Function Node
         for (EPK_Node n : Next_Elem) {
             to_Run.getInstance().add_To_Scheduled_Work(n);
 
@@ -669,6 +702,8 @@ public class Discrete_Event_Simulator {
     //------------------------------------------------------------------------------------------------------------------
     //------------------------------------------------------------------------------------------------------------------
 
+    //Like deactivatingFunction(), but here it reserves Resources and Users. A new instance_Workflow object is called
+    //with the same Function as a Goal but with isWorking() = true.
     private void ActivateFunction(Instance_Workflow to_Run, int day) {
         boolean error = false;
         List<Resource> CalculateResource = new ArrayList<>();
@@ -745,6 +780,9 @@ public class Discrete_Event_Simulator {
         } else {
             //TODO generate OPTIMAL LAYOUT
         }
+        //get the Duration of the Simulation and check if it is simulateable within the same day or if it needs to be
+        //started at the next day (optionally start it irrelevant of the remaining Daytime if the simulation
+        // is setup this way
         if (!error) {
             LocalTime Duration = event_Calendar.getRuntime();
             int lasting_Shifttime_in_Seconds = event_Calendar.getEnd_Time().toSecondOfDay() - event_Calendar.getRuntime().toSecondOfDay();
@@ -759,7 +797,7 @@ public class Discrete_Event_Simulator {
 
 
             if (Workingtime_in_Seconds <= lasting_Shifttime_in_Seconds) {
-
+                // add new instance Workflow to Upcoming List, reserve all used Users and Resources
                 Instance_Workflow Running_Instance = new Instance_Workflow(to_Run.getInstance(), Duration, to_Run.getEPKNode(), to_Run.isWorking());
                 Running_Instance.Add_Active_Users(CalculateUsers);
                 Running_Instance.Add_Active_Resources(CalculateResource);
@@ -796,6 +834,8 @@ public class Discrete_Event_Simulator {
                     }
                 }
             } else {
+                //Calculate each Day that needs to pass until this simulation is finished, then add the instance_Workflow
+                //into that Upcoming list.
                 Workingtime_in_Seconds = Workingtime_in_Seconds - lasting_Shifttime_in_Seconds;
                 int Shifttime_in_Seconds = event_Calendar.getEnd_Time().toSecondOfDay() - event_Calendar.getBegin_Time().toSecondOfDay();
                 int advanceday = 1;

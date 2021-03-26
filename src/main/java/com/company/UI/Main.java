@@ -33,17 +33,17 @@ public class Main extends Application {
         Parent root = loader.load();
         Scene scene = new Scene(root, 1600, 900);
 
-        Borderpanecon borderpanecon = loader.getController();
-        BorderPane pane = borderpanecon.getCanvaspane();
-        VBox Box = borderpanecon.getRightbox();
+        UI_Controller UIController = loader.getController();
+        BorderPane pane = UIController.getCanvaspane();
+        VBox Box = UIController.getRightbox();
 
-        borderpanecon.initializeButtons();
+        UIController.initializeButtons();
 
-        graph = new Graph(Box, borderpanecon);
+        graph = new Graph(Box, UIController);
 
-        borderpanecon.setModel(graph.getModel());
-        borderpanecon.setEPK(graph.getModel().getEPK());
-        borderpanecon.setPrimaryStage(primaryStage);
+        UIController.setModel(graph.getModel());
+        UIController.setEPK(graph.getModel().getEPK());
+        UIController.setPrimaryStage(primaryStage);
 
         pane.setCenter(graph.getScrollPane());
 

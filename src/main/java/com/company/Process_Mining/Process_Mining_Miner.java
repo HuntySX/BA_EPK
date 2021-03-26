@@ -9,8 +9,8 @@ import java.util.*;
 
 import static com.company.Process_Mining.Relation_Type.*;
 
+//Mainclass of the Process Mining,
 public class Process_Mining_Miner {
-
 
     private final Process_Mining_Settings Mining_Settings;
     private Process_Mining_JSON_Read Reader;
@@ -25,7 +25,7 @@ public class Process_Mining_Miner {
     private HashMap<Integer, List<LocalTime>> Completetime_per_Instance_On_Activity;
     private HashMap<Mining_Instance, Log_Relation_Data> Complete_Log;
     private HashMap<Mining_Activity, Complete_Time_Activity> Time_Log_By_Activity;
-    private List<Transactional_Relation> All_Places;
+    private List<Transition_Relation> All_Places;
     private Integer Total_User_Relation_Count;
     private HashMap<Integer, Mining_Activity> Activity_Hashmap;
     private Mining_Logger Print_To_File;
@@ -62,35 +62,36 @@ public class Process_Mining_Miner {
 
     public void start_Mining() {
         System.out.println("Starting Filter");
-
         FilterLog();
-
     }
 
+
     private void FilterLog() {
-
-
         FilterByActivity();
         Initialize_Activity_Time_Map(Delay_per_Instance_On_Activity);
         Initialize_Activity_Time_Map(Workingtime_per_Instance_On_Activity);
         Initialize_Activity_Time_Map(Completetime_per_Instance_On_Activity);
-        //TODO FILL Hashmaps on Relationdecider
         FilterByActivityWorkingTime();
-        //FilterByUserWorkingTime();
-        //FilterByResourceWorkingTime();
+        //FilterByUserWorkingTime(); Obsolete
+        //FilterByResourceWorkingTime(); Obsolete
         generate_Extended_Alpha_Mapping();
+        //Mining Logger prints the extended analysis into several Files for further Research in Python or Excel
         Print_To_File = new Mining_Logger(Activity_Hashmap, User_Relation_Hashmap, Total_User_Relation_Count, Timed_Mining_Activity_per_User, Timed_Mining_Activity_By_Resource, Time_Log_By_Activity, All_Places);
         Print_To_File.LogMining();
-
     }
 
     private void generate_Extended_Alpha_Mapping() {
 
+        //Used for Relations Related and followed by.
         HashMap<Integer, HashMap<Integer, Relation_Count>> Relation_Hashmap = new HashMap<>();
+        //Used for Relations 2-Step-Sequence
         HashMap<Integer, HashMap<Integer, Relation_Count>> Sequence_Hashmap = new HashMap<>();
         HashMap<Integer, HashMap<Integer, Relation_Count>> Parallel_Hashmap = new HashMap<>();
         HashMap<Integer, HashMap<Integer, Relation_Count>> One_Loop_Map = new HashMap<>();
 
+        //Initialize all Hashmaps based on the Activities found in the Log (i.e. every Hashmap is a table mapping
+        //each Activity to each activity in the form of single Cells of the Table) and for the Userrelation Hashmap
+        //and the Resource Usage Hashmap
         Initialize_Activity_HashMap();
         Initialize_Activity_Relation_Hashmap(Relation_Hashmap);
         Initialize_Activity_Relation_Hashmap(Sequence_Hashmap);
@@ -98,32 +99,57 @@ public class Process_Mining_Miner {
         Initialize_Resource_Usage_Map();
         Initialize_User_Relation_Map(User_Relation_Hashmap);
 
+        //Checks for Activity Relation in the Caselist i.e. it generates a Process Tree for each Case
+        //in the Form that there are two Hashmaps in the End. One which maps each Mining_instance to its Pairs
+        //(i.e. Begining, Working, Ending a Event) and one wich Maps every started Mining_instance to their directly
+        //followed Mining_Instances (i.e. those that Begin in the same Second as those that finish)
+        //right now it only does this based on Mining_Instances which are Generated for Logevents for EPK-Functions.
         for (List<Mining_Instance> Single_Mining_Instance : Reader.getSorted_Instance_List()) {
             check_For_Activity_Relation(Relation_Hashmap, Single_Mining_Instance);
         }
+        //Calculates User Relation based on the Processtree discovered.
         Calculate_User_Relations();
+        //Calculate Userusage on a Activity and ResourceUsage
         Calculate_User_At_ActivityMap();
         Calculate_Resource_Usage();
+        //Calculates the Complete Delay and Workingtime for each distinct Activity in the Log
         Calculate_Times_At_Activities();
+        //Process Tree discovery of Relation between Activities
         generate_enhanced_Dependency(Relation_Hashmap);
+        //Generates Final_Place (i.e it searches for the Last Activities that are used and
+        // generates a Place as a successor for them
         generate_Final_Places(Relation_Hashmap);
+        //Identify 1-Step Loops based on the Process Tree Discovery of Relations and Marks their ID´s
         List<Integer> Mark_For_One_Loops = Identify_One_Step_Loops(Relation_Hashmap);
+        //Delete Loops from the Hashmaps and re-relate all Incoming Relations of the Loops to the outgoing Relations of them.
         Preprocess_One_Loops(Relation_Hashmap, Mark_For_One_Loops, One_Loop_Map);
+        //Identify 2-step Loops based on the Process Trees of Cases
         Identify_Two_Step_Loops(Relation_Hashmap, Sequence_Hashmap);
+        //calculate the Followed By Relation based on the Process Tree Discovered Related and Bisequence Relation
         generate_Direct_Dependency(Relation_Hashmap, Sequence_Hashmap);
+        //calculate Parallelism based on the Process Tree Discovered Related and Bisequence Relation
         generate_Activity_Parallel_Execution(Relation_Hashmap, Sequence_Hashmap, Parallel_Hashmap);
-        Identify_Two_Step_Loops(Relation_Hashmap, Sequence_Hashmap);
         List<Relation_Places> Min_Set = new ArrayList<>();
+        //Step 4 of the Basic Alpha Algorithm on the Relations without 1-Step-Loop Activities.
         generate_Min_Places(Min_Set, Relation_Hashmap);
+        //Just to be sure
         Clean_Min_Places(Min_Set, Relation_Hashmap);
+        //Step 5 of the Basic Alpha ALgorithm
         List<Relation_Places> Max_Set = generate_max_Set(Min_Set, Parallel_Hashmap, Relation_Hashmap);
-        List<Transactional_Relation> Transaction_Relations = getTransactional_Relations(Max_Set);
-        List<Transactional_Relation> possibleLoopTransitions = getPossibleLoopTransactional_Relations(Mark_For_One_Loops, Max_Set);
-        List<Transactional_Relation> LoopPlaces = PostProcess_One_Loops(possibleLoopTransitions, One_Loop_Map, Mark_For_One_Loops);
-        Transaction_Relations.addAll(LoopPlaces);
-        Transaction_Relations.addAll(GenerateTransactional_Relation_Final());
-        Transaction_Relations.addAll(GenerateTransactional_Relation_Start());
-        All_Places = Transaction_Relations;
+        //The Previous Steps 4 and 5 implicitly generate Places generated in Step 6 of Alpha
+
+        //Generate Transitions based on the Activities in the Log and connect them to the Places calculated by Alpha
+        //(i.e. Step 7)
+        List<Transition_Relation> Transition_Relations = getTransition_Relations(Max_Set);
+        //Postprocess Phase, Calculate Possible Loop Places and the according Transitions for the deleted 1-Loop Activities
+        List<Transition_Relation> possibleLoopTransitions = getPossibleLoopTransition_Relations(Mark_For_One_Loops, Max_Set);
+        //Based on the Possible Transition/Place Relations, calculate the exact needed Places for those Activities
+        List<Transition_Relation> LoopPlaces = PostProcess_One_Loops(possibleLoopTransitions, One_Loop_Map, Mark_For_One_Loops);
+        //Add All Loop Places to the Transition Relations, and calculate Transition Relations for the Start and Final Place.
+        Transition_Relations.addAll(LoopPlaces);
+        Transition_Relations.addAll(GenerateTransactional_Relation_Final());
+        Transition_Relations.addAll(GenerateTransactional_Relation_Start());
+        All_Places = Transition_Relations;
     }
 
     private void Initialize_Activity_Relation_Hashmap(HashMap<Integer, HashMap<Integer, Relation_Count>> relation_hashmap) {
@@ -169,9 +195,9 @@ public class Process_Mining_Miner {
         }
     }
 
-
+    //Searches for Mining_Instance Objects, which Used a User. inserts on a Map for this User a List of All Mining_Instance Object which
+    // Used that User i.e this Method calculates a Hashmap wich maps a User to all its occurences in Mining_Instances.
     private void Calculate_User_At_ActivityMap() {
-        //Timed_Mining_Activity_per_User
         for (Map.Entry<Mining_Instance, Log_Relation_Data> Complete_Instance_Log : Complete_Log.entrySet()) {
             Log_Relation_Data Log = Complete_Instance_Log.getValue();
             for (Map.Entry<Mining_Instance, List<Mining_Instance>> Single_Instance_Log : Log.getSingle_Mining_Instance_Map().entrySet()) {
@@ -219,7 +245,7 @@ public class Process_Mining_Miner {
 
     }
 
-    private List<Transactional_Relation> GenerateTransactional_Relation_Start() {
+    private List<Transition_Relation> GenerateTransactional_Relation_Start() {
         Relation_Places Start = new Relation_Places();
         List<Integer> Start_IDs = new ArrayList<>();
         Start.setStart(true);
@@ -229,24 +255,24 @@ public class Process_Mining_Miner {
                 Start.getTo().add(Start_Activity);
             }
         }
-        List<Transactional_Relation> Resultlist = new ArrayList<>();
+        List<Transition_Relation> Resultlist = new ArrayList<>();
         for (Integer Start_ID : Start_IDs) {
-            Transactional_Relation newStartRelation = new Transactional_Relation(Start_ID, Start, false);
+            Transition_Relation newStartRelation = new Transition_Relation(Start_ID, Start, false);
             Resultlist.add(newStartRelation);
         }
         return Resultlist;
     }
 
-    private List<Transactional_Relation> GenerateTransactional_Relation_Final() {
+    private List<Transition_Relation> GenerateTransactional_Relation_Final() {
         List<Integer> Final_IDs = new ArrayList<>();
         for (Mining_Activity Final_Activity : Final_Place.getFrom()) {
             if (!Final_IDs.contains(Final_Activity.getNode_ID())) {
                 Final_IDs.add(Final_Activity.getNode_ID());
             }
         }
-        List<Transactional_Relation> Resultlist = new ArrayList<>();
+        List<Transition_Relation> Resultlist = new ArrayList<>();
         for (Integer Final_ID : Final_IDs) {
-            Transactional_Relation FinalRelation = new Transactional_Relation(Final_ID, Final_Place, true);
+            Transition_Relation FinalRelation = new Transition_Relation(Final_ID, Final_Place, true);
             Resultlist.add(FinalRelation);
         }
         return Resultlist;
@@ -259,27 +285,28 @@ public class Process_Mining_Miner {
             if (!Activity_Hashmap.containsKey(Activity.getNode_ID())) {
                 Activity_Hashmap.put(Activity.getNode_ID(), Activity);
             } else {
-                System.out.println("Error puting new Activity Key to ActivityHashmap (LoopTransaction.java)");
+                System.out.println("Error puting new Activity Key to ActivityHashmap (LoopTransition.java)");
             }
         }
 
     }
 
-    private List<Transactional_Relation> getPossibleLoopTransactional_Relations(List<Integer> mark_for_one_loops,
-                                                                                List<Relation_Places> max_set) {
-        List<Transactional_Relation> Resultlist = new ArrayList<>();
+    //Generates all possible Transitions/Place Combination of Loop Transitions, based on the Max_Set Places by Alpha.
+    private List<Transition_Relation> getPossibleLoopTransition_Relations(List<Integer> mark_for_one_loops,
+                                                                          List<Relation_Places> max_set) {
+        List<Transition_Relation> Resultlist = new ArrayList<>();
         for (Integer ID : mark_for_one_loops) {
             for (Relation_Places place : max_set) {
-                Transactional_Relation newLeftRelation = new Transactional_Relation(ID, place, true);
-                Transactional_Relation newRightRelation = new Transactional_Relation(ID, place, false);
+                Transition_Relation newLeftRelation = new Transition_Relation(ID, place, true);
+                Transition_Relation newRightRelation = new Transition_Relation(ID, place, false);
                 Resultlist.add(newLeftRelation);
                 Resultlist.add(newRightRelation);
             }
         }
 
-        List<Transactional_Relation> Mark_For_Deletion = new ArrayList<>();
-        for (Transactional_Relation first : Resultlist) {
-            for (Transactional_Relation second : Resultlist) {
+        List<Transition_Relation> Mark_For_Deletion = new ArrayList<>();
+        for (Transition_Relation first : Resultlist) {
+            for (Transition_Relation second : Resultlist) {
                 if (!first.equals(second) && !Mark_For_Deletion.contains(first) && !Mark_For_Deletion.contains(second) && first.isSame(second)) {
                     Mark_For_Deletion.add(second);
                 }
@@ -289,8 +316,8 @@ public class Process_Mining_Miner {
         return Resultlist;
     }
 
-    private List<Transactional_Relation> getTransactional_Relations(List<Relation_Places> max_set) {
-        List<Transactional_Relation> Resultlist = new ArrayList<>();
+    private List<Transition_Relation> getTransition_Relations(List<Relation_Places> max_set) {
+        List<Transition_Relation> Resultlist = new ArrayList<>();
         for (Relation_Places Place : max_set) {
             Resultlist.addAll(generateLeftTransaction(Place));
             Resultlist.addAll(generateRightTransaction(Place));
@@ -298,9 +325,9 @@ public class Process_Mining_Miner {
 
         //Clean Transactional_Relation_Place From Double Entries
 
-        List<Transactional_Relation> Mark_For_Deletion = new ArrayList<>();
-        for (Transactional_Relation first : Resultlist) {
-            for (Transactional_Relation second : Resultlist) {
+        List<Transition_Relation> Mark_For_Deletion = new ArrayList<>();
+        for (Transition_Relation first : Resultlist) {
+            for (Transition_Relation second : Resultlist) {
                 if (!first.equals(second) && !Mark_For_Deletion.contains(first) && !Mark_For_Deletion.contains(second) && first.isSame(second)) {
                     Mark_For_Deletion.add(second);
                 }
@@ -310,19 +337,19 @@ public class Process_Mining_Miner {
         return Resultlist;
     }
 
-    private List<Transactional_Relation> generateLeftTransaction(Relation_Places place) {
-        List<Transactional_Relation> leftList = new ArrayList<>();
+    private List<Transition_Relation> generateLeftTransaction(Relation_Places place) {
+        List<Transition_Relation> leftList = new ArrayList<>();
         for (Mining_Activity Activity : place.getFrom()) {
-            Transactional_Relation newRelation = new Transactional_Relation(Activity.getNode_ID(), place, true);
+            Transition_Relation newRelation = new Transition_Relation(Activity.getNode_ID(), place, true);
             leftList.add(newRelation);
         }
         return leftList;
     }
 
-    private List<Transactional_Relation> generateRightTransaction(Relation_Places place) {
-        List<Transactional_Relation> rightList = new ArrayList<>();
+    private List<Transition_Relation> generateRightTransaction(Relation_Places place) {
+        List<Transition_Relation> rightList = new ArrayList<>();
         for (Mining_Activity Activity : place.getTo()) {
-            Transactional_Relation newRelation = new Transactional_Relation(Activity.getNode_ID(), place, false);
+            Transition_Relation newRelation = new Transition_Relation(Activity.getNode_ID(), place, false);
             rightList.add(newRelation);
         }
         return rightList;
@@ -384,6 +411,8 @@ public class Process_Mining_Miner {
         }
     }
 
+    //Searches for Mining_Instance Objects, which Used a Resource. inserts on a Map for this Resource a List of All Mining_Instance Object which
+    // Used that Resource i.e this Method calculates a Hashmap wich maps a Resource to all its occurences in Mining_Instances.
     private void Calculate_Resource_Usage() {
         for (Map.Entry<Mining_Instance, Log_Relation_Data> Instance_Log : Complete_Log.entrySet()) {
             HashMap<Mining_Instance, List<Mining_Instance>> Single_Instance_Activity_Map = Instance_Log.getValue().getSingle_Mining_Instance_Map();
@@ -407,6 +436,9 @@ public class Process_Mining_Miner {
         }
     }
 
+    //traverses the Process trees and Checks if for each distinct activity, and its successors, Users where used.
+    //if yes, it adds a Relation into the User_Relation_Hashmap which relates each User of the Activity to the Users of the Successor.
+    //Also each Relation is Counted to get additional information about how often the communication between to two Users happens.
     private void Calculate_User_Relations() {
         for (Map.Entry<Mining_Instance, Log_Relation_Data> Instance_Log : Complete_Log.entrySet()) {
             HashMap<Mining_Instance, List<Mining_Instance>> Instance_Relation_Log = Instance_Log.getValue().getMining_Instances_Relations();
@@ -455,6 +487,7 @@ public class Process_Mining_Miner {
         }
     }
 
+    //Helper Method to Delete Places which are a direct Copy of Another.
     private void Clean_Min_Places(List<Relation_Places> min_set, HashMap<Integer, HashMap<Integer, Relation_Count>> relation_hashmap) {
         List<Relation_Places> Mark_For_Deletion = new ArrayList<>();
         for (Relation_Places relation : min_set) {
@@ -493,6 +526,9 @@ public class Process_Mining_Miner {
         }
     }
 
+    //Alpha-Algorithm Method to generate a Set of Minimal Places (i.e. the Step 4 of the ALpha-Algorithm)
+    //It Generates a Relation_Place Object for each Followed By Relation, with the Source Activity in a From-list and the sink Activity
+    //in a To-List.
     private void generate_Min_Places(List<Relation_Places> min_set, HashMap<Integer, HashMap<Integer, Relation_Count>> relation_Hashmap) {
         HashMap<Integer, Mining_Activity> All_Activities = new HashMap<>();
         for (Map.Entry<Integer, HashMap<Integer, Relation_Count>> Relation_By_Single_Elem : relation_Hashmap.entrySet()) {
@@ -530,6 +566,8 @@ public class Process_Mining_Miner {
     }
 
 
+    //Alpha-Algorithm Step 5, generates a overarching Set of Places, based on the min_Set, which fuse Places of the Minimal Places together.
+    //For Each overarching Place, all Distinct Activities of the From and To, Part have to be unrelated to each other.
     private List<Relation_Places> generate_max_Set(List<Relation_Places> min_Set,
                                                    HashMap<Integer, HashMap<Integer, Relation_Count>> Relation_Hashmap,
                                                    HashMap<Integer, HashMap<Integer, Relation_Count>> Parallel_Hashmap) {
@@ -607,6 +645,7 @@ public class Process_Mining_Miner {
         return ResultList;
     }
 
+
     private void generate_Final_Places(HashMap<Integer, HashMap<Integer, Relation_Count>> Relation_Hashmap) {
         List<Mining_Activity> Final_Activities = new ArrayList<>();
         for (Map.Entry<Integer, HashMap<Integer, Relation_Count>> Relation_By_Single_Elem : Relation_Hashmap.entrySet()) {
@@ -670,7 +709,8 @@ public class Process_Mining_Miner {
     }
 
 
-    //TODO NEW RULES!
+    //Calculates the Followed By Relation for Each Activity Set if they are Related in one way, not in both ways,
+    //or if they are Related and in a Bisequence
     private void generate_Direct_Dependency(HashMap<Integer, HashMap<Integer, Relation_Count>> Relation_Hashmap,
                                             HashMap<Integer, HashMap<Integer, Relation_Count>> Sequence_Hashmap) {
 
@@ -687,7 +727,8 @@ public class Process_Mining_Miner {
         }
     }
 
-    //TODO NEW RULES!
+    //Calculates the Parallel  Relation for Each Activity Set if they are Related in both ways, not in one ways,
+    //and if they are not in a Bisequence
     private void generate_Activity_Parallel_Execution(HashMap<Integer, HashMap<Integer, Relation_Count>> Relation_Hashmap,
                                                       HashMap<Integer, HashMap<Integer, Relation_Count>> Sequence_Hashmap,
                                                       HashMap<Integer, HashMap<Integer, Relation_Count>> Parallel_Hashmap) {
@@ -720,11 +761,17 @@ public class Process_Mining_Miner {
         return Mark_For_One_Loop;
     }
 
+    //Based on the Marked for Loops Integerlist, it Searches the Relations Hashmap for each ID and reconnects all incoming Relations to the outgoing Relations
+
     private void Preprocess_One_Loops(HashMap<Integer, HashMap<Integer, Relation_Count>> Relation_Hashmap, List<Integer> Mark_For_One_Loop, HashMap<Integer, HashMap<Integer, Relation_Count>> One_Loop_Map) {
+
+
+        //Copy the Relations of the Loop into a cached Hashmap for the later re-adding of the Loops.
         for (Integer ID : Mark_For_One_Loop) {
             One_Loop_Map.put(ID, Relation_Hashmap.get(ID));
             Relation_Hashmap.remove(ID);
 
+            //Re-relate each incoming Relation of a 1-Step-Loop Activity to the all Outgoing Relations of that Activity.
             for (Map.Entry<Integer, HashMap<Integer, Relation_Count>> Relation_From_Single_Element : Relation_Hashmap.entrySet()) {
                 for (Map.Entry<Integer, Relation_Count> Relation_To_Single_Element : Relation_From_Single_Element.getValue().entrySet()) {
                     if (Relation_To_Single_Element.getValue().getRelation_type() == Related && Relation_To_Single_Element.getKey().equals(ID)) {
@@ -737,6 +784,7 @@ public class Process_Mining_Miner {
                 }
             }
 
+            //Remove the 1-Loop-Activity from the Relation Hashmap
             for (Map.Entry<Integer, HashMap<Integer, Relation_Count>> Relation_From_Single_Element : Relation_Hashmap.entrySet()) {
                 if (Relation_From_Single_Element.getValue().get(ID).getRelation_type() == Related) {
                     if (One_Loop_Map.containsKey(Relation_From_Single_Element.getKey())) {
@@ -762,11 +810,15 @@ public class Process_Mining_Miner {
         }
     }
 
-    private List<Transactional_Relation> PostProcess_One_Loops(List<Transactional_Relation> possibleTransitions, HashMap<Integer, HashMap<Integer, Relation_Count>> one_Loop_Map, List<Integer> mark_For_One_Loops) {
-        List<Transactional_Relation> ResultingLoopPlaces = new ArrayList<>();
-        List<Transactional_Relation> possibleLoopPlaces = generateLoopSet(mark_For_One_Loops, one_Loop_Map);
-        for (Transactional_Relation TransitionPlace : possibleTransitions) {
-            for (Transactional_Relation LoopPlace : possibleLoopPlaces) {
+    //generate in generateLoopSet() all Possible Transition/Place Relations for 1-Step-Loop Activities, based on the
+    //Relations of those Activities (in Contrast to the Max Set Places).
+    private List<Transition_Relation> PostProcess_One_Loops(List<Transition_Relation> possibleTransitions, HashMap<Integer, HashMap<Integer, Relation_Count>> one_Loop_Map, List<Integer> mark_For_One_Loops) {
+        List<Transition_Relation> ResultingLoopPlaces = new ArrayList<>();
+        List<Transition_Relation> possibleLoopPlaces = generateLoopSet(mark_For_One_Loops, one_Loop_Map);
+
+        //Only Chose those Transition/Place Combination that was calculated by the Max_Set Combination AND the Relation Combination
+        for (Transition_Relation TransitionPlace : possibleTransitions) {
+            for (Transition_Relation LoopPlace : possibleLoopPlaces) {
                 if (TransitionPlace.isSame(LoopPlace) && !ResultingLoopPlaces.contains(TransitionPlace)) {
                     ResultingLoopPlaces.add(TransitionPlace);
                 }
@@ -775,14 +827,17 @@ public class Process_Mining_Miner {
         return ResultingLoopPlaces;
     }
 
-    private List<Transactional_Relation> generateLoopSet(List<Integer> mark_for_one_loops, HashMap<Integer, HashMap<Integer, Relation_Count>> one_loop_map) {
 
+    //generates all Possible PLaces for Loop Transitions that could be inside the resulting Model.
+    private List<Transition_Relation> generateLoopSet(List<Integer> mark_for_one_loops, HashMap<Integer, HashMap<Integer, Relation_Count>> one_loop_map) {
 
-        List<LoopTransaction> allLoopTransactions = new ArrayList<>();
+        //For Each Loop Activity generate From and To Relations (i.e.Places)
+        List<LoopTransition> allLoopTransitions = new ArrayList<>();
         for (Integer LoopID : mark_for_one_loops) {
             List<Integer> FromRelations = new ArrayList<>();
             List<Integer> ToRelations = new ArrayList<>();
 
+            //Calculate all Source Relations
             HashMap<Integer, Relation_Count> LoopRelatedTo = one_loop_map.get(LoopID);
             for (Map.Entry<Integer, Relation_Count> Related : LoopRelatedTo.entrySet()) {
                 if (Related.getValue().getRelation_type() == Relation_Type.Related) {
@@ -791,6 +846,7 @@ public class Process_Mining_Miner {
                     }
                 }
             }
+            //Calculate all Sink Relations
             for (Map.Entry<Integer, HashMap<Integer, Relation_Count>> Related_From : one_loop_map.entrySet()) {
                 if (Related_From.getValue().get(LoopID).getRelation_type() == Related) {
                     if (!FromRelations.contains(Related_From.getKey())) {
@@ -798,16 +854,20 @@ public class Process_Mining_Miner {
                     }
                 }
             }
-            LoopTransaction newLoopTransaction = new LoopTransaction(LoopID, FromRelations, ToRelations);
-            allLoopTransactions.add(newLoopTransaction);
+            //Generate new Loop Transition with From and To Relation.
+            LoopTransition newLoopTransition = new LoopTransition(LoopID, FromRelations, ToRelations);
+            allLoopTransitions.add(newLoopTransition);
         }
-        List<Transactional_Relation> ResultingList = new ArrayList<>();
-        for (LoopTransaction LoopTransaction : allLoopTransactions) {
-            ResultingList.addAll(LoopTransaction.generateMaxPlaceSet(Activity_Hashmap));
+        //Translate Loop Transition Objects to Transitition Relation Objects and calculate all Possible Place combinations
+        List<Transition_Relation> ResultingList = new ArrayList<>();
+        for (LoopTransition LoopTransition : allLoopTransitions) {
+            ResultingList.addAll(LoopTransition.generateMaxPlaceSet(Activity_Hashmap));
         }
         return ResultingList;
     }
 
+    //Works on the Process Tree of all Cases to find 2-Step-Sequences, (i.e. two of the same activities that are "interrupted"
+    //by a different Activity)
     private void Identify_Two_Step_Loops(HashMap<Integer, HashMap<Integer, Relation_Count>> relation_Hashmap, HashMap<Integer, HashMap<Integer, Relation_Count>> Sequence_Hashmap) {
 
         List<Mining_Activity> ActivityList = Reader.getActivityList();
@@ -821,6 +881,8 @@ public class Process_Mining_Miner {
             }
         }
 
+        //Searches for Activities in the Complete Log Map that are 2-step Loops
+        //and puts the according Relation on the Sequence Hashmap as soon as those are found as a Unisequence.
         for (Map.Entry<Mining_Instance, Log_Relation_Data> Instance_Log : Complete_Log.entrySet()) {
             HashMap<Mining_Instance, List<Mining_Instance>> Instance_Relation_Map = Instance_Log.getValue().getMining_Instances_Relations();
             for (Map.Entry<Mining_Instance, List<Mining_Instance>> Instance_Relations : Instance_Log.getValue().getMining_Instances_Relations().entrySet()) {
@@ -838,6 +900,9 @@ public class Process_Mining_Miner {
                 }
             }
         }
+
+        //if two activities are both in Unisequence to each other they are in a bisequence Relation which should
+        //be reflected in the Sequence Hashmap.
         for (Map.Entry<Integer, HashMap<Integer, Relation_Count>> Relations_From : Sequence_Hashmap.entrySet()) {
             for (Map.Entry<Integer, Relation_Count> Relations_To : Relations_From.getValue().entrySet()) {
                 if ((!Relations_To.getKey().equals(Relations_From.getKey())) && Relations_To.getValue().getRelation_type() == Unisequence) {
@@ -850,10 +915,13 @@ public class Process_Mining_Miner {
         }
     }
 
-    //GENERATES COMPLETE_LOG(RELATIONS AND LIFECYCLELOG AND STARTING + FINAL PLACES.
-    //TODO CAN BE UPDATED TO STOP ADDING ITEMS TO relation_Hashmap
+    //Based on a Process Tree this Method calculates a Tree Structure for each Case, i.e. from a Starting Mining_Instance
+    //all followed Instanced and the Relations between them can be filtered out.
+    //Both Hashmaps are then put into a Map which Maps the first Mining_Instance of a Case to the corresponding Hashmaps of that Case.
     private void check_For_Activity_Relation(HashMap<Integer, HashMap<Integer, Relation_Count>> relation_hashmap, List<Mining_Instance> single_mining_instance) {
 
+        //Single_Mining_Instance_Map is the Map that will result in a complete Mining_Instance (i.e. Begin, Working and Ending of one single Activity)
+        //Mining_Instances_Related is a Hashmap wich maps every started Mining_Instances to its direct successors.
         HashMap<Mining_Instance, List<Mining_Instance>> Single_Mining_Instance_Map = new HashMap<>();
         HashMap<Mining_Instance, List<Mining_Instance>> Mining_Instances_Related = new HashMap<>();
         List<Mining_Instance> Working_List = new ArrayList<>(single_mining_instance);
@@ -884,7 +952,6 @@ public class Process_Mining_Miner {
             to_Work_On.remove(0);
             ListIterator<Mining_Instance> iter = Working_List.listIterator();
             boolean instance_checked = false;
-            //get Start iterator index
             while (!instance_checked && iter.hasNext()) {
                 if (iter.nextIndex() == index) {
                     //start from index to search for related activities
@@ -1054,12 +1121,11 @@ public class Process_Mining_Miner {
 
     //Optionals
 
+    //Generates a Filtered List of Activities for each Case with only the Started Activities to Calculate the
+    // points in time in which a Activity started. Each Single Activity is instantiated as a Mining_Activity Object
+    //in a list with the Same Design as the Case-List.
     private void FilterByActivityWorkingTime() {
 
-        List<List<Mining_Activity_Event>> Activity_Resolution_List_per_Day = new ArrayList<>();
-
-
-        Mining_Activity Empty_Activity = new Mining_Activity("Null", "Function", 0);
         List<List<Mining_Instance>> sorted_Instance_List = Reader.getSorted_Instance_List();
         List<List<Mining_Activity>> used_Activity_per_Instance = new ArrayList<>();
         for (List<Mining_Instance> single_Instance_List : sorted_Instance_List) {
@@ -1076,7 +1142,6 @@ public class Process_Mining_Miner {
     }
 
     private void FilterByActivity() {
-        Mining_Activity Empty_Activity = new Mining_Activity("Null", "Function", 0);
         List<List<Mining_Instance>> sorted_Instance_List = Reader.getSorted_Instance_List();
         List<List<Mining_Activity>> used_Activity_per_Instance = new ArrayList<>();
         for (List<Mining_Instance> single_Instance_List : sorted_Instance_List) {

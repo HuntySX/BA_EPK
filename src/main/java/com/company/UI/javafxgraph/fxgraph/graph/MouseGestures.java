@@ -2,9 +2,9 @@ package com.company.UI.javafxgraph.fxgraph.graph;
 
 import com.company.EPK.EPK_Node;
 import com.company.EPK.Event_Con_Split;
-import com.company.UI.Borderpanecon;
 import com.company.UI.EPKUI.UI_Instantiable;
 import com.company.UI.UI_Button_Active_Type;
+import com.company.UI.UI_Controller;
 import com.company.UI.javafxgraph.fxgraph.cells.UI_View_Gen;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
@@ -22,7 +22,7 @@ public class MouseGestures {
     Graph graph;
     VBox Box;
     Model model;
-    Borderpanecon controller;
+    UI_Controller controller;
 
     EventHandler<MouseEvent> onMouseClickedEventHandler = new EventHandler<MouseEvent>() {
         @Override
@@ -149,7 +149,7 @@ public class MouseGestures {
         }
     };
 
-    public MouseGestures(Graph graph, VBox box, Model model, Borderpanecon controller) {
+    public MouseGestures(Graph graph, VBox box, Model model, UI_Controller controller) {
         this.graph = graph;
         this.Box = box;
         this.model = model;

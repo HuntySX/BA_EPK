@@ -29,7 +29,6 @@ public class Process_Mining_JSON_Read {
     public void Read_From_File() {
 
         JSONParser Functionparser = new JSONParser();
-
         try (FileReader reader = new FileReader("./InstanceLog/Line.json")) {
             Object obj = Functionparser.parse(reader);
 
@@ -60,8 +59,10 @@ public class Process_Mining_JSON_Read {
         Sorted_Instance_List = generateSortedInstanceList();
     }
 
+    //Main Method to instantiate a Sorted Instance List (i.e a Log consisting of Mining_Instance Objects
+    // in the chronological Order represented in the Log with a affiliation to a Case (i.e, each List in the resulting
+    // List is a Case with all chronological Mining_Instances).
 
-    //TODO Schau hier rein du sack
     private List<List<Mining_Instance>> generateSortedInstanceList() {
         List<List<Mining_Instance>> sorted_Instance_List = new ArrayList<>();
         for (Mining_Instance mining_Instance : InstanceList) {
@@ -82,6 +83,8 @@ public class Process_Mining_JSON_Read {
         return sorted_Instance_List;
     }
 
+    //Method to Parse an Logevent into an Mining_Instance Object. Every Attribute in the Logevent is marked
+    //onto a suitable String / long Variable, with which the Mining_Instance for this event is instantiated.
     private void parseInstanceObject(JSONObject inst) {
 
         String Activity_Status = (String) inst.get("Status");
@@ -101,6 +104,7 @@ public class Process_Mining_JSON_Read {
         Mining_Instance newInstance = new Mining_Instance(LocalTime.of((int) Hour, (int) Minute, (int) Second), (int) Activity_Day,
                 (int) Instance_ID, Activity_Status, newActivity);
 
+        //If Working/finished means it was a Function that Used / freed Users and Resources.
         if (Activity_Status.equals("Working") || Activity_Status.equals("Finished")) {
             JSONArray UserArray = (JSONArray) inst.get("used_User");
             JSONArray RessourceArray = (JSONArray) inst.get("used_Resources");
@@ -125,6 +129,7 @@ public class Process_Mining_JSON_Read {
         InstanceList.add(newInstance);
     }
 
+    //Helper Method to bound a Resource to a Mining Instance.
     private void addResourceToInstance(Mining_Instance newInstance, Mining_Resource newResource, int count) {
         for (Mining_Resource_Count ListResourceCount : newInstance.getUsed_Resources()) {
             if (ListResourceCount.getResource().getR_ID() == newResource.getR_ID()) {
@@ -135,6 +140,7 @@ public class Process_Mining_JSON_Read {
         newInstance.getUsed_Resources().add(newResCount);
     }
 
+    //Searches for already instantiated Resources from the Log. If none is found, it instantiates a new one.
     private Mining_Resource CreateOrLoadResource(String resname, int r_id) {
         for (Mining_Resource ListResource : ResourceList) {
             if (ListResource.getR_ID() == r_id) {
@@ -146,6 +152,7 @@ public class Process_Mining_JSON_Read {
         return newResource;
     }
 
+    //Searches for already instantiated Activities from the Log. If none is found, it instantiates a new one.
     private Mining_Activity CreateOrLoadActivity(String activity_name, int activity_id, String activity_type) {
         for (Mining_Activity ListActivity : ActivityList) {
             if (ListActivity.getNode_ID() == activity_id) {
@@ -157,6 +164,7 @@ public class Process_Mining_JSON_Read {
         return newActivity;
     }
 
+    //Searches for already instantiated Users from the Log. If none is found, it instantiates a new one.
     private Mining_User CreateOrLoadUser(String name, String lastName, long u_id) {
 
         for (Mining_User listuser : Userlist) {
@@ -164,7 +172,6 @@ public class Process_Mining_JSON_Read {
                 return listuser;
             }
         }
-
         Mining_User newUser = new Mining_User(null, null, 0);
         newUser.setP_ID((int) u_id);
         newUser.setName(name);

@@ -37,7 +37,7 @@ import java.util.ResourceBundle;
 import static com.company.UI.UI_Button_Active_Type.*;
 
 
-public class Borderpanecon implements Initializable {
+public class UI_Controller implements Initializable {
 
     UI_Button_Active_Type Btn_Type;
     Model model;
@@ -438,9 +438,9 @@ public class Borderpanecon implements Initializable {
             List<Workforce> UI_Workforces = EPK.getAll_Workforces();
             List<EPK_Node> UI_All_Nodes = EPK.getAll_Elems();
             List<Start_Event> Final_Start_Events = new ArrayList<>();
+
+
             //INSTANTIATE SETTINGS
-
-
             UI_Settings UISettings = EPK.getUI_Settings();
             Settings settings = new Settings();
             settings.setBeginTime(UISettings.getBeginTime());
@@ -456,7 +456,7 @@ public class Borderpanecon implements Initializable {
             UI_EXTERNAL_EVENT_MANAGER UI_External_Events = EPK.getUI_External_Events();
             external_events.addAll(UI_External_Events.getList());*/
 
-            //INSTANTIATE ALL UNITS
+            //INSTANTIATE ALL Users, Resources and Workforces
             for (Resource Res : UI_Resource) {
                 Resource newRes = new Resource(Res.getName(), Res.getCount(), Res.getID());
                 Final_Resource.add(newRes);
@@ -487,17 +487,14 @@ public class Borderpanecon implements Initializable {
                                 ((Function) Node).getMean_Workingtime(), ((Function) Node).getDeviation_Workintime());
                         Final_List.add(newFunc);
                     }
-                    //NEXTELEMBINDING
                 } else if (Node instanceof Event && !(Node instanceof Activating_Start_Event) && !(Node instanceof Start_Event)) {
                     Event newEvent = new Event(null, Node.getID(), ((Event) Node).getEvent_Tag(),
                             ((Event) Node).is_Start_Event(), ((Event) Node).is_End_Event());
                     Final_List.add(newEvent);
-                    //NEXTELEMBINDING
                 } else if (Node instanceof Activating_Start_Event) {
                     Activating_Start_Event newActivateStartEvent = new Activating_Start_Event(null, Node.getID(),
                             null, null, ((Event) Node).getEvent_Tag(), true);
                     Final_List.add(newActivateStartEvent);
-                    //ACTIVATE FUNCTION/ NEXTELEMBINDING
                 } else if (Node instanceof Activating_Function) {
                     if (((Function) Node).isDeterministic()) {
                         Activating_Function newActivatingFunction = new Activating_Function(((Function) Node).getFunction_tag(),
@@ -522,11 +519,9 @@ public class Borderpanecon implements Initializable {
                         newActivatingFunction.setNeeded_Resources(((Activating_Function) Node).getNeeded_Resources());
                         Final_List.add(newActivatingFunction);
                     }
-                    //NEXTELEM;STARTEVENTBINDING
                 } else if (Node instanceof Event_Con_Join) {
                     Event_Con_Join newCon_Join = new Event_Con_Join(null, Node.getID(), ((Event_Con_Join) Node).getContype());
                     Final_List.add(newCon_Join);
-                    //MAPPEDBRANCHEDELEMENTS Binding
                 } else if (Node instanceof Event_Con_Split) {
                     Event_Con_Split newCon_Split = new Event_Con_Split(null, Node.getID(),
                             ((Event_Con_Split) Node).getContype(), ((Event_Con_Split) Node).getDecide_Type(), ((Event_Con_Split) Node).getChances_List());
@@ -548,7 +543,7 @@ public class Borderpanecon implements Initializable {
                 }
             }
 
-            //Instantiate Bindings
+            //Instantiate Bindings between Nodes, Users and Resources
             for (EPK_Node newNode : Final_List) {
                 EPK_Node UI_Node = null;
                 for (EPK_Node uiNode : UI_All_Nodes) {
@@ -557,6 +552,7 @@ public class Borderpanecon implements Initializable {
                         break;
                     }
                 }
+                //add next Elements to every Node
                 if (UI_Node != null) {
                     List<EPK_Node> next_Elems = new ArrayList<>();
                     List<EPK_Node> UI_Next_elems = UI_Node.getNext_Elem();
@@ -573,6 +569,7 @@ public class Borderpanecon implements Initializable {
                         newNode.setNext_Elem(next_Elems);
                     }
 
+                    //Bind Workforces to Functions
                     if (newNode instanceof Function && !(newNode instanceof Activating_Function) && !(newNode instanceof External_Function)) {
                         for (Workforce force : UI_Workforces) {
                             List<Function> Used_In = force.getUsed_in();
@@ -589,7 +586,9 @@ public class Borderpanecon implements Initializable {
                                 }
                             }
                         }
-                    } else if (newNode instanceof Activating_Start_Event) {
+                    }
+                    //Bind Activating activating Functions to its activating Start event
+                    else if (newNode instanceof Activating_Start_Event) {
                         Activating_Function Function = ((Activating_Start_Event) UI_Node).getActivating_Function();
                         if (Function != null) {
                             for (EPK_Node Node : Final_List) {
@@ -601,7 +600,9 @@ public class Borderpanecon implements Initializable {
                         } else {
                             ((Activating_Start_Event) newNode).setFunction(null);
                         }
-                    } else if (newNode instanceof Activating_Function) {
+                    }
+                    //Bind Activating Start Event to its Activating Function and Add Workforces to the Activating Function
+                    else if (newNode instanceof Activating_Function) {
                         Activating_Start_Event Event = ((Activating_Function) UI_Node).getStart_Event();
                         if (Event != null) {
                             for (EPK_Node Node : Final_List) {
@@ -631,7 +632,10 @@ public class Borderpanecon implements Initializable {
                             }
                         }
 
-                    } else if (newNode instanceof Event_Con_Join) {
+                    }
+                    //Setup Event_Con Joins: Give it all previous Mapped Nodes and, incase of an External XOR, Bind
+                    //the according External_Function to it.
+                    else if (newNode instanceof Event_Con_Join) {
 
                         List<EPK_Node> MappedElems = ((Event_Con_Join) UI_Node).getPrevious_Elements();
                         List<EPK_Node> newMap = new ArrayList<>();
@@ -669,6 +673,7 @@ public class Borderpanecon implements Initializable {
                     }
                 }
             }
+            // Bind Resources to Functions if they use them
             for (Resource Res : Final_Resource) {
                 for (Resource UI_Res : UI_Resource) {
                     if (Res.getID() == UI_Res.getID()) {
@@ -683,6 +688,7 @@ public class Borderpanecon implements Initializable {
                     }
                 }
             }
+            //Bind Users to Workforces.
             for (User newuser : Final_User) {
                 for (User oldUser : UI_Users) {
                     if (newuser.getP_ID() == oldUser.getP_ID()) {
@@ -700,6 +706,7 @@ public class Borderpanecon implements Initializable {
             }
 
 
+            //Next Code is to Print into the Debug Console a List of all EPK-Elements
             List<Print_Event_Driven_File> PrinterList = new ArrayList<>();
             for (EPK_Node Node : Final_List) {
                 List<Connected_Elem_Print> Next_elems = new ArrayList<>();
@@ -840,6 +847,8 @@ public class Borderpanecon implements Initializable {
 
 
             }
+
+            //Instantiate Final Log Printer
             Printer_Gate pg = Printer_Gate.get_Printer_Gate();
             pg.setNodelistToPrint(PrinterList);
             Printer_Queue printer_queue = new Printer_Queue();

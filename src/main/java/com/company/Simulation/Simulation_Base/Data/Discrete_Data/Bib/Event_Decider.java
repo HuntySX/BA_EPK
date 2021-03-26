@@ -17,6 +17,8 @@ public class Event_Decider {
     private final List<User> Users;
     private final List<Resource> Resources;
 
+    //Main Class to Choose an Event which the Simulator should handle. Right now it works with a FIFO and Greedy
+    //Decision structure.
     public Event_Decider(Settings settings, List<User> Users, List<Resource> Resources, Event_Calendar calendar) {
         this.settings = settings;
         this.Users = Users;
@@ -24,8 +26,12 @@ public class Event_Decider {
         this.calendar = calendar;
     }
 
+    //Main Method to Decide an Event. gets the Upcoming and Waiting list of the Simulation wich has all Events that
+    //Need to be handled up to the actual Runtime.
     public Instance_Workflow Decide_Event(List<Instance_Workflow> Upcoming, Simulation_Waiting_List Waiting) {
         Instance_Workflow lightInstance = null;
+
+        //Handle Lightweight Instances first (Those which free Resources)
         for (Instance_Workflow Upcoming_Workflow : Upcoming) {
             lightInstance = CheckForResourcefreeing(Upcoming_Workflow);
             if (lightInstance != null) {
@@ -38,6 +44,10 @@ public class Event_Decider {
         if (Upcoming.isEmpty() && Waiting.getEvent_List().isEmpty()) {
             return null;
         }
+        //FIFO only gives Resources to the first Element of the Waiting List or (if Empty) the Upcoming List, as long
+        //as it can be decided. As soon as One Element misses Requirements, the FIFO doesn´t Choose an Event in this Second
+        //anymore.
+
         if (Decide_Option == FIFO || Decide_Option == DEFAULT) {
             //DECIDE EVENT FIFO, WAIT FOR RESOURCES AND USERS TO BE FREE FOR THE FIRST WAITING EVENT.
             //IF WAITINGLIST.isEMPTY() Decide for first Elem of Upcoming.
@@ -59,8 +69,11 @@ public class Event_Decider {
                     return null;
                 }
             }
-
-        } else if (Decide_Option == GREEDY) {
+        }
+        //Greedy still Prioritizes Delayed Events instead of Upcoming Events, but it gives Resources to all Events as
+        //long as they are available. Greedy doesnt stop on the First Event that misses Requirements and checks other
+        //Events if they can be handled.
+        else if (Decide_Option == GREEDY) {
             List<Instance_Workflow> Event_list = Waiting.getEvent_List();
             boolean found = false;
             Instance_Workflow mark_for_Del = null;
@@ -95,15 +108,16 @@ public class Event_Decider {
 
 
         } else if (Decide_Option == BY_CUSTOMER_RELATION) {
-
+            //TBD
         } else if (Decide_Option == BY_LARGEST_INVEST) {
-
+            //TBD
         } else {
 
         }
         return null;
     }
 
+    //Helper Method for lightweight instance checking
     private Instance_Workflow CheckForResourcefreeing(Instance_Workflow upcoming) {
         if (((upcoming.getEPKNode() instanceof Function) && upcoming.isWorking())) {
             return upcoming;
@@ -112,6 +126,8 @@ public class Event_Decider {
         }
     }
 
+    //the Event Decider checks the External Events of the Event Calendar if there are External Events to Handle outside
+    //of the Instances (like Users getting Ill, or Machines being broken). Is called by the Simulator after each jump() Method call
     public void updateWithExternalEvents() {
         LocalTime Runtime = calendar.getRuntime();
         int Day = calendar.getAct_runtimeDay();
@@ -128,6 +144,8 @@ public class Event_Decider {
         }
     }
 
+    //Main Method to handle External Events i.e. it disables / enables Users / Resources
+    // which are marked in an External_Event object
     private void handleExternalEvent(External_Event external_event) {
         if (external_event instanceof Resource_Activating_External_Event) {
             for (Resource res : Resources) {

@@ -209,6 +209,9 @@ public class Function extends EPK_Node implements Printable_Node, Is_Tagged {
     }
 
 
+    //Generate a Workingtime Object with the Duration of the simulation on Det / Nondet Base.
+    //
+
     public Workingtime getWorkingTime() {
         if (isDeterministic) {
             return DeterministicWorkingTime;
@@ -257,6 +260,7 @@ public class Function extends EPK_Node implements Printable_Node, Is_Tagged {
     }
 
     @Override
+    //Settings Checker for Test EPK.
     public boolean CheckSettings() {
         boolean Check = true;
         if (Needed_Resources == null || Needed_Resources.isEmpty()) {
@@ -274,6 +278,7 @@ public class Function extends EPK_Node implements Printable_Node, Is_Tagged {
         return Check;
     }
 
+    //remove Resource in UI from Function
     public void removeResourcebyID(Resource resource) {
         List<Resource> to_Delete = new ArrayList<>();
         for (Resource r : Needed_Resources) {
@@ -286,6 +291,7 @@ public class Function extends EPK_Node implements Printable_Node, Is_Tagged {
         }
     }
 
+    //removing Workforce in UI from Function
     public void removeWorkforceByID(Workforce workforce) {
         List<Workforce> to_Delete = new ArrayList<>();
         for (Workforce w : Needed_Workforce) {

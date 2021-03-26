@@ -1,6 +1,6 @@
 package com.company.UI.javafxgraph.fxgraph.graph;
 
-import com.company.UI.Borderpanecon;
+import com.company.UI.UI_Controller;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.control.ScrollPane;
@@ -20,10 +20,10 @@ public class Graph {
     private Node Active_Element;
     private final VBox VBox;
     private final Group canvas;
-    private final Borderpanecon controller;
+    private final UI_Controller controller;
     private final ZoomableScrollPane scrollPane;
 
-    public Graph(VBox Box, Borderpanecon controller) {
+    public Graph(VBox Box, UI_Controller controller) {
 
         this.model = new Model(this);
         this.VBox = Box;
@@ -99,7 +99,7 @@ public class Graph {
         return this.scrollPane.getScaleValue();
     }
 
-    public Borderpanecon getBorderpanecontroller() {
+    public UI_Controller getBorderpanecontroller() {
 
         return controller;
     }

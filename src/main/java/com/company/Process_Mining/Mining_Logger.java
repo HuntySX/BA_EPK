@@ -29,7 +29,7 @@ public class Mining_Logger {
     private HashMap<Integer, Mining_Activity> activity_hashmap;
     private HashMap<Mining_User, HashMap<Mining_User, Relation_Count>> user_relation_hashmap;
     private HashMap<Mining_Activity, Complete_Time_Activity> time_log_by_activity;
-    private List<Transactional_Relation> All_Places;
+    private List<Transition_Relation> All_Places;
     private Integer PlaceID;
     private Integer Total_User_Relation_Count;
     private HashMap<Mining_Resource, List<Timed_Resource_Usage_By_Activity>> Timed_Mining_Activity_By_Resource;
@@ -47,7 +47,7 @@ public class Mining_Logger {
                          HashMap<Mining_User, List<Timed_User_Usage_By_Activity>> Timed_Mining_Activity_per_User,
                          HashMap<Mining_Resource, List<Timed_Resource_Usage_By_Activity>> Timed_Mining_Activity_By_Resource,
                          HashMap<Mining_Activity, Complete_Time_Activity> time_log_by_activity,
-                         List<Transactional_Relation> all_Places) {
+                         List<Transition_Relation> all_Places) {
         Total_User_Relation_Count = total_User_Relation_Count;
         this.activity_hashmap = activity_hashmap;
         this.user_relation_hashmap = user_relation_hashmap;
@@ -320,7 +320,7 @@ public class Mining_Logger {
     private void GeneratePrintablePlaces() {
 
 
-        for (Transactional_Relation Relation : All_Places) {
+        for (Transition_Relation Relation : All_Places) {
             if (!Transitions_To_Places.containsKey(Relation.getActivityID())) {
                 Transitions_To_Places.put(Relation.getActivityID(), new ArrayList<>());
             }
@@ -343,7 +343,7 @@ public class Mining_Logger {
             }
         }
 
-        for (Transactional_Relation Relation : All_Places) {
+        for (Transition_Relation Relation : All_Places) {
             if (Relation.isFromTransaction()) {
                 Integer Con_Transition_To_PlaceID = 0;
                 for (Map.Entry<Integer, Relation_Places> Place_to_Relation : Places_to_Relations.entrySet()) {

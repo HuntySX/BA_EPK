@@ -17,6 +17,10 @@ import com.company.Simulation.Simulation_Discrete_Event.Discrete_Event_Simulator
 
 import java.util.List;
 
+
+//Generator Class for the Discrete Event Simulation. Gives the Calendar, the Decider and the Simulator
+//all needed informations and instantiates them as a new object. After that, it starts the simulation through
+//Discrete_Event_Simulator.run().
 public class Discrete_Event_Generator {
 
     private EPK EPK;
@@ -76,22 +80,32 @@ public class Discrete_Event_Generator {
         this.Simulation = new Discrete_Event_Simulator(this);
     }
 
+    //run Method of the Generator, instantiates all needed objects and starts the simulation.
     public void run() {
+
+        //Instantiate the Calendar on the basis of the Start Events and the simulation Days.
         event_Calendar.fillCalendar();
         System.out.println("Calendar filled");
         List<Simulation_Event_List> Events = event_Calendar.getUpcoming_List();
+
+        //Print all Upcoming instances to Debug log
         for (Simulation_Event_List List : Events) {
             System.out.println("List for Day: " + Events.indexOf(List) + 1);
             for (Instance_Workflow Instance : List.getWorkflows()) {
                 System.out.println("Time to Start for Instance " + Instance.getInstance().getCase_ID() + ": " + Instance.getTo_Start());
             }
         }
+        //generate Mapped Elements for each EPK-Node (needed for the Event Con Joins)
         EPK.generateMapping();
+        //map previous Elements to each Gate.
         EPK.generateGateMapping();
         for (EPK_Node n : EPK.getElements()) {
             System.out.println(n.ReachabletoString());
         }
+        //Give Calendar to all Activating_Functions so that they can instatiate a new Simulation Instance.
         giveCalToActivatings();
+
+        //start the Simulation
         Simulation.run();
     }
 
@@ -136,7 +150,4 @@ public class Discrete_Event_Generator {
         case_ID = case_ID + 1;
         return id;
     }
-
-    //TODO Graphische Visualisierung mit Graphviz
-    //TODO PROCESS MINING!
 }

@@ -158,6 +158,7 @@ public class EPK {
         }
     }
 
+    //calculate Reachable Nodes from each EPK Note (breadth first search)
     public void generateMapping() {
         for (EPK_Node n : elements) {
             List<EPK_Node> Reachable = new ArrayList<>();
@@ -177,6 +178,7 @@ public class EPK {
         }
     }
 
+    //Instantiate Previous Elements for each Event_Con_Join
     public void generateGateMapping() {
         for (EPK_Node n : elements) {
             for (EPK_Node m : n.getNext_Elem()) {

@@ -13,6 +13,9 @@ import java.util.Random;
 
 import static com.company.Enums.Start_Event_Type.*;
 
+
+//Main Class for the Simulation Event Calendar. This Class has a List of External Events, a List for Upcoming Events
+//and the Timecode for the Simulation. Also this Class maintains all delayed Events of the simulation in a Waiting List
 public class Event_Calendar {
 
     private int RuntimeDays;
@@ -109,6 +112,10 @@ public class Event_Calendar {
         }
     }
 
+    //Main method to place an new Instance_Workflow on the Upcoming List. Manages the Upcoming List to search for the
+    //Day in wich the new Instance_Workflow should be placed. For this Day there is a Index on the List wich has all
+    //Events for that day in a Simulation_Event_List Object.
+
     public void Add_To_Upcoming_List(Instance_Workflow Instance, int day) {
 
         if (Instance != null) {
@@ -139,6 +146,45 @@ public class Event_Calendar {
         Waiting_List.remove_from_WaitingList(Instance);
     }
 
+
+    //Quicksort Algorithm to Sort the Upcoming and Waiting lists on Adding a new Instance
+    private static void QuickSort(int[] inputArray, int low, int high) {
+        int iLowerIndex = low;
+        int iHighIndex = high;
+        // Take middle as pivot element.
+        int middle = low + (high - low) / 2;
+        int pivotElement = inputArray[middle];
+        while (iLowerIndex <= iHighIndex) {
+            // Keep scanning lower half till value is less than pivot element
+            while (inputArray[iLowerIndex] < pivotElement) {
+                iLowerIndex++;
+            }
+            // Keep scanning upper half till value is greater than pivot element
+            while (inputArray[iHighIndex] > pivotElement) {
+                iHighIndex--;
+            }
+            //swap element if they are out of place
+            if (iLowerIndex <= iHighIndex) {
+                swap(inputArray, iLowerIndex, iHighIndex);
+                iLowerIndex++;
+                iHighIndex--;
+            }
+        }
+        // Sort lower half -- low to iHighIndex
+        if (low < iHighIndex) {
+            QuickSort(inputArray, low, iHighIndex);
+        }
+        // Sort upper half -- iLowerIndex to high
+        if (iLowerIndex < high) {
+            QuickSort(inputArray, iLowerIndex, high);
+        }
+    }
+
+    //Fills the Calendar initialy on Begin of the Simulation. For this it Determines the begin and Endtime of each Day
+    //and adds one new Index onto the UpcomingList for each Day. new Instances are Generated Based on a Distributon type
+    //Random (Total Random Time Calculation, will mostly be Even Distributed), Exponential (places more Instances on the
+    //end of a Day), Normal (Gaussian distribution per Day with the Middle between Begin and Endtime + a 25 % Quartile as
+    //Standart Distribution.
     public void fillCalendar() {
 
         int days = RuntimeDays;
@@ -229,6 +275,17 @@ public class Event_Calendar {
         }
     }
 
+    public boolean isFinished_cycle() {
+        return finished_cycle;
+    }
+
+    public void setFinished_cycle(boolean finished_cycle) {
+        this.finished_cycle = finished_cycle;
+    }
+
+    //Jumps the Event Calendar to the next Second (right now). Can be Changed to Jump to the Next Event Time (tbd)
+    //if the Jump returns a Value outside of the Timehorizon of the Simulation,
+    // The Simulation is stopped through setFinished_cycle
     public void jump() {
         runtime = runtime.plusSeconds(1);
         if (runtime.isAfter(getEnd_Time())) {
@@ -243,14 +300,11 @@ public class Event_Calendar {
         }
     }
 
-    public boolean isFinished_cycle() {
-        return finished_cycle;
-    }
-
-    public void setFinished_cycle(boolean finished_cycle) {
-        this.finished_cycle = finished_cycle;
-    }
-
+    //Helper Method for Activating Functions to Instantiate a new Simulation instance on the connected
+    //activating start event. Calculation for this is similar as the activate / deactivate Function Method in Simulator
+    //as the Incoming Time of the new Simulation instance is calculated to work with the Design of the Upcoming list
+    //(i.e. jump days if the instantiation Time is outside of the current Day).
+    //Doesn´t instantiate if the Time to instantiate is Outside of the Simulation Horizon.
     public void instantiate_new_Activation_Event(Activating_Start_Event start, Activating_Function Func, Instance_Workflow for_Workflow, Workingtime to_Start) {
         Activating_Event_Instance activating_instance = new Activating_Event_Instance(Generator.get_Unique_case_ID(), Func, for_Workflow);
         LocalTime StartTime = getRuntime();
@@ -282,46 +336,6 @@ public class Event_Calendar {
                 activating_workflow.getInstance().add_To_Scheduled_Work(start);
                 Add_To_Upcoming_List(activating_workflow, getAct_runtimeDay() + advanceday);
             }
-        }
-    }
-
-    private static void QuickSort(int[] inputArray, int low, int high) {
-
-        int iLowerIndex = low;
-        int iHighIndex = high;
-
-        // Take middle as pivot element.
-        int middle = low + (high - low) / 2;
-        int pivotElement = inputArray[middle];
-
-        while (iLowerIndex <= iHighIndex) {
-
-            // Keep scanning lower half till value is less than pivot element
-            while (inputArray[iLowerIndex] < pivotElement) {
-                iLowerIndex++;
-            }
-
-            // Keep scanning upper half till value is greater than pivot element
-            while (inputArray[iHighIndex] > pivotElement) {
-                iHighIndex--;
-            }
-
-            //swap element if they are out of place
-            if (iLowerIndex <= iHighIndex) {
-                swap(inputArray, iLowerIndex, iHighIndex);
-                iLowerIndex++;
-                iHighIndex--;
-            }
-        }
-
-        // Sort lower half -- low to iHighIndex
-        if (low < iHighIndex) {
-            QuickSort(inputArray, low, iHighIndex);
-        }
-
-        // Sort upper half -- iLowerIndex to high
-        if (iLowerIndex < high) {
-            QuickSort(inputArray, iLowerIndex, high);
         }
     }
 

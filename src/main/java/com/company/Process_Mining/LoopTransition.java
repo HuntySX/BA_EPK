@@ -7,19 +7,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
 
-public class LoopTransaction {
+public class LoopTransition {
 
     private Integer LoopID;
     private List<Integer> FromRelations;
     private List<Integer> ToRelations;
 
-    public LoopTransaction() {
+    public LoopTransition() {
         LoopID = 0;
         FromRelations = new ArrayList<>();
         ToRelations = new ArrayList<>();
     }
 
-    public LoopTransaction(Integer loopID, List<Integer> fromRelations, List<Integer> toRelations) {
+    public LoopTransition(Integer loopID, List<Integer> fromRelations, List<Integer> toRelations) {
         LoopID = loopID;
         FromRelations = fromRelations;
         ToRelations = toRelations;
@@ -49,9 +49,12 @@ public class LoopTransaction {
         ToRelations = toRelations;
     }
 
-    public List<Transactional_Relation> generateMaxPlaceSet(HashMap<Integer, Mining_Activity> Activity_Hashmap) {
+    //generates a Maximum Amount of Places which a Loop Transition COULD be connected to. (for Example
+    //if there is a Place (a to b,c) it would generate 3 places (a to b) (a to c) and (a to b,c)) i.e. the Crossproduct
+    // of all single Activities in a Loop Transition Place.
+    public List<Transition_Relation> generateMaxPlaceSet(HashMap<Integer, Mining_Activity> Activity_Hashmap) {
 
-        List<Transactional_Relation> ResultList = new ArrayList<>();
+        List<Transition_Relation> ResultList = new ArrayList<>();
         List<Relation_Places> MinSet = new ArrayList<>();
         for (Integer From : FromRelations) {
             for (Integer To : ToRelations) {
@@ -68,7 +71,6 @@ public class LoopTransaction {
         List<Relation_Places> Working_List = new ArrayList<>(MinSet);
         List<Relation_Places> Unique_Place_List = new ArrayList<>(MinSet);
         List<Relation_Places> newPlaceWorking_List = new ArrayList<>();
-
 
         while (!Working_List.isEmpty()) {
             boolean foundnew = false;
@@ -148,8 +150,8 @@ public class LoopTransaction {
 
         Clean_Up_Place_List(Unique_Place_List);
         for (Relation_Places PossibleLoopPlace : Unique_Place_List) {
-            Transactional_Relation newLoopFromLeftRelation = new Transactional_Relation(LoopID, PossibleLoopPlace, true);
-            Transactional_Relation newLoopFromRightRelation = new Transactional_Relation(LoopID, PossibleLoopPlace, false);
+            Transition_Relation newLoopFromLeftRelation = new Transition_Relation(LoopID, PossibleLoopPlace, true);
+            Transition_Relation newLoopFromRightRelation = new Transition_Relation(LoopID, PossibleLoopPlace, false);
             ResultList.add(newLoopFromLeftRelation);
             ResultList.add(newLoopFromRightRelation);
         }
@@ -157,6 +159,7 @@ public class LoopTransaction {
     }
 
 
+    //Helper Method to Delete Copies of Places
     private void Clean_Up_Place_List(List<Relation_Places> place_list) {
         ListIterator<Relation_Places> Place_Iterator_One = place_list.listIterator();
         List<Relation_Places> Mark_For_Deletion = new ArrayList<>();
