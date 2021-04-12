@@ -1,0 +1,44 @@
+[
+  {
+    "start_event_type": "NORMAL",
+    "to_Instantiate": 100,
+    "Event_Tag": "Start Event: 1",
+    "is_Start_Event": true,
+    "is_End_Event": false,
+    "Node_Type": "Start_Event",
+    "ID": 1,
+    "Next_Elements": [
+      {
+        "id": 3,
+        "Tag": "Function: 3"
+      }
+    ]
+  },
+  {
+    "Event_Tag": "End-Event: 2",
+    "is_Start_Event": false,
+    "is_End_Event": true,
+    "Node_Type": "End_Event",
+    "ID": 2,
+    "Next_Elements": []
+  },
+  {
+    "Tag": "Function: 3",
+    "concurrently": false,
+    "Resources": [],
+    "Workforces": [],
+    "WorkingTime": {
+      "Hours": 0,
+      "Minutes": 0,
+      "Seconds": 0
+    },
+    "Node_Type": "Function",
+    "ID": 3,
+    "Next_Elements": [
+      {
+        "id": 2,
+        "Tag": "End-Event: 2"
+      }
+    ]
+  }
+]

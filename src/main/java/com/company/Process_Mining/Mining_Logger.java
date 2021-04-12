@@ -17,6 +17,7 @@ import guru.nidi.graphviz.model.Node;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.time.Duration;
 import java.util.*;
 
 import static com.company.Process_Mining.Relation_Type.Related;
@@ -80,7 +81,6 @@ public class Mining_Logger {
     }
 
     private void Write_Resource_Activity_Log_To_File() {
-
         int maxDay = 0;
         for (Map.Entry<Mining_Resource, List<Timed_Resource_Usage_By_Activity>> Resource_Activities : Timed_Mining_Activity_By_Resource.entrySet()) {
             for (Timed_Resource_Usage_By_Activity Activity : Resource_Activities.getValue()) {
@@ -128,28 +128,34 @@ public class Mining_Logger {
     }
 
     private void printResoureHashMapToFile(HashMap<Mining_Resource, List<List<Timed_Resource_Usage_By_Activity>>> print_hashMap) {
-
         try {
-            File ResourceUsage = new File("MiningResults/ResourceUsage.txt");
-            FileWriter Writer = new FileWriter(ResourceUsage);
-            File ResourceTime = new File("MiningResults/ResourceTime.txt");
-            FileWriter ResourceTimeWriter = new FileWriter(ResourceUsage);
             for (Map.Entry<Mining_Resource, List<List<Timed_Resource_Usage_By_Activity>>> Resource_Log : print_hashMap.entrySet()) {
                 int Actvalue = 0;
+                int Sortnumber = 1;
                 int day = 0;
                 for (List<Timed_Resource_Usage_By_Activity> DayList : Resource_Log.getValue()) {
+                    String ResultUsagepath = "MiningResults/ResourceUsage_" + Resource_Log.getKey().getName() + "_Day" + day + ".txt";
+                    String ResultTimepath = "MiningResults/ResourceTime" + Resource_Log.getKey().getName() + "_Day" + day + ".txt";
+                    File ResourceUsage = new File(ResultUsagepath);
+                    FileWriter Writer = new FileWriter(ResourceUsage);
+                    File ResourceTime = new File(ResultTimepath);
+                    FileWriter ResourceTimeWriter = new FileWriter(ResourceTime);
                     for (Timed_Resource_Usage_By_Activity Single_Resource_Activity : DayList) {
                         Actvalue = Actvalue + Single_Resource_Activity.getCount();
-                        Writer.write(Resource_Log.getKey().getName() + "|" + Single_Resource_Activity.getActivity().getActivity_Name() + "|" + day + "|" + Single_Resource_Activity.getTime().toString() + "|" + Actvalue);
+                        Writer.write(Sortnumber + "|" + Resource_Log.getKey().getName() + "|" + Single_Resource_Activity.getActivity().getActivity_Name() + "|" + Single_Resource_Activity.getTime().toString() + "|" + Actvalue);
                         Writer.write(System.getProperty("line.separator"));
-                        ResourceTimeWriter.write(Resource_Log.getKey().getName() + "|" + day + "|" + Single_Resource_Activity.getTime().toString() + "|" + Actvalue);
+                        ResourceTimeWriter.write(Sortnumber + "|" + Resource_Log.getKey().getName() + "|" + Single_Resource_Activity.getTime().toString() + "|" + Actvalue);
                         ResourceTimeWriter.write(System.getProperty("line.separator"));
+                        Sortnumber++;
                     }
                     day++;
+                    Sortnumber = 1;
+                    Writer.close();
+                    ResourceTimeWriter.close();
                 }
             }
-            Writer.close();
             System.out.println("Wrote ResourceUsage to File ResourceUsage.txt");
+            System.out.println("Wrote ResourceTimeWriter to File ResourceTime.txt");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -204,58 +210,69 @@ public class Mining_Logger {
 
     private void printUserHashMapToFile(HashMap<Mining_User, List<List<Timed_User_Usage_By_Activity>>> print_hashMap) {
         try {
-            File UserUsage = new File("MiningResults/UserUsage.txt");
-            File UserTime = new File("MiningResults/UserAtActivity");
-            FileWriter UsageWriter = new FileWriter(UserUsage);
-            FileWriter UserTimeWriter = new FileWriter(UserTime);
             for (Map.Entry<Mining_User, List<List<Timed_User_Usage_By_Activity>>> User_Log : print_hashMap.entrySet()) {
                 int day = 0;
+                int sortnumber = 1;
                 for (List<Timed_User_Usage_By_Activity> DayList : User_Log.getValue()) {
+
+                    String UserUsageDayPath = "MiningResults/UserUsage " + User_Log.getKey().getName() + " Day" + day + ".txt";
+                    String UserTimeDayPath = "MiningResults/UserAtActivity " + User_Log.getKey().getName() + " Day" + day + ".txt";
+                    File UserUsage = new File(UserUsageDayPath);
+                    File UserTime = new File(UserTimeDayPath);
+                    FileWriter UsageWriter = new FileWriter(UserUsage);
+                    FileWriter UserTimeWriter = new FileWriter(UserTime);
                     for (Timed_User_Usage_By_Activity Single_User_Activity : DayList) {
                         if (Single_User_Activity.isFinishing()) {
-                            UsageWriter.write(User_Log.getKey().getName() + " " + Single_User_Activity.getActivity().getActivity_Name() + "|" + day + "|" + Single_User_Activity.getTime().toString() + "|" + "0");
+                            UsageWriter.write(sortnumber + "|" + Single_User_Activity.getActivity().getActivity_Name() + "|" + Single_User_Activity.getTime().toString() + "|" + "0");
                             UsageWriter.write(System.getProperty("line.separator"));
-                            UserTimeWriter.write(User_Log.getKey().getName() + "|" + day + "|" + Single_User_Activity.getTime().toString() + "|" + "0");
+                            UserTimeWriter.write(sortnumber + "|" + Single_User_Activity.getTime().toString() + "|" + "0");
                             UserTimeWriter.write(System.getProperty("line.separator"));
-
                         } else {
-                            UsageWriter.write(User_Log.getKey().getName() + "|" + Single_User_Activity.getActivity().getActivity_Name() + "|" + day + "|" + Single_User_Activity.getTime().toString() + "|" + "1");
+                            UsageWriter.write(sortnumber + "|" + Single_User_Activity.getActivity().getActivity_Name() + "|" + Single_User_Activity.getTime().toString() + "|" + "1");
                             UsageWriter.write(System.getProperty("line.separator"));
-                            UserTimeWriter.write(User_Log.getKey().getName() + "|" + day + "|" + Single_User_Activity.getTime().toString() + "|" + "0");
+                            UserTimeWriter.write(sortnumber + "|" + Single_User_Activity.getTime().toString() + "|" + "1");
                             UserTimeWriter.write(System.getProperty("line.separator"));
                         }
+                        sortnumber++;
                     }
                     day++;
+                    sortnumber = 1;
+                    UsageWriter.close();
+                    UserTimeWriter.close();
                 }
             }
-            UsageWriter.close();
             System.out.println("Wrote UserUsage to File UserUsage.txt");
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-
     private void Write_Delay_On_Activity_To_File() {
         try {
-            File Delay = new File("MiningResults/Delay.txt");
+            File Delay = new File("MiningResults/Activities/Delay.txt");
             FileWriter Writer = new FileWriter(Delay);
+            int Sortnumber = 1;
             for (Map.Entry<Mining_Activity, Complete_Time_Activity> activity_Times : time_log_by_activity.entrySet()) {
+                String ActivityDelayTimePath = "MiningResults/Activities/Delaytime" + activity_Times.getKey().getActivity_Name() + ".txt";
+                File ActivityDelayTime = new File(ActivityDelayTimePath);
+                FileWriter SingleActivityFile = new FileWriter(ActivityDelayTime);
                 for (Time_Log_Data Single_Delay : activity_Times.getValue().getSingle_Instance_Activity_Time()) {
 
-
                     String result = "" + Single_Delay.getDelay().getSeconds();
-
                     /*int result = (int)Single_Delay.getDelay().getSeconds();
                     int Dhours = (int) (Dseconds / 3600);
                     Dseconds -= Dhours * 3600;
                     int Dminutes = (int) (Dseconds / 60);
                     Dseconds -= Dminutes * 60;
                     String result = ""+ Dhours + ":" + Dminutes + ":" + Dseconds;*/
-
-                    Writer.write(activity_Times.getKey().getActivity_Name() + " " + result);
+                    SingleActivityFile.write(Sortnumber + "|" + activity_Times.getKey().getActivity_Name() + "|" + result);
+                    SingleActivityFile.write(System.getProperty("line.separator"));
+                    Writer.write(activity_Times.getKey().getActivity_Name() + "|" + result);
                     Writer.write(System.getProperty("line.separator"));
+                    Sortnumber++;
                 }
+                SingleActivityFile.close();
+                Sortnumber = 1;
             }
             Writer.close();
             System.out.println("Wrote Delay to File Delay.txt");
@@ -266,9 +283,13 @@ public class Mining_Logger {
 
     private void Write_Completetime_On_Activity_To_File() {
         try {
-            File Delay = new File("MiningResults/Completetime.txt");
-            FileWriter Writer = new FileWriter(Delay);
+            File Complete = new File("MiningResults/Activities/Completetime.txt");
+            FileWriter Writer = new FileWriter(Complete);
+            int Sortnumber = 1;
             for (Map.Entry<Mining_Activity, Complete_Time_Activity> activity_Times : time_log_by_activity.entrySet()) {
+                String ActivityCompleteTimePath = "MiningResults/Activities/Completetime" + activity_Times.getKey().getActivity_Name() + ".txt";
+                File ActivityCompleteTime = new File(ActivityCompleteTimePath);
+                FileWriter SingleActivityFile = new FileWriter(ActivityCompleteTime);
                 for (Time_Log_Data Single_Delay : activity_Times.getValue().getSingle_Instance_Activity_Time()) {
 
                     String result = "" + (int) Single_Delay.getWorkingtime().plus(Single_Delay.getDelay()).getSeconds();
@@ -279,10 +300,14 @@ public class Mining_Logger {
                     int Cminutes = (int) (Cseconds / 60);
                     Cseconds -= Cminutes * 60;
                     String result = ""+ Chours + ":" + Cminutes +":" + Cseconds;*/
-
-                    Writer.write(activity_Times.getKey().getActivity_Name() + " " + result);
+                    SingleActivityFile.write(Sortnumber + "|" + activity_Times.getKey().getActivity_Name() + "|" + result);
+                    SingleActivityFile.write(System.getProperty("line.separator"));
+                    Writer.write(activity_Times.getKey().getActivity_Name() + "|" + result);
                     Writer.write(System.getProperty("line.separator"));
+                    Sortnumber++;
                 }
+                SingleActivityFile.close();
+                Sortnumber = 1;
             }
             Writer.close();
             System.out.println("Wrote Completetime to File Completetime.txt");
@@ -293,22 +318,23 @@ public class Mining_Logger {
 
     private void Write_Workingtime_On_Activity_To_File() {
         try {
-            File Delay = new File("MiningResults/Workingtime.txt");
-            FileWriter Writer = new FileWriter(Delay);
+            File Working = new File("MiningResults/Activities/Workingtime.txt");
+            FileWriter Writer = new FileWriter(Working);
+            int Sortnumber = 1;
             for (Map.Entry<Mining_Activity, Complete_Time_Activity> activity_Times : time_log_by_activity.entrySet()) {
+                String ActivityWorkingTimePath = "MiningResults/Activities/Workingtime" + activity_Times.getKey().getActivity_Name() + ".txt";
+                File ActivityWorkingTime = new File(ActivityWorkingTimePath);
+                FileWriter SingleActivityFile = new FileWriter(ActivityWorkingTime);
                 for (Time_Log_Data Single_Delay : activity_Times.getValue().getSingle_Instance_Activity_Time()) {
-
                     String result = "" + (int) Single_Delay.getWorkingtime().getSeconds();
-                        /*int Wseconds = (int)Single_Delay.getWorkingtime().getSeconds();
-                        int Whours = (int) (Wseconds / 3600);
-                        Wseconds -= Whours * 3600;
-                        int Wminutes = (int) (Wseconds / 60);
-                        Wseconds -= Wminutes * 60;
-                        String result = ""+ Whours + ":" + Wminutes +":" + Wseconds;*/
-
-                    Writer.write(activity_Times.getKey().getActivity_Name() + " " + result);
+                    SingleActivityFile.write(Sortnumber + "|" + activity_Times.getKey().getActivity_Name() + "|" + result);
+                    SingleActivityFile.write(System.getProperty("line.separator"));
+                    Writer.write(activity_Times.getKey().getActivity_Name() + "|" + result);
                     Writer.write(System.getProperty("line.separator"));
+                    Sortnumber++;
                 }
+                SingleActivityFile.close();
+                Sortnumber = 1;
             }
             Writer.close();
             System.out.println("Wrote Workingtime to File Workingtime.txt");
@@ -318,7 +344,6 @@ public class Mining_Logger {
     }
 
     private void GeneratePrintablePlaces() {
-
 
         for (Transition_Relation Relation : All_Places) {
             if (!Transitions_To_Places.containsKey(Relation.getActivityID())) {
@@ -431,7 +456,36 @@ public class Mining_Logger {
 
         for (Map.Entry<Integer, List<Integer>> Transition_to_Place : Transitions_To_Places.entrySet()) {
             Integer visited = time_log_by_activity.get(activity_hashmap.get(Transition_to_Place.getKey())).getSingle_Instance_Activity_Time().size();
-            TransitionList.put(Transition_to_Place.getKey(), mutNode(activity_hashmap.get(Transition_to_Place.getKey()).getActivity_Name() + "\n Visited: " + visited.toString()).add(attr("shape", Shape.BOX)));
+
+            Duration Delay = time_log_by_activity.get(activity_hashmap.get(Transition_to_Place.getKey())).getComplete_Delay();
+            int Dseconds = (int) Delay.getSeconds();
+            int Dhours = (int) (Dseconds / 3600);
+            Dseconds -= Dhours * 3600;
+            int Dminutes = (int) (Dseconds / 60);
+            Dseconds -= Dminutes * 60;
+            String Delaystring = Dhours + ":" + Dminutes + ":" + Dseconds;
+
+            Duration Workingtime = time_log_by_activity.get(activity_hashmap.get(Transition_to_Place.getKey())).getComplete_WorkingTime();
+            int Wseconds = (int) Workingtime.getSeconds();
+            int Whours = (int) (Wseconds / 3600);
+            Wseconds -= Whours * 3600;
+            int Wminutes = (int) (Wseconds / 60);
+            Wseconds -= Wminutes * 60;
+            String WorkingtimeString = Whours + ":" + Wminutes + ":" + Wseconds;
+
+            Duration Completetime = time_log_by_activity.get(activity_hashmap.get(Transition_to_Place.getKey())).getComplete_Time();
+            int Cseconds = (int) Completetime.getSeconds();
+            int Chours = (int) (Cseconds / 3600);
+            Cseconds -= Chours * 3600;
+            int Cminutes = (int) (Cseconds / 60);
+            Cseconds -= Cminutes * 60;
+            String CompletetimeString = Chours + ":" + Cminutes + ":" + Cseconds;
+
+            TransitionList.put(Transition_to_Place.getKey(), mutNode(activity_hashmap.get(Transition_to_Place.getKey()).getActivity_Name()
+                    + "\n Visited: " + visited.toString()
+                    + "\n Delay: " + Delaystring
+                    + "\n Working: " + WorkingtimeString
+                    + "\n Complete: " + CompletetimeString).add(attr("shape", Shape.BOX)));
         }
 
         for (Map.Entry<Integer, List<Integer>> Place_to_Transition : Places_to_Transitions.entrySet()) {
